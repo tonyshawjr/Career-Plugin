@@ -1,0 +1,398 @@
+/**
+ * Careers Manager Admin Styles
+ */
+
+/* Dashboard Stats */
+.careers-admin-stats {
+    margin: 20px 0;
+}
+
+.careers-stat-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.careers-stat-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-left: 4px solid #007cba;
+}
+
+.careers-stat-box h3 {
+    font-size: 36px;
+    margin: 0 0 10px 0;
+    color: #007cba;
+    font-weight: bold;
+}
+
+.careers-stat-box p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Admin Sections */
+.careers-admin-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+    .careers-admin-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.careers-admin-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.careers-admin-section h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #007cba;
+    padding-bottom: 10px;
+}
+
+/* Applications Filters */
+.careers-applications-filters {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 4px;
+    margin: 20px 0;
+}
+
+.careers-applications-filters form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.careers-applications-filters select {
+    min-width: 150px;
+}
+
+/* Status Select */
+.careers-status-select {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: white;
+}
+
+/* Status Colors */
+.careers-status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.careers-status-pending { background: #fff3cd; color: #856404; }
+.careers-status-reviewed { background: #d1ecf1; color: #0c5460; }
+.careers-status-interviewing { background: #ffeeba; color: #856404; }
+.careers-status-hired { background: #d4edda; color: #155724; }
+.careers-status-rejected { background: #f8d7da; color: #721c24; }
+
+/* Modal Styles */
+.careers-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.careers-modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.careers-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+}
+
+.careers-modal-close:hover {
+    color: #333;
+}
+
+/* Application Details */
+.careers-application-details {
+    margin-top: 20px;
+}
+
+.careers-detail-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.careers-detail-section:last-child {
+    border-bottom: none;
+}
+
+.careers-detail-section h3 {
+    color: #007cba;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.careers-detail-section p {
+    margin: 8px 0;
+    line-height: 1.5;
+}
+
+.careers-detail-section strong {
+    color: #333;
+    font-weight: 600;
+}
+
+/* Analytics Styles */
+.careers-analytics-content {
+    display: grid;
+    gap: 30px;
+}
+
+.careers-chart-section {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.careers-chart-section h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #007cba;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Status Chart */
+.careers-status-chart {
+    display: grid;
+    gap: 15px;
+}
+
+.careers-status-item {
+    display: grid;
+    grid-template-columns: 150px 1fr 100px;
+    gap: 15px;
+    align-items: center;
+}
+
+.careers-status-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.careers-status-bar {
+    background: #f0f0f0;
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.careers-status-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.careers-status-fill.careers-status-pending { background: #ffc107; }
+.careers-status-fill.careers-status-reviewed { background: #17a2b8; }
+.careers-status-fill.careers-status-interviewing { background: #fd7e14; }
+.careers-status-fill.careers-status-hired { background: #28a745; }
+.careers-status-fill.careers-status-rejected { background: #dc3545; }
+
+.careers-status-count {
+    text-align: right;
+    font-weight: 500;
+    color: #666;
+}
+
+/* Jobs Chart */
+.careers-jobs-chart {
+    display: grid;
+    gap: 15px;
+}
+
+.careers-job-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #007cba;
+}
+
+.careers-job-title {
+    font-weight: 500;
+    color: #333;
+}
+
+.careers-job-count {
+    color: #007cba;
+    font-weight: bold;
+}
+
+/* Responsive Tables */
+@media (max-width: 768px) {
+    .wp-list-table {
+        font-size: 12px;
+    }
+    
+    .wp-list-table th,
+    .wp-list-table td {
+        padding: 8px 4px;
+    }
+    
+    .careers-status-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        text-align: center;
+    }
+}
+
+/* Loading State */
+.careers-admin-loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.careers-admin-loading:after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007cba;
+    border-radius: 50%;
+    animation: careers-admin-spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes careers-admin-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Buttons */
+.careers-admin-btn {
+    background: #007cba;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+    transition: background 0.3s;
+}
+
+.careers-admin-btn:hover {
+    background: #005a87;
+    color: white;
+}
+
+.careers-admin-btn-secondary {
+    background: #6c757d;
+}
+
+.careers-admin-btn-secondary:hover {
+    background: #545b62;
+}
+
+.careers-admin-btn-danger {
+    background: #dc3545;
+}
+
+.careers-admin-btn-danger:hover {
+    background: #c82333;
+}
+
+/* Admin Notice Styles */
+.careers-admin-notice {
+    padding: 12px;
+    margin: 20px 0;
+    border-left: 4px solid #007cba;
+    background: #f7f7f7;
+}
+
+.careers-admin-notice.error {
+    border-left-color: #dc3545;
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.careers-admin-notice.success {
+    border-left-color: #28a745;
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Form Styles */
+.careers-admin-form {
+    max-width: 600px;
+}
+
+.careers-admin-form-group {
+    margin-bottom: 20px;
+}
+
+.careers-admin-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.careers-admin-form-group input,
+.careers-admin-form-group select,
+.careers-admin-form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.careers-admin-form-group input:focus,
+.careers-admin-form-group select:focus,
+.careers-admin-form-group textarea:focus {
+    outline: none;
+    border-color: #007cba;
+    box-shadow: 0 0 0 1px #007cba;
+} 
