@@ -51,7 +51,7 @@ class CareersEmails {
     }
     
     /**
-     * Send admin notification email
+     * Send admin notification email to multiple recipients
      */
     public static function send_admin_notification($application_id) {
         $application = CareersApplicationDB::get_application($application_id);
@@ -67,8 +67,22 @@ class CareersEmails {
             return false;
         }
         
-        $admin_email = get_option('admin_email');
-        $subject = sprintf(__('New Job Application - %s', 'careers-manager'), $job->post_title);
+        // Send to multiple recipients as specified
+        $admin_emails = array(
+            'careers@nationalmobilexray.com',
+            get_option('admin_email') // Fallback to default admin email
+        );
+        
+        // Add additional recipients - these would typically be set via admin settings
+        $additional_emails = get_option('careers_notification_emails', array());
+        if (!empty($additional_emails)) {
+            $admin_emails = array_merge($admin_emails, $additional_emails);
+        }
+        
+        // Remove duplicates and filter valid emails
+        $admin_emails = array_unique(array_filter($admin_emails, 'is_email'));
+        
+        $subject = sprintf(__('New Application Received - %s', 'careers-manager'), $job->post_title);
         
         $message = sprintf(
             __('A new job application has been submitted.
@@ -89,7 +103,16 @@ Best regards,
             get_bloginfo('name')
         );
         
-        return wp_mail($admin_email, $subject, $message);
+        $headers = array('Content-Type: text/html; charset=UTF-8');
+        
+        // Send to all admin emails
+        $results = array();
+        foreach ($admin_emails as $email) {
+            $results[] = wp_mail($email, $subject, $message, $headers);
+        }
+        
+        // Return true if at least one email was sent successfully
+        return in_array(true, $results, true);
     }
     
     /**

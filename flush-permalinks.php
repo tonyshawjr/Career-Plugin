@@ -24,6 +24,13 @@ if (class_exists('CareerJobCPT')) {
     echo "<p>❌ CareerJobCPT class not found</p>";
 }
 
+// Add dashboard rewrite rules before flushing
+if (class_exists('CareersManager')) {
+    $manager = CareersManager::get_instance();
+    $manager->add_rewrite_rules();
+    echo "<p>✅ Added dashboard rewrite rules</p>";
+}
+
 // Flush rewrite rules
 flush_rewrite_rules();
 echo "<p>✅ Permalinks flushed successfully!</p>";

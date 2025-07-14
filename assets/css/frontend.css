@@ -1,12 +1,581 @@
 /**
- * Careers Manager Frontend Styles
+ * National Mobile X-Ray Careers Manager Frontend Styles
+ * Based on Design System v1.0
  */
 
-/* General Styles */
+/* ===== DESIGN SYSTEM CORE COLORS ===== */
+
+/* Light Mode Palette */
+:root {
+    /* Brand Colors */
+    --brand-red: #BF1E2D;
+    --brand-black: #000000;
+    
+    /* System Colors - Light Mode */
+    --primary: hsl(222.2, 47.4%, 11.2%);       /* Dark navy blue */
+    --background: hsl(0, 0%, 100%);            /* Pure white */
+    --foreground: hsl(222.2, 84%, 4.9%);      /* Very dark blue */
+    --secondary: hsl(210, 40%, 96.1%);         /* Light blue-gray */
+    --muted: hsl(215.4, 16.3%, 46.9%);        /* Medium gray */
+    --border: hsl(214.3, 31.8%, 91.4%);       /* Light gray border */
+    
+    /* Component Specifications */
+    --radius: 0.5rem;
+    --tab-height: 40px;
+    --card-padding: 24px;
+    --table-row-height: 48px;
+    --button-height-small: 32px;
+    --button-height-medium: 40px;
+    --button-radius: 4px;
+    --card-radius: 6px;
+}
+
+/* Brand Color Utilities */
+.text-brand-red {
+    color: var(--brand-red);
+}
+
+.bg-brand-red {
+    background-color: var(--brand-red);
+}
+
+.border-brand-red {
+    border-color: var(--brand-red);
+}
+
+.hover\:bg-red-700:hover {
+    background-color: #9f1c25; /* Darker shade for hover */
+}
+
+.hover\:text-red-700:hover {
+    color: #9f1c25;
+}
+
+/* System Color Utilities */
+.text-primary {
+    color: var(--primary);
+}
+
+.bg-background {
+    background-color: var(--background);
+}
+
+.text-foreground {
+    color: var(--foreground);
+}
+
+.bg-secondary {
+    background-color: var(--secondary);
+}
+
+.text-muted {
+    color: var(--muted);
+}
+
+.border-border {
+    border-color: var(--border);
+}
+
+/* Focus States - Accessibility Compliant */
+.focus\:ring-brand-red:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(191, 30, 45, 0.1);
+}
+
+.focus\:border-brand-red:focus {
+    border-color: var(--brand-red);
+}
+
+/* Typography Scale - Design System Compliant */
+.text-6xl { font-size: 3.75rem; line-height: 1; }      /* Hero headings */
+.text-5xl { font-size: 3rem; line-height: 1; }
+.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.text-2xl { font-size: 1.5rem; line-height: 2rem; }    /* Page titles */
+.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-lg { font-size: 1.125rem; line-height: 1.75rem; } /* Section headers */
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-sm { font-size: 0.875rem; line-height: 1.25rem; } /* Body text */
+.text-xs { font-size: 0.75rem; line-height: 1rem; }     /* Data labels */
+
+/* Font Weights */
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+.font-normal { font-weight: 400; }
+
+/* Layout & Spacing */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+    .container {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+/* Button Components - Design System Compliant */
+.btn-primary {
+    background-color: var(--brand-red);
+    color: white;
+    border: 1px solid var(--brand-red);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--button-radius);
+    font-weight: 500;
+    font-size: 0.875rem;
+    height: var(--button-height-medium);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #9f1c25;
+    border-color: #9f1c25;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--brand-red);
+    border: 1px solid var(--brand-red);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--button-radius);
+    font-weight: 500;
+    font-size: 0.875rem;
+    height: var(--button-height-medium);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: var(--brand-red);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-small {
+    height: var(--button-height-small);
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+/* Card Components */
+.card {
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: var(--card-padding);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card-shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Dashboard Specific Components */
+.dashboard-tab {
+    height: var(--tab-height);
+    padding: 0 1.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    background: none;
+    border: none;
+    color: #6b7280;
+}
+
+.dashboard-tab.active {
+    color: var(--brand-red);
+    font-weight: 600;
+}
+
+.dashboard-tab:not(.active):hover {
+    color: #374151;
+}
+
+/* Table Components - shadcn Style */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    border: none;
+    margin-block-end: 0;
+}
+
+.data-table thead {
+    background-color: transparent;
+}
+
+.data-table th {
+    padding: 1rem; /* 4px padding */
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.data-table td {
+    padding: 1rem; /* 4px padding */
+    text-align: left;
+    vertical-align: middle;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.data-table tbody tr {
+    transition: background-color 0.15s ease;
+    background-color: transparent;
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(249, 250, 251, 0.5); /* muted/50 opacity */
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Table Cell Content Styling */
+.table-job-title {
+    font-weight: 500; /* medium weight for emphasis */
+    color: #111827;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.table-job-type {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.table-location {
+    color: #374151;
+    font-size: 0.875rem;
+}
+
+.table-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.table-status-active {
+    background-color: #d1fae5;
+    color: #047857;
+}
+
+.table-status-draft {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.table-applications {
+    color: #BF1E2D;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.table-date {
+    color: #6b7280;
+    font-size: 0.813rem;
+}
+
+/* Action Buttons - shadcn Style */
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem; /* 1-unit spacing */
+}
+
+.table-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem; /* 8x8 size */
+    height: 2rem;
+    color: #6b7280;
+    background-color: transparent;
+    border: none;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    padding: 0; /* zero padding */
+}
+
+.table-action-btn:hover {
+    color: #374151;
+    background-color: #f3f4f6;
+}
+
+.table-action-btn.delete:hover {
+    color: #dc2626;
+    background-color: #fef2f2;
+}
+
+.table-action-btn svg {
+    width: 1rem; /* 4x4 icon size */
+    height: 1rem;
+    stroke-width: 1.5;
+}
+
+/* Empty State */
+.table-empty-state {
+    text-align: center;
+    padding: 3rem;
+}
+
+.table-empty-icon {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 1.5rem;
+    color: #d1d5db;
+}
+
+/* Table Container - shadcn Style */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: transparent;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    margin: 0; /* Remove any margin */
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    .data-table {
+        font-size: 0.813rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    .table-actions {
+        gap: 0.25rem;
+    }
+    
+    .table-action-btn {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Dashboard Visual Design System */
+
+.dashboard-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2.5rem 1rem; /* py-10 px-4 */
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: 700; /* font-bold */
+    color: #111827; /* text-gray-900 */
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+    color: #6b7280; /* text-gray-600 */
+    margin-top: 0.5rem; /* mt-2 */
+}
+
+/* Tabbed Interface */
+.dashboard-tabs {
+    max-width: 28rem; /* max-w-md */
+    margin-bottom: 2rem;
+}
+
+.dashboard-tab-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* grid-cols-2 */
+    gap: 0.5rem;
+    background-color: #f3f4f6;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+}
+
+.dashboard-tab-trigger {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #6b7280;
+    background-color: transparent;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.dashboard-tab-trigger.active {
+    background-color: white;
+    color: #111827;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Card Component Design */
+.dashboard-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.dashboard-card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-card-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Dashboard Card Content - No padding for table */
+.dashboard-card-content {
+    padding: 1.5em; /* Remove padding for table */
+}
+
+.dashboard-card-content.with-padding {
+    padding: 1.5rem; /* Use this class when padding is needed */
+}
+
+/* Tab Content Management */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .dashboard-inner {
+        padding: 1.5rem 0.75rem;
+    }
+    
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+    
+    .dashboard-tab-trigger {
+        font-size: 0.813rem;
+        padding: 0.375rem 0.75rem;
+    }
+}
+
+/* Navigation Links */
+.nav-link {
+    font-weight: 500;
+    color: #374151; /* gray-700 */
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+}
+
+.nav-link:hover {
+    color: var(--brand-red);
+    text-decoration: none;
+}
+
+/* Animations - Design System Compliant */
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+    transform: translateY(10px);
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.transition {
+    transition: all 0.15s ease-in-out;
+}
+
+/* Responsive Utilities */
+.mobile-first {
+    /* Mobile first approach */
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* General Styles - Design System Compliant */
 .careers-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 1.25rem; /* 20px converted to rem */
 }
 
 /* Main container for job listings */
@@ -21,16 +590,16 @@
 }
 
 .careers-main-title {
-    font-size: 32px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #333;
+    font-size: 2rem; /* text-2xl equivalent */
+    font-weight: 700; /* font-bold */
+    margin-bottom: 0.625rem;
+    color: var(--foreground); /* Design system color */
 }
 
 .careers-main-description {
-    font-size: 16px;
-    color: #666;
-    max-width: 700px;
+    font-size: 1rem; /* text-base */
+    color: var(--muted); /* Design system color */
+    max-width: 43.75rem; /* 700px in rem */
     margin: 0 auto;
 }
 
@@ -44,12 +613,12 @@
 
 /* Filters Sidebar - Ultra Compact Tailwind Style */
 .careers-filters-sidebar {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 0.75rem; /* 12px - Tailwind p-3 */
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--button-radius);
+    padding: 0.75rem;
     position: sticky;
-    top: 20px;
+    top: 1.25rem;
 }
 
 .careers-filters-header {
@@ -60,21 +629,21 @@
 }
 
 .careers-filters-header h3 {
-    font-size: 14px;
+    font-size: 0.875rem; /* text-sm */
     font-weight: 600;
     margin: 0;
-    color: #333;
+    color: var(--foreground);
 }
 
 .careers-clear-filters {
-    font-size: 11px;
-    color: #007cba;
+    font-size: 0.6875rem; /* 11px */
+    color: var(--brand-red);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color 0.15s ease-in-out;
 }
 
 .careers-clear-filters:hover {
-    color: #005a87;
+    color: #9f1c25; /* Darker brand red */
     text-decoration: underline;
 }
 
@@ -91,9 +660,9 @@
 }
 
 .careers-filter-group label {
-    font-size: 12px;
+    font-size: 0.75rem; /* text-xs */
     font-weight: 500;
-    color: #333;
+    color: var(--foreground);
     margin-bottom: 0;
 }
 
@@ -104,10 +673,11 @@
 
 .careers-search-input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 0.625rem;
+    border: 1px solid var(--border);
+    border-radius: var(--button-radius);
+    font-size: 0.875rem; /* text-sm */
+    transition: border-color 0.15s ease-in-out;
 }
 
 .careers-filter-row {
@@ -118,46 +688,46 @@
 
 .careers-filter-select {
     width: 100%;
-    padding: 0.375rem 1.5rem 0.375rem 0.5rem; /* 6px 24px 6px 8px - Tailwind py-1.5 pr-6 pl-2 */
-    border: 1px solid #e0e0e0;
-    border-radius: 0.25rem; /* 4px - Tailwind rounded */
-    background-color: #fff;
-    font-size: 12px;
-    color: #333;
+    padding: 0.375rem 1.5rem 0.375rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--button-radius);
+    background-color: var(--background);
+    font-size: 0.75rem; /* text-xs */
+    color: var(--foreground);
     appearance: none;
-    background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1 1L6 5L11 1" stroke="%23666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/%3E%3C/svg%3E');
+    background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1 1L6 5L11 1" stroke="%23BF1E2D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/%3E%3C/svg%3E');
     background-repeat: no-repeat;
-    background-position: right 0.5rem center; /* 8px - Tailwind right-2 */
+    background-position: right 0.5rem center;
     background-size: 12px;
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: border-color 0.15s ease-in-out;
 }
 
 .careers-filter-select:hover {
-    border-color: #007cba;
+    border-color: var(--brand-red);
 }
 
 .careers-filter-select:focus {
     outline: none;
-    border-color: #007cba;
-    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+    border-color: var(--brand-red);
+    box-shadow: 0 0 0 3px rgba(191, 30, 45, 0.1);
 }
 
 .careers-filter-btn {
-    padding: 0.375rem 1rem; /* 6px 16px - Tailwind py-1.5 px-4 */
-    background: #007cba;
+    padding: 0.375rem 1rem;
+    background: var(--brand-red);
     color: white;
     border: none;
-    border-radius: 0.25rem; /* 4px - Tailwind rounded */
+    border-radius: var(--button-radius);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 0.75rem; /* text-xs */
     font-weight: 500;
-    transition: all 0.2s;
-    margin-top: 0.25rem; /* 4px - Tailwind mt-1 */
+    transition: all 0.15s ease-in-out;
+    margin-top: 0.25rem;
 }
 
 .careers-filter-btn:hover {
-    background: #005a87;
+    background: #9f1c25; /* Darker brand red */
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -190,17 +760,17 @@
     }
 }
 
-/* Job Cards - Exact Design Match */
+/* Job Cards - Design System Compliant */
 .careers-job-card-new {
-    background: #ffffff;
-    border: 1px solid #e5e7eb; /* border-gray-200 */
-    border-radius: 0.5rem; /* rounded-lg */
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: box-shadow 0.15s ease-in-out;
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 24px; /* Exactly 24px all around */
+    padding: var(--card-padding);
 }
 
 .careers-job-card-new:hover {
@@ -226,9 +796,9 @@
 
 .careers-job-title-new {
     font-size: 1.25rem; /* text-xl */
-    font-weight: 600; /* font-semibold */
+    font-weight: 600;
     margin: 0 0 0.5rem 0;
-    color: #111827; /* text-gray-900 */
+    color: var(--foreground);
     line-height: 1.3;
 }
 
@@ -243,12 +813,12 @@
     width: 1rem;
     height: 1rem;
     margin-right: 0.25rem;
-    color: #dc2626; /* text-brand-red */
+    color: var(--brand-red);
 }
 
 .careers-location-tag {
-    color: #4b5563; /* text-gray-600 */
-    font-size: 0.875rem;
+    color: var(--muted);
+    font-size: 0.875rem; /* text-sm */
     font-weight: normal;
     background: none;
     border: none;
@@ -258,22 +828,22 @@
 
 /* Job type tags as pills */
 .careers-job-type-tag {
-    background: #fef2f2; /* bg-red-50 */
-    color: #dc2626; /* text-brand-red */
+    background: rgba(191, 30, 45, 0.1); /* Brand red with 10% opacity */
+    color: var(--brand-red);
     font-size: 0.75rem; /* text-xs */
     font-weight: 500;
     padding: 0.25rem 0.75rem;
-    border-radius: 9999px; /* rounded-full */
+    border-radius: 9999px;
     white-space: nowrap;
     display: inline-block;
 }
 
 /* Body section */
 .careers-job-description-new {
-    color: #4b5563; /* text-gray-600 */
-    font-size: 0.875rem;
+    color: var(--muted);
+    font-size: 0.875rem; /* text-sm */
     line-height: 1.5;
-    margin-bottom: 1.5rem; /* mb-6 */
+    margin-bottom: 1.5rem;
     flex: 1;
 }
 
@@ -285,18 +855,18 @@
 }
 
 .careers-posted-date {
-    color: #6b7280; /* text-gray-500 */
+    color: var(--muted);
     font-size: 0.875rem; /* text-sm */
     margin: 0;
 }
 
 .careers-view-details-btn {
-    background: #ffffff;
-    color: #dc2626; /* text-brand-red */
-    border: 1px solid #dc2626;
+    background: var(--background);
+    color: var(--brand-red);
+    border: 1px solid var(--brand-red);
     text-decoration: none;
     padding: 0.5rem 1rem;
-    border-radius: 0.375rem; /* rounded-md */
+    border-radius: var(--button-radius);
     font-size: 0.875rem;
     font-weight: 500;
     transition: all 0.15s ease-in-out;
@@ -304,8 +874,8 @@
 }
 
 .careers-view-details-btn:hover {
-    background: #dc2626; /* bg-brand-red */
-    color: #ffffff;
+    background: var(--brand-red);
+    color: white;
     text-decoration: none;
 }
 
@@ -331,10 +901,10 @@
 }
 
 .careers-job-detail-title {
-    font-size: 1.8rem;
+    font-size: 1.875rem; /* text-3xl */
     font-weight: 600;
-    margin: 0 0 15px 0;
-    color: #333;
+    margin: 0 0 0.9375rem 0;
+    color: var(--foreground);
 }
 
 .careers-job-badges {
@@ -353,17 +923,17 @@
 }
 
 .careers-location-badge {
-    background: #f8f9fa;
-    color: #6c757d;
+    background: var(--secondary);
+    color: var(--muted);
 }
 
 .careers-type-badge {
-    background: #dc3545;
+    background: var(--brand-red);
     color: white;
 }
 
 .careers-employment-badge {
-    background: #dc3545;
+    background: var(--brand-red);
     color: white;
 }
 
@@ -373,10 +943,10 @@
 }
 
 .careers-section h2 {
-    font-size: 1.4rem;
+    font-size: 1.25rem; /* text-xl */
     font-weight: 600;
-    margin: 0 0 20px 0;
-    color: #333;
+    margin: 0 0 1.25rem 0;
+    color: var(--foreground);
 }
 
 .careers-responsibility-list,
@@ -395,7 +965,7 @@
 
 .careers-responsibility-list li:before {
     content: "•";
-    color: #dc3545;
+    color: var(--brand-red);
     font-weight: bold;
     position: absolute;
     left: 0;
@@ -403,7 +973,7 @@
 
 .careers-requirement-list li:before {
     content: "•";
-    color: #dc3545;
+    color: var(--brand-red);
     font-weight: bold;
     position: absolute;
     left: 0;
@@ -411,18 +981,18 @@
 
 /* Licensing Box */
 .careers-licensing-box {
-    background: #fff5f5;
-    border: 1px solid #fecaca;
-    border-left: 4px solid #dc3545;
-    padding: 20px;
-    margin: 30px 0;
-    border-radius: 4px;
+    background: rgba(191, 30, 45, 0.05);
+    border: 1px solid rgba(191, 30, 45, 0.2);
+    border-left: 4px solid var(--brand-red);
+    padding: 1.25rem;
+    margin: 1.875rem 0;
+    border-radius: var(--button-radius);
 }
 
 .careers-licensing-box h3 {
-    margin: 0 0 10px 0;
-    color: #dc3545;
-    font-size: 1.1rem;
+    margin: 0 0 0.625rem 0;
+    color: var(--brand-red);
+    font-size: 1.125rem; /* text-lg */
 }
 
 /* Vehicle Features */
@@ -438,15 +1008,15 @@
 }
 
 .careers-feature-item h4 {
-    font-size: 1rem;
+    font-size: 1rem; /* text-base */
     font-weight: 600;
-    margin: 0 0 8px 0;
-    color: #333;
+    margin: 0 0 0.5rem 0;
+    color: var(--foreground);
 }
 
 .careers-feature-item p {
-    font-size: 14px;
-    color: #6c757d;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--muted);
     margin: 0;
 }
 
@@ -454,36 +1024,36 @@
 .careers-placeholder-image,
 .careers-vehicle-image,
 .careers-location-image {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    height: 200px;
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    height: 12.5rem; /* 200px */
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
-    color: #adb5bd;
-    margin: 20px 0;
+    color: var(--muted);
+    margin: 1.25rem 0;
 }
 
 /* Sidebar */
 .careers-job-sidebar {
-    background: white;
+    background: var(--background);
 }
 
 .careers-sidebar-section {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 24px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: var(--card-padding);
+    margin-bottom: var(--card-padding);
 }
 
 .careers-sidebar-section h3 {
-    font-size: 1.2rem;
+    font-size: 1.25rem; /* text-xl */
     font-weight: 600;
-    margin: 0 0 20px 0;
-    color: #333;
+    margin: 0 0 1.25rem 0;
+    color: var(--foreground);
 }
 
 /* Quick Info */
@@ -491,8 +1061,8 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 12px 0;
-    border-bottom: 1px solid #f8f9fa;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
 }
 
 .careers-info-item:last-child {
@@ -501,16 +1071,16 @@
 
 .careers-info-label {
     font-weight: 500;
-    color: #495057;
-    font-size: 14px;
+    color: var(--foreground);
+    font-size: 0.875rem; /* text-sm */
 }
 
 .careers-info-value {
-    font-size: 14px;
-    color: #6c757d;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--muted);
     text-align: right;
     flex: 1;
-    margin-left: 20px;
+    margin-left: 1.25rem;
 }
 
 /* Benefits List */
@@ -521,24 +1091,24 @@
 }
 
 .careers-benefits-list li {
-    padding: 6px 0;
-    padding-left: 20px;
+    padding: 0.375rem 0;
+    padding-left: 1.25rem;
     position: relative;
-    font-size: 14px;
-    color: #495057;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--foreground);
 }
 
 .careers-benefits-list li:before {
     content: "✓";
-    color: #28a745;
+    color: #10b981; /* emerald-500 for checkmarks */
     font-weight: bold;
     position: absolute;
     left: 0;
 }
 
 .careers-benefits-note {
-    font-size: 13px;
-    color: #6c757d;
+    font-size: 0.8125rem; /* 13px */
+    color: var(--muted);
     font-style: italic;
     margin: 0;
 }
@@ -553,68 +1123,68 @@
 
 .careers-day-list li {
     counter-increment: day-counter;
-    padding: 8px 0;
-    padding-left: 30px;
+    padding: 0.5rem 0;
+    padding-left: 1.875rem;
     position: relative;
-    font-size: 14px;
-    color: #495057;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--foreground);
 }
 
 .careers-day-list li:before {
     content: counter(day-counter);
-    background: #dc3545;
+    background: var(--brand-red);
     color: white;
-    width: 20px;
-    height: 20px;
+    width: 1.25rem;
+    height: 1.25rem;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 0.75rem; /* text-xs */
     font-weight: bold;
     position: absolute;
     left: 0;
-    top: 8px;
+    top: 0.5rem;
 }
 
 .careers-day-note {
-    font-size: 13px;
-    color: #6c757d;
+    font-size: 0.8125rem; /* 13px */
+    color: var(--muted);
     margin: 0;
 }
 
 /* Apply Section */
 .careers-apply-section {
-    background: #f8f9fa !important;
-    border: 2px solid #dc3545 !important;
+    background: var(--secondary) !important;
+    border: 2px solid var(--brand-red) !important;
 }
 
 .careers-apply-now-btn {
-    background: #dc3545;
+    background: var(--brand-red);
     color: white;
-    padding: 12px 24px;
-    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--card-radius);
     text-decoration: none;
     font-weight: 500;
     display: inline-block;
-    margin: 15px 0;
-    transition: background 0.2s;
+    margin: 0.9375rem 0;
+    transition: background 0.15s ease-in-out;
 }
 
 .careers-apply-now-btn:hover {
-    background: #c82333;
+    background: #9f1c25; /* Darker brand red */
     color: white;
     text-decoration: none;
 }
 
 .careers-apply-note {
-    font-size: 13px;
-    color: #6c757d;
+    font-size: 0.8125rem; /* 13px */
+    color: var(--muted);
     margin: 0;
 }
 
 .careers-apply-note a {
-    color: #dc3545;
+    color: var(--brand-red);
     text-decoration: none;
 }
 
@@ -636,20 +1206,20 @@
 
 /* Legacy job card styles for backward compatibility */
 .careers-job-card {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 24px;
-    transition: all 0.2s ease;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: var(--card-padding);
+    transition: all 0.15s ease-in-out;
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
 .careers-job-card:hover {
-    border-color: #007cba;
+    border-color: var(--brand-red);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(191, 30, 45, 0.08);
 }
 
 /* Benefits List with Green Checkmarks */
@@ -662,21 +1232,21 @@
 .careers-benefits-list li {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: #4a5568;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--foreground);
 }
 
 .careers-checkmark {
-    height: 16px;
-    width: 16px;
-    color: #48bb78;
-    margin-right: 8px;
-    margin-top: 2px;
+    height: 1rem;
+    width: 1rem;
+    color: #10b981; /* emerald-500 */
+    margin-right: 0.5rem;
+    margin-top: 0.125rem;
     flex-shrink: 0;
 }
 
-/* A Typical Day List with Red Numbered Dots */
+/* A Typical Day List with Red Numbered Dots - Design System Compliant */
 .careers-day-list {
     list-style: none;
     padding: 0;
@@ -686,47 +1256,47 @@
 .careers-day-list li {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: #4a5568;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--foreground);
 }
 
 .careers-day-number {
-    background: #fed7d7;
-    color: #c53030;
+    background: rgba(191, 30, 45, 0.1);
+    color: var(--brand-red);
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 1.5rem;
+    height: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 12px;
-    margin-right: 12px;
-    margin-top: 2px;
+    font-size: 0.75rem; /* text-xs */
+    margin-right: 0.75rem;
+    margin-top: 0.125rem;
     flex-shrink: 0;
 }
 
 /* Equipment List Styles */
 .careers-equipment-list {
     list-style: disc;
-    padding-left: 20px;
+    padding-left: 1.25rem;
     margin: 0;
 }
 
 .careers-equipment-list li {
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #4a5568;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem; /* text-sm */
+    color: var(--foreground);
 }
 
-/* Notes */
+/* Notes - Design System Compliant */
 .careers-benefits-note,
 .careers-day-note {
-    font-size: 12px;
-    color: #718096;
+    font-size: 0.75rem; /* text-xs */
+    color: var(--muted);
     font-style: italic;
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
 }

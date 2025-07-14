@@ -69,6 +69,10 @@ class CareersManager {
             new CareersApplicationDB();
         }
         
+        if (class_exists('CareersUserRoles')) {
+            new CareersUserRoles();
+        }
+        
         if (class_exists('CareersShortcodes')) {
             new CareersShortcodes();
         }
@@ -113,6 +117,7 @@ class CareersManager {
         require_once CAREERS_PLUGIN_PATH . 'includes/helpers.php';
         require_once CAREERS_PLUGIN_PATH . 'includes/class-job-cpt.php';
         require_once CAREERS_PLUGIN_PATH . 'includes/class-application-db.php';
+        require_once CAREERS_PLUGIN_PATH . 'includes/class-user-roles.php';
         require_once CAREERS_PLUGIN_PATH . 'includes/class-shortcodes.php';
         require_once CAREERS_PLUGIN_PATH . 'includes/class-auth.php';
         require_once CAREERS_PLUGIN_PATH . 'includes/class-dashboard.php';
@@ -249,7 +254,7 @@ class CareersManager {
     }
     
     /**
-     * Add custom rewrite rules for job posts
+     * Add custom rewrite rules for job posts and dashboard
      */
     public function add_rewrite_rules() {
         // Add rewrite rule for /job/job-name/
@@ -265,6 +270,31 @@ class CareersManager {
             'index.php?post_type=career_job&name=$matches[1]',
             'top'
         );
+        
+        // Add rewrite rules for dashboard and sub-pages
+        add_rewrite_rule(
+            '^dashboard/?$',
+            'index.php?careers_dashboard=main',
+            'top'
+        );
+        
+        add_rewrite_rule(
+            '^dashboard/([^/]+)/?$',
+            'index.php?careers_dashboard=$matches[1]',
+            'top'
+        );
+        
+        add_rewrite_rule(
+            '^dashboard/([^/]+)/([^/]+)/?$',
+            'index.php?careers_dashboard=$matches[1]&careers_action=$matches[2]',
+            'top'
+        );
+        
+        add_rewrite_rule(
+            '^dashboard/([^/]+)/([^/]+)/([^/]+)/?$',
+            'index.php?careers_dashboard=$matches[1]&careers_action=$matches[2]&careers_id=$matches[3]',
+            'top'
+        );
     }
     
     /**
@@ -272,6 +302,9 @@ class CareersManager {
      */
     public function add_query_vars($vars) {
         $vars[] = 'career_job';
+        $vars[] = 'careers_dashboard';
+        $vars[] = 'careers_action';
+        $vars[] = 'careers_id';
         return $vars;
     }
     
