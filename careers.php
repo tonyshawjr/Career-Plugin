@@ -93,6 +93,10 @@ class CareersManager {
             new CareersEmails();
         }
         
+        if (class_exists('CareersElementorWidgets')) {
+            new CareersElementorWidgets();
+        }
+        
         // Enqueue assets
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
@@ -123,6 +127,7 @@ class CareersManager {
         require_once CAREERS_PLUGIN_PATH . 'includes/class-dashboard.php';
         require_once CAREERS_PLUGIN_PATH . 'includes/class-admin.php';
         require_once CAREERS_PLUGIN_PATH . 'includes/class-emails.php';
+        require_once CAREERS_PLUGIN_PATH . 'includes/class-elementor-widgets.php';
     }
     
     /**

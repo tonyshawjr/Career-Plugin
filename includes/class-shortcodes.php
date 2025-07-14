@@ -33,6 +33,57 @@ class CareersShortcodes {
         add_shortcode('careers_auth_form', array($this, 'auth_form_shortcode'));
         add_shortcode('careers_admin_dashboard', array($this, 'admin_dashboard_shortcode'));
         add_shortcode('careers_debug', array($this, 'debug_shortcode'));
+        add_shortcode('careers_header_nav', array($this, 'header_nav_shortcode'));
+    }
+    
+    /**
+     * Header navigation shortcode [careers_header_nav]
+     */
+    public function header_nav_shortcode($atts) {
+        $atts = shortcode_atts(array(
+            'redirect_after_login' => home_url('/dashboard/'),
+            'redirect_after_logout' => home_url('/'),
+        ), $atts, 'careers_header_nav');
+        
+        ob_start();
+        
+        if (is_user_logged_in()) {
+            $current_user = wp_get_current_user();
+            $dashboard_url = home_url('/dashboard/');
+            $logout_url = wp_logout_url($atts['redirect_after_logout']);
+            
+            // Determine user role for dashboard link text
+            $dashboard_text = 'Dashboard';
+            if (in_array('career_admin', $current_user->roles)) {
+                $dashboard_text = 'Admin Dashboard';
+            } elseif (in_array('applicant', $current_user->roles)) {
+                $dashboard_text = 'My Dashboard';
+            }
+            
+            ?>
+            <div class="careers-header-nav">
+                <a href="<?php echo esc_url($dashboard_url); ?>" class="careers-dashboard-link"><?php echo esc_html($dashboard_text); ?></a>
+                <a href="<?php echo esc_url($logout_url); ?>" class="elementor-button elementor-button-link elementor-size-sm careers-logout-btn">
+                    <span class="elementor-button-content-wrapper">
+                        <span class="elementor-button-text">Logout</span>
+                    </span>
+                </a>
+            </div>
+            <?php
+        } else {
+            $login_url = wp_login_url($atts['redirect_after_login']);
+            ?>
+            <div class="careers-header-nav">
+                <a href="<?php echo esc_url($login_url); ?>" class="elementor-button elementor-button-link elementor-size-sm careers-login-btn">
+                    <span class="elementor-button-content-wrapper">
+                        <span class="elementor-button-text">Sign In</span>
+                    </span>
+                </a>
+            </div>
+            <?php
+        }
+        
+        return ob_get_clean();
     }
     
     /**
