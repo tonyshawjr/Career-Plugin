@@ -86,36 +86,36 @@
     border-color: var(--brand-red);
 }
 
-/* Typography Scale - Design System Compliant */
-.text-6xl { font-size: 3.75rem; line-height: 1; }      /* Hero headings */
-.text-5xl { font-size: 3rem; line-height: 1; }
-.text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-.text-2xl { font-size: 1.5rem; line-height: 2rem; }    /* Page titles */
-.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; } /* Section headers */
-.text-base { font-size: 1rem; line-height: 1.5rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; } /* Body text */
-.text-xs { font-size: 0.75rem; line-height: 1rem; }     /* Data labels */
+/* Typography Scale - Using Site's Custom Variables */
+.text-6xl { font-size: var(--text-6); line-height: 1.1; }      /* Hero headings */
+.text-5xl { font-size: var(--text-5); line-height: 1.1; }
+.text-4xl { font-size: var(--text-4); line-height: 1.2; }
+.text-3xl { font-size: var(--text-3); line-height: 1.3; }
+.text-2xl { font-size: var(--text-2); line-height: 1.3; }      /* Page titles */
+.text-xl { font-size: var(--text-1); line-height: 1.4; }
+.text-lg { font-size: var(--text-0); line-height: 1.5; }       /* Section headers */
+.text-base { font-size: var(--text-0); line-height: 1.5; }
+.text-sm { font-size: var(--text--1); line-height: 1.4; }      /* Body text */
+.text-xs { font-size: var(--text--2); line-height: 1.3; }      /* Data labels */
 
 /* ===== HEADER NAVIGATION STYLES ===== */
 
 .careers-header-nav {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-s);
 }
 
 /* Base button styles for the widget */
 .careers-auth-button {
     display: inline-block;
-    padding: 8px 16px;
+    padding: var(--space-2xs) var(--space-s);
     background-color: var(--brand-red);
     color: white;
     text-decoration: none;
     border-radius: var(--button-radius);
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: var(--text--1);
     transition: all 0.2s ease;
     border: none;
     cursor: pointer;
@@ -138,7 +138,7 @@
     color: var(--foreground);
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: var(--text--1);
     transition: color 0.2s ease;
 }
 
@@ -152,11 +152,11 @@
     background-color: var(--brand-red);
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: var(--space-2xs) var(--space-s);
     border-radius: var(--button-radius);
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: var(--text--1);
     transition: background-color 0.2s ease;
     display: inline-flex;
     align-items: center;
@@ -177,30 +177,30 @@
 
 /* Size variants for Elementor compatibility */
 .careers-header-nav .elementor-size-sm {
-    padding: 6px 12px;
-    font-size: 0.75rem;
+    padding: var(--space-3xs) var(--space-xs);
+    font-size: var(--text--2);
 }
 
 .careers-header-nav .elementor-size-md {
-    padding: 8px 16px;
-    font-size: 0.875rem;
+    padding: var(--space-2xs) var(--space-s);
+    font-size: var(--text--1);
 }
 
 .careers-header-nav .elementor-size-lg {
-    padding: 12px 24px;
-    font-size: 1rem;
+    padding: var(--space-xs) var(--space-m);
+    font-size: var(--text-0);
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
     .careers-header-nav {
         flex-direction: column;
-        gap: 8px;
+        gap: var(--space-2xs);
         align-items: flex-start;
     }
     
     .careers-dashboard-link {
-        font-size: 0.75rem;
+        font-size: var(--text--2);
     }
     
     .careers-header-nav .elementor-button {
@@ -676,45 +676,44 @@
 .text-brand-red { color: #BF1E2D; }
 .text-blue-600 { color: #2563eb; }
 
-.text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-.text-2xl { font-size: 1.5rem; line-height: 2rem; }
-.text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-.text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-3xl { font-size: var(--text-3); line-height: 1.3; }
+.text-2xl { font-size: var(--text-2); line-height: 1.3; }
+.text-xl { font-size: var(--text-1); line-height: 1.4; }
+.text-lg { font-size: var(--text-0); line-height: 1.5; }
+.text-sm { font-size: var(--text--1); line-height: 1.4; }
 
 .font-bold { font-weight: 700; }
 .font-semibold { font-weight: 600; }
 .font-medium { font-weight: 500; }
 
-.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
-.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-.py-16 { padding-top: 4rem; padding-bottom: 4rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-.px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-.py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
-.p-8 { padding: 2rem; }
+.py-8 { padding-top: var(--space-l); padding-bottom: var(--space-l); }
+.py-3 { padding-top: var(--space-2xs); padding-bottom: var(--space-2xs); }
+.py-16 { padding-top: var(--space-2xl); padding-bottom: var(--space-2xl); }
+.px-4 { padding-left: var(--space-s); padding-right: var(--space-s); }
+.px-6 { padding-left: var(--space-m); padding-right: var(--space-m); }
+.px-3 { padding-left: var(--space-2xs); padding-right: var(--space-2xs); }
+.py-1 { padding-top: var(--space-3xs); padding-bottom: var(--space-3xs); }
+.p-4 { padding: var(--space-s); }
+.p-6 { padding: var(--space-m); }
+.p-8 { padding: var(--space-l); }
 
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-3 { margin-bottom: 0.75rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-6 { margin-top: 1.5rem; }
-.ml-2 { margin-left: 0.5rem; }
-.ml-3 { margin-left: 0.75rem; }
-.mr-1 { margin-left: 0.25rem; }
-.mr-2 { margin-right: 0.5rem; }
-.mr-3 { margin-right: 0.75rem; }
-.mr-4 { margin-right: 1rem; }
+.mb-2 { margin-bottom: var(--space-2xs); }
+.mb-3 { margin-bottom: var(--space-xs); }
+.mb-4 { margin-bottom: var(--space-s); }
+.mb-6 { margin-bottom: var(--space-m); }
+.mt-4 { margin-top: var(--space-s); }
+.mt-6 { margin-top: var(--space-m); }
+.ml-2 { margin-left: var(--space-2xs); }
+.ml-3 { margin-left: var(--space-xs); }
+.mr-1 { margin-right: var(--space-3xs); }
+.mr-2 { margin-right: var(--space-2xs); }
+.mr-3 { margin-right: var(--space-xs); }
+.mr-4 { margin-right: var(--space-s); }
 
-.space-y-2 > * + * { margin-top: 0.5rem; }
-.space-y-3 > * + * { margin-top: 0.75rem; }
-.space-y-6 > * + * { margin-top: 1.5rem; }
-.space-x-2 > * + * { margin-left: 0.5rem; }
+.space-y-2 > * + * { margin-top: var(--space-2xs); }
+.space-y-3 > * + * { margin-top: var(--space-xs); }
+.space-y-6 > * + * { margin-top: var(--space-m); }
+.space-x-2 > * + * { margin-left: var(--space-2xs); }
 
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
@@ -725,10 +724,10 @@
 .justify-center { justify-content: center; }
 .justify-between { justify-content: space-between; }
 
-.gap-2 { gap: 0.5rem; }
-.gap-3 { gap: 0.75rem; }
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
+.gap-2 { gap: var(--space-2xs); }
+.gap-3 { gap: var(--space-xs); }
+.gap-4 { gap: var(--space-s); }
+.gap-6 { gap: var(--space-m); }
 
 .inline-flex { display: inline-flex; }
 .inline-block { display: inline-block; }
@@ -791,7 +790,7 @@
     .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .lg\:col-span-2 { grid-column: span 2 / span 2; }
     .lg\:col-span-1 { grid-column: span 1 / span 1; }
-    .lg\:gap-6 { gap: 1.5rem; }
+    .lg\:gap-6 { gap: var(--space-m); }
     .lg\:flex { display: flex; }
     .lg\:items-start { align-items: flex-start; }
     .lg\:justify-between { justify-content: space-between; }
@@ -802,11 +801,11 @@
 @media (min-width: 768px) {
     .md\:h-80 { height: 20rem; }
     .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .md\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+    .md\:text-4xl { font-size: var(--text-4); line-height: 1.2; }
 }
 
 @media (min-width: 640px) {
-    .sm\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+    .sm\:text-3xl { font-size: var(--text-3); line-height: 1.3; }
     .sm\:flex-row { flex-direction: row; }
 }
 
@@ -875,35 +874,62 @@
 }
 
 /* Main container for job listings */
-.careers-job-listings-container {
+/* ===== GLOBAL PLUGIN CONTAINER STYLES ===== */
+
+/* Main container for all careers plugin pages */
+.careers-job-listings-container,
+.careers-single-job,
+.careers-dashboard-container,
+.careers-auth-container,
+.careers-apply-container {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    padding-top: var(--space-l);
+    padding-left: var(--space-m);
+    padding-bottom: var(--space-l);
+    padding-right: var(--space-m);
+}
+
+/* Mobile responsive padding */
+@media (max-width: 768px) {
+    .careers-job-listings-container,
+    .careers-single-job,
+    .careers-dashboard-container,
+    .careers-auth-container,
+    .careers-apply-container {
+        padding-top: var(--space-s);
+        padding-left: var(--space-xs);
+        padding-bottom: var(--space-s);
+        padding-right: var(--space-xs);
+    }
 }
 
 /* Header section */
 .careers-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: var(--space-xl);
 }
 
 .careers-main-title {
-    font-size: 2rem; /* text-2xl equivalent */
-    font-weight: 700; /* font-bold */
-    margin-bottom: 0.625rem;
-    color: var(--foreground); /* Design system color */
+    font-size: var(--text-3); /* Using site's custom text scale */
+    font-weight: 700;
+    margin-bottom: var(--space-s);
+    color: var(--foreground);
+    line-height: 1.3;
 }
 
 .careers-main-description {
-    font-size: 1rem; /* text-base */
-    color: var(--muted); /* Design system color */
-    max-width: 43.75rem; /* 700px in rem */
+    font-size: var(--text-0); /* Using site's custom text scale */
+    color: var(--muted);
+    max-width: 43.75rem;
     margin: 0 auto;
+    line-height: 1.5;
 }
 
 /* Content wrapper for sidebar + grid layout */
 .careers-content-wrapper {
     display: grid;
     grid-template-columns: 250px 1fr;
-    gap: 30px;
+    gap: var(--space-xl);
     align-items: start;
 }
 
@@ -912,27 +938,27 @@
     background: var(--background);
     border: 1px solid var(--border);
     border-radius: var(--button-radius);
-    padding: 0.75rem;
+    padding: var(--space-s);
     position: sticky;
-    top: 1.25rem;
+    top: var(--space-s);
 }
 
 .careers-filters-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem; /* 8px - Tailwind mb-2 */
+    margin-bottom: var(--space-2xs);
 }
 
 .careers-filters-header h3 {
-    font-size: 0.875rem; /* text-sm */
+    font-size: var(--text--1);
     font-weight: 600;
     margin: 0;
     color: var(--foreground);
 }
 
 .careers-clear-filters {
-    font-size: 0.6875rem; /* 11px */
+    font-size: var(--text--2);
     color: var(--brand-red);
     text-decoration: none;
     transition: color 0.15s ease-in-out;
@@ -946,17 +972,17 @@
 .careers-filter-form {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem; /* 6px - Tailwind gap-1.5 */
+    gap: var(--space-3xs);
 }
 
 .careers-filter-group {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem; /* 4px - Tailwind gap-1 */
+    gap: var(--space-3xs);
 }
 
 .careers-filter-group label {
-    font-size: 0.75rem; /* text-xs */
+    font-size: var(--text--2);
     font-weight: 500;
     color: var(--foreground);
     margin-bottom: 0;
@@ -969,31 +995,31 @@
 
 .careers-search-input {
     width: 100%;
-    padding: 0.625rem;
+    padding: var(--space-xs);
     border: 1px solid var(--border);
     border-radius: var(--button-radius);
-    font-size: 0.875rem; /* text-sm */
+    font-size: var(--text--1);
     transition: border-color 0.15s ease-in-out;
 }
 
 .careers-filter-row {
     display: flex;
-    gap: 15px;
+    gap: var(--space-s);
     flex-wrap: wrap;
 }
 
 .careers-filter-select {
     width: 100%;
-    padding: 0.375rem 1.5rem 0.375rem 0.5rem;
+    padding: var(--space-3xs) var(--space-m) var(--space-3xs) var(--space-2xs);
     border: 1px solid var(--border);
     border-radius: var(--button-radius);
     background-color: var(--background);
-    font-size: 0.75rem; /* text-xs */
+    font-size: var(--text--2);
     color: var(--foreground);
     appearance: none;
     background-image: url('data:image/svg+xml;charset=UTF-8,%3Csvg width="12" height="6" viewBox="0 0 12 6" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M1 1L6 5L11 1" stroke="%23BF1E2D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/%3E%3C/svg%3E');
     background-repeat: no-repeat;
-    background-position: right 0.5rem center;
+    background-position: right var(--space-2xs) center;
     background-size: 12px;
     cursor: pointer;
     transition: border-color 0.15s ease-in-out;
@@ -1010,16 +1036,16 @@
 }
 
 .careers-filter-btn {
-    padding: 0.375rem 1rem;
+    padding: var(--space-3xs) var(--space-s);
     background: var(--brand-red);
     color: white;
     border: none;
     border-radius: var(--button-radius);
     cursor: pointer;
-    font-size: 0.75rem; /* text-xs */
+    font-size: var(--text--2);
     font-weight: 500;
     transition: all 0.15s ease-in-out;
-    margin-top: 0.25rem;
+    margin-top: var(--space-3xs);
 }
 
 .careers-filter-btn:hover {
@@ -1031,7 +1057,7 @@
 /* Job Grid */
 .careers-jobs-grid {
     display: grid;
-    gap: 20px;
+    gap: var(--space-l);
 }
 
 .careers-columns-1 { grid-template-columns: 1fr; }
@@ -1046,7 +1072,7 @@
     
     .careers-filters-sidebar {
         position: static;
-        margin-bottom: 30px;
+        margin-bottom: var(--space-xl);
     }
 }
 
@@ -1078,7 +1104,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-s);
 }
 
 .careers-card-left {
@@ -1087,34 +1113,34 @@
 
 .careers-card-right {
     flex-shrink: 0;
-    margin-left: 1rem;
+    margin-left: var(--space-s);
 }
 
 .careers-job-title-new {
-    font-size: 1.25rem; /* text-xl */
+    font-size: var(--text-1);
     font-weight: 600;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 var(--space-2xs) 0;
     color: var(--foreground);
-    line-height: 1.3;
+    line-height: 1.4;
 }
 
 /* Location with icon */
 .careers-job-location-new {
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-s);
 }
 
 .careers-location-icon {
     width: 1rem;
     height: 1rem;
-    margin-right: 0.25rem;
+    margin-right: var(--space-3xs);
     color: var(--brand-red);
 }
 
 .careers-location-tag {
     color: var(--muted);
-    font-size: 0.875rem; /* text-sm */
+    font-size: var(--text--1);
     font-weight: normal;
     background: none;
     border: none;
@@ -1124,11 +1150,11 @@
 
 /* Job type tags as pills */
 .careers-job-type-tag {
-    background: rgba(191, 30, 45, 0.1); /* Brand red with 10% opacity */
+    background: rgba(191, 30, 45, 0.1);
     color: var(--brand-red);
-    font-size: 0.75rem; /* text-xs */
+    font-size: var(--text--2);
     font-weight: 500;
-    padding: 0.25rem 0.75rem;
+    padding: var(--space-3xs) var(--space-xs);
     border-radius: 9999px;
     white-space: nowrap;
     display: inline-block;
@@ -1137,9 +1163,9 @@
 /* Body section */
 .careers-job-description-new {
     color: var(--muted);
-    font-size: 0.875rem; /* text-sm */
+    font-size: var(--text--1);
     line-height: 1.5;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-m);
     flex: 1;
 }
 
@@ -1152,7 +1178,7 @@
 
 .careers-posted-date {
     color: var(--muted);
-    font-size: 0.875rem; /* text-sm */
+    font-size: var(--text--1);
     margin: 0;
 }
 
@@ -1161,9 +1187,9 @@
     color: var(--brand-red);
     border: 1px solid var(--brand-red);
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: var(--space-2xs) var(--space-s);
     border-radius: var(--button-radius);
-    font-size: 0.875rem;
+    font-size: var(--text--1);
     font-weight: 500;
     transition: all 0.15s ease-in-out;
     display: inline-block;
