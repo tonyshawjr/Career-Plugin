@@ -1226,43 +1226,222 @@ class CareersDashboard {
             return;
         }
         
-        // Get current job meta
-        $location = get_post_meta($job_id, '_job_location', true);
-        $job_type = get_post_meta($job_id, '_job_type', true);
-        $salary_range = get_post_meta($job_id, '_salary_range', true);
-        $experience_level = get_post_meta($job_id, '_experience_level', true);
-        $application_deadline = get_post_meta($job_id, '_application_deadline', true);
+        // Get current job meta - using same field names as creation form
+        $job_title = $job->post_title;
+        $job_description = $job->post_content;
+        $job_summary = get_post_meta($job_id, 'job_summary', true);
+        $job_requirements = get_post_meta($job_id, 'job_requirements', true);
+        $job_responsibilities = get_post_meta($job_id, 'job_responsibilities', true);
+        $job_benefits = get_post_meta($job_id, 'job_benefits', true);
+        $job_equipment = get_post_meta($job_id, 'job_equipment', true);
+        $location = get_post_meta($job_id, 'job_location', true);
+        $job_type = get_post_meta($job_id, 'job_type', true);
+        $job_modality = get_post_meta($job_id, 'job_modality', true);
+        $salary_min = get_post_meta($job_id, 'salary_min', true);
+        $salary_max = get_post_meta($job_id, 'salary_max', true);
+        $experience_level = get_post_meta($job_id, 'experience_level', true);
+        $state_licensing = get_post_meta($job_id, 'state_licensing', true);
+        $application_deadline = get_post_meta($job_id, 'application_deadline', true);
         ?>
         
-        <div class="dashboard-container">
-            <div class="dashboard-inner">
-                <div class="dashboard-header">
-                    <h1 class="dashboard-title">Edit Job: <?php echo esc_html($job->post_title); ?></h1>
-                    <p class="dashboard-subtitle">Update job posting details</p>
+        <div class="bg-gray-50 min-h-screen">
+            <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+                <!-- Page Header -->
+                <div class="mb-8">
+                    <nav class="mb-4">
+                        <ol class="flex space-x-2 text-sm text-gray-600">
+                            <li>
+                                <a href="<?php echo home_url('/dashboard'); ?>" class="hover:text-brand-red transition">Dashboard</a>
+                            </li>
+                            <li>/</li>
+                            <li>
+                                <a href="<?php echo home_url('/dashboard/jobs'); ?>" class="hover:text-brand-red transition">Jobs</a>
+                            </li>
+                            <li>/</li>
+                            <li class="text-gray-900 font-medium">Edit Job</li>
+                        </ol>
+                    </nav>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4">Edit Job: <?php echo esc_html($job_title); ?></h1>
+                    <p class="text-lg text-gray-600">
+                        Update the job posting details below.
+                    </p>
                 </div>
-                
-                <div class="dashboard-card">
-                    <div class="dashboard-card-header">
-                        <h2 class="dashboard-card-title">Job Details</h2>
-                        <p class="dashboard-card-description">Update the job information below</p>
-                    </div>
-                    <div class="dashboard-card-content with-padding">
-                        <form id="edit-job-form" method="post">
-                            <?php wp_nonce_field('edit_career_job', 'edit_job_nonce'); ?>
-                            <input type="hidden" name="job_id" value="<?php echo $job_id; ?>">
+
+                <!-- Job Edit Form -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8">
+                    <form id="job-edit-form" method="post" action="<?php echo admin_url('admin-ajax.php'); ?>">
+                        <?php wp_nonce_field('update_job_nonce', 'job_nonce'); ?>
+                        <input type="hidden" name="action" value="update_career_job">
+                        <input type="hidden" name="job_id" value="<?php echo $job_id; ?>">
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Basic Information -->
+                            <div class="lg:col-span-2">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
+                            </div>
                             
-                            <div style="display: grid; gap: 1.5rem;">
-                                <div>
-                                    <label for="job_title" style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Job Title</label>
-                                    <input type="text" id="job_title" name="job_title" value="<?php echo esc_attr($job->post_title); ?>" 
-                                           style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;" required>
-                                </div>
-                                
-                                <div>
-                                    <label for="job_description" style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Job Description</label>
-                                    <textarea id="job_description" name="job_description" rows="6" 
-                                              style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;" required><?php echo esc_textarea($job->post_content); ?></textarea>
-                                </div>
+                            <div>
+                                <label for="job_title" class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+                                <input type="text" id="job_title" name="job_title" value="<?php echo esc_attr($job_title); ?>" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                            </div>
+                            
+                            <div>
+                                <label for="job_location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <select id="job_location" name="job_location" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                                    <option value="">Select Location</option>
+                                    <optgroup label="Arizona">
+                                        <option value="Phoenix" <?php selected($location, 'Phoenix'); ?>>Phoenix</option>
+                                        <option value="Tucson" <?php selected($location, 'Tucson'); ?>>Tucson</option>
+                                        <option value="Mesa" <?php selected($location, 'Mesa'); ?>>Mesa</option>
+                                        <option value="Scottsdale" <?php selected($location, 'Scottsdale'); ?>>Scottsdale</option>
+                                    </optgroup>
+                                    <optgroup label="North Carolina">
+                                        <option value="Raleigh" <?php selected($location, 'Raleigh'); ?>>Raleigh</option>
+                                        <option value="Fayetteville" <?php selected($location, 'Fayetteville'); ?>>Fayetteville</option>
+                                        <option value="Charlotte" <?php selected($location, 'Charlotte'); ?>>Charlotte</option>
+                                        <option value="Asheville" <?php selected($location, 'Asheville'); ?>>Asheville</option>
+                                        <option value="Hickory" <?php selected($location, 'Hickory'); ?>>Hickory</option>
+                                        <option value="Winston Salem" <?php selected($location, 'Winston Salem'); ?>>Winston Salem</option>
+                                        <option value="Greensboro" <?php selected($location, 'Greensboro'); ?>>Greensboro</option>
+                                        <option value="Jacksonville" <?php selected($location, 'Jacksonville'); ?>>Jacksonville</option>
+                                        <option value="New Bern" <?php selected($location, 'New Bern'); ?>>New Bern</option>
+                                    </optgroup>
+                                    <optgroup label="Texas">
+                                        <option value="Dallas" <?php selected($location, 'Dallas'); ?>>Dallas</option>
+                                        <option value="Houston" <?php selected($location, 'Houston'); ?>>Houston</option>
+                                        <option value="Austin" <?php selected($location, 'Austin'); ?>>Austin</option>
+                                        <option value="San Antonio" <?php selected($location, 'San Antonio'); ?>>San Antonio</option>
+                                        <option value="Corpus Christi" <?php selected($location, 'Corpus Christi'); ?>>Corpus Christi</option>
+                                        <option value="McAllen" <?php selected($location, 'McAllen'); ?>>McAllen</option>
+                                        <option value="Lufkin" <?php selected($location, 'Lufkin'); ?>>Lufkin</option>
+                                        <option value="Nacogdoches" <?php selected($location, 'Nacogdoches'); ?>>Nacogdoches</option>
+                                    </optgroup>
+                                    <optgroup label="Virginia">
+                                        <option value="Roanoke" <?php selected($location, 'Roanoke'); ?>>Roanoke</option>
+                                    </optgroup>
+                                    <optgroup label="Kentucky">
+                                        <option value="Louisville" <?php selected($location, 'Louisville'); ?>>Louisville</option>
+                                        <option value="Lexington" <?php selected($location, 'Lexington'); ?>>Lexington</option>
+                                        <option value="Bowling Green" <?php selected($location, 'Bowling Green'); ?>>Bowling Green</option>
+                                    </optgroup>
+                                    <optgroup label="Georgia">
+                                        <option value="Atlanta" <?php selected($location, 'Atlanta'); ?>>Atlanta</option>
+                                        <option value="Augusta" <?php selected($location, 'Augusta'); ?>>Augusta</option>
+                                        <option value="Columbus" <?php selected($location, 'Columbus'); ?>>Columbus</option>
+                                        <option value="Savannah" <?php selected($location, 'Savannah'); ?>>Savannah</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="job_type" class="block text-sm font-medium text-gray-700 mb-1">Job Type</label>
+                                <select id="job_type" name="job_type" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                                    <option value="">Select Job Type</option>
+                                    <option value="Full-Time" <?php selected($job_type, 'Full-Time'); ?>>Full-Time</option>
+                                    <option value="Part-Time" <?php selected($job_type, 'Part-Time'); ?>>Part-Time</option>
+                                    <option value="Contract" <?php selected($job_type, 'Contract'); ?>>Contract</option>
+                                    <option value="Per Diem" <?php selected($job_type, 'Per Diem'); ?>>Per Diem</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="job_modality" class="block text-sm font-medium text-gray-700 mb-1">Modality</label>
+                                <select id="job_modality" name="job_modality" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                                    <option value="">Select Modality</option>
+                                    <option value="X-Ray" <?php selected($job_modality, 'X-Ray'); ?>>X-Ray</option>
+                                    <option value="Ultrasound" <?php selected($job_modality, 'Ultrasound'); ?>>Ultrasound</option>
+                                    <option value="General" <?php selected($job_modality, 'General'); ?>>General</option>
+                                </select>
+                            </div>
+                            
+                            <div class="lg:col-span-2">
+                                <label for="job_summary" class="block text-sm font-medium text-gray-700 mb-1">Job Summary</label>
+                                <textarea id="job_summary" name="job_summary" rows="3" required
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red"
+                                          placeholder="Brief summary of the position..."><?php echo esc_textarea($job_summary); ?></textarea>
+                            </div>
+                            
+                            <div class="lg:col-span-2">
+                                <label for="job_description" class="block text-sm font-medium text-gray-700 mb-1">Job Description</label>
+                                <textarea id="job_description" name="job_description" rows="6" required
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red"
+                                          placeholder="Detailed description of the position, duties, and work environment..."><?php echo esc_textarea($job_description); ?></textarea>
+                            </div>
+                            
+                            <!-- Requirements -->
+                            <div class="lg:col-span-2 mt-6">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Requirements & Qualifications</h2>
+                            </div>
+                            
+                            <div class="lg:col-span-2">
+                                <label for="job_requirements" class="block text-sm font-medium text-gray-700 mb-1">Requirements</label>
+                                <textarea id="job_requirements" name="job_requirements" rows="4" required
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red"
+                                          placeholder="List job requirements (one per line)"><?php echo esc_textarea($job_requirements); ?></textarea>
+                                <p class="mt-1 text-sm text-gray-500">Enter each requirement on a new line</p>
+                            </div>
+                            
+                            <div class="lg:col-span-2">
+                                <label for="job_responsibilities" class="block text-sm font-medium text-gray-700 mb-1">Responsibilities</label>
+                                <textarea id="job_responsibilities" name="job_responsibilities" rows="4" required
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red"
+                                          placeholder="List job responsibilities (one per line)"><?php echo esc_textarea($job_responsibilities); ?></textarea>
+                                <p class="mt-1 text-sm text-gray-500">Enter each responsibility on a new line</p>
+                            </div>
+                            
+                            <div class="lg:col-span-2">
+                                <label for="job_equipment" class="block text-sm font-medium text-gray-700 mb-1">Equipment Used</label>
+                                <textarea id="job_equipment" name="job_equipment" rows="3"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red"
+                                          placeholder="List equipment used (one per line)"><?php echo esc_textarea($job_equipment); ?></textarea>
+                                <p class="mt-1 text-sm text-gray-500">Enter each piece of equipment on a new line</p>
+                            </div>
+                            
+                            <!-- Additional Information -->
+                            <div class="lg:col-span-2 mt-6">
+                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Additional Information</h2>
+                            </div>
+                            
+                            <div class="lg:col-span-2">
+                                <label for="job_benefits" class="block text-sm font-medium text-gray-700 mb-1">Benefits</label>
+                                <textarea id="job_benefits" name="job_benefits" rows="4"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red"
+                                          placeholder="List job benefits (one per line)"><?php echo esc_textarea($job_benefits); ?></textarea>
+                                <p class="mt-1 text-sm text-gray-500">Enter each benefit on a new line</p>
+                            </div>
+                            
+                            <div class="lg:col-span-2">
+                                <label for="state_licensing" class="block text-sm font-medium text-gray-700 mb-1">State Licensing Information</label>
+                                <textarea id="state_licensing" name="state_licensing" rows="2"
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red"
+                                          placeholder="State-specific licensing requirements..."><?php echo esc_textarea($state_licensing); ?></textarea>
+                            </div>
+                            
+                            <div>
+                                <label for="job_status" class="block text-sm font-medium text-gray-700 mb-1">Job Status</label>
+                                <select id="job_status" name="job_status" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-brand-red focus:border-brand-red">
+                                    <option value="publish" <?php selected($job->post_status, 'publish'); ?>>Active (Published)</option>
+                                    <option value="draft" <?php selected($job->post_status, 'draft'); ?>>Draft</option>
+                                </select>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="flex flex-col sm:flex-row gap-4 pt-6 mt-6 border-t border-gray-200">
+                            <button type="submit" id="update-job-btn"
+                                    class="inline-flex items-center justify-center px-6 py-3 bg-brand-red text-white font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-red transition">
+                                <span class="btn-text">Update Job</span>
+                                <span class="btn-loading hidden">Updating...</span>
+                            </button>
+                            <a href="<?php echo home_url('/dashboard/jobs'); ?>" 
+                               class="inline-flex items-center justify-center px-6 py-3 bg-gray-500 text-white font-medium rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition">
+                                Cancel
+                            </a>
+                        </div>
                                 
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                                     <div>
@@ -1291,15 +1470,12 @@ class CareersDashboard {
                                             <option value="senior" <?php selected($experience_level, 'senior'); ?>>Senior Level</option>
                                         </select>
                                     </div>
-                                </div>
-                                
-                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                                    <div>
-                                        <label for="salary_range" style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Salary Range</label>
-                                        <input type="text" id="salary_range" name="salary_range" value="<?php echo esc_attr($salary_range); ?>" 
-                                               placeholder="e.g., $50,000 - $70,000"
-                                               style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
-                                    </div>
+    }
+    
+    /**
+     * Render job management interface
+     */
+    private function render_job_management() {
                                     
                                     <div>
                                         <label for="application_deadline" style="display: block; font-weight: 500; margin-bottom: 0.5rem;">Application Deadline</label>

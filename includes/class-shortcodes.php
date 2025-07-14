@@ -217,7 +217,7 @@ class CareersShortcodes {
                         // Add meta filters
                         if (!empty($filter_employment_type)) {
                             $args['meta_query'][] = array(
-                                'key' => '_career_employment_type',
+                                'key' => '_job_type',
                                 'value' => $filter_employment_type,
                                 'compare' => '='
                             );
@@ -228,13 +228,13 @@ class CareersShortcodes {
                         if ($jobs_query->have_posts()):
                             while ($jobs_query->have_posts()): $jobs_query->the_post();
                                 $job_id = get_the_ID();
-                                $location = get_post_meta($job_id, '_career_location', true);
-                                $employment_type = get_post_meta($job_id, '_career_employment_type', true);
-                                $salary_min = get_post_meta($job_id, '_career_salary_min', true);
-                                $salary_max = get_post_meta($job_id, '_career_salary_max', true);
-                                $experience_level = get_post_meta($job_id, '_career_experience_level', true);
+                                $location = get_post_meta($job_id, '_job_location', true);
+                                $employment_type = get_post_meta($job_id, '_job_type', true);
+                                $salary_min = get_post_meta($job_id, '_salary_min', true);
+                                $salary_max = get_post_meta($job_id, '_salary_max', true);
+                                $experience_level = get_post_meta($job_id, '_experience_level', true);
                                 $posted_date = get_the_date();
-                                $summary = get_post_meta($job_id, '_career_summary', true);
+                                $summary = get_post_meta($job_id, '_job_summary', true);
                                 
                                 // Get certifications and modalities
                                 $certifications = wp_get_post_terms($job_id, 'job_certification');
