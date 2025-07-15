@@ -60,74 +60,81 @@ class CareersManager {
         // Load text domain
         load_plugin_textdomain('careers-manager', false, dirname(plugin_basename(__FILE__)) . '/languages');
         
-        // Initialize components
-        if (class_exists('CareerJobCPT')) {
-            new CareerJobCPT();
-        }
-        
-        if (class_exists('CareersApplicationDB')) {
-            new CareersApplicationDB();
-        }
-        
-        if (class_exists('CareersUserRoles')) {
-            new CareersUserRoles();
-        }
-        
-        if (class_exists('CareersShortcodes')) {
-            new CareersShortcodes();
-        }
-        
-        if (class_exists('CareersAuth')) {
-            new CareersAuth();
-        }
-        
-        if (class_exists('CareersDashboard')) {
-            new CareersDashboard();
-        }
-        
-        if (class_exists('CareersAdmin')) {
-            new CareersAdmin();
-        }
-        
-        if (class_exists('CareersEmails')) {
-            new CareersEmails();
-        }
-        
-        if (class_exists('CareersElementorWidgets')) {
-            new CareersElementorWidgets();
+        // Initialize components with error handling
+        try {
+            if (class_exists('CareersPositionsDB')) {
+                new CareersPositionsDB();
+            }
+            
+            if (class_exists('CareersApplicationDB')) {
+                new CareersApplicationDB();
+            }
+            
+            if (class_exists('CareersUserRoles')) {
+                new CareersUserRoles();
+            }
+            
+            if (class_exists('CareersShortcodes')) {
+                new CareersShortcodes();
+            }
+            
+            if (class_exists('CareersAuth')) {
+                new CareersAuth();
+            }
+            
+            if (class_exists('CareersDashboard')) {
+                new CareersDashboard();
+            }
+            
+            if (class_exists('CareersAdmin')) {
+                new CareersAdmin();
+            }
+            
+            if (class_exists('CareersEmails')) {
+                new CareersEmails();
+            }
+            
+            // Elementor widgets are initialized in their own class file
+            
+        } catch (Exception $e) {
+            error_log('Careers Plugin Initialization Error: ' . $e->getMessage());
         }
         
         // Enqueue assets
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         
-        // Template handling
-        add_filter('single_template', array($this, 'single_template'));
-        add_filter('archive_template', array($this, 'archive_template'));
-        
-        // Ensure proper permalinks
-        add_filter('post_type_link', array($this, 'career_job_permalink'), 10, 2);
-        
         // Add custom rewrite rules
-        add_action('init', array($this, 'add_rewrite_rules'), 20);
+        add_action('init', array($this, 'add_rewrite_rules'), 10);
         add_filter('query_vars', array($this, 'add_query_vars'));
-        add_action('template_redirect', array($this, 'handle_job_redirect'));
+        add_action('template_redirect', array($this, 'handle_position_redirect'));
     }
     
     /**
      * Load includes
      */
     private function load_includes() {
-        require_once CAREERS_PLUGIN_PATH . 'includes/helpers.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-job-cpt.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-application-db.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-user-roles.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-shortcodes.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-auth.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-dashboard.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-admin.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-emails.php';
-        require_once CAREERS_PLUGIN_PATH . 'includes/class-elementor-widgets.php';
+        $includes = array(
+            'includes/helpers.php',
+            'includes/class-positions-db.php',
+            'includes/class-application-db.php',
+            'includes/class-user-roles.php',
+            'includes/class-shortcodes-new.php',
+            'includes/class-auth.php',
+            'includes/class-dashboard-new.php',
+            'includes/class-admin.php',
+            'includes/class-emails.php',
+            'includes/class-elementor-widgets.php'
+        );
+        
+        foreach ($includes as $file) {
+            $file_path = CAREERS_PLUGIN_PATH . $file;
+            if (file_exists($file_path)) {
+                require_once $file_path;
+            } else {
+                error_log('Careers Plugin: Missing file ' . $file_path);
+            }
+        }
     }
     
     /**
@@ -188,23 +195,39 @@ class CareersManager {
      * Plugin activation
      */
     public function activate() {
-        // Load includes first to ensure classes are available
-        $this->load_includes();
-        
-        // Register post type to ensure rewrite rules are created
-        if (class_exists('CareerJobCPT')) {
-            $cpt = new CareerJobCPT();
-            $cpt->register_post_type();
-            $cpt->register_taxonomies();
+        try {
+            // Load includes first to ensure classes are available
+            $this->load_includes();
+            
+            // Create database tables
+            if (class_exists('CareersPositionsDB')) {
+                CareersPositionsDB::create_tables();
+            }
+            
+            if (class_exists('CareersApplicationDB')) {
+                CareersApplicationDB::create_table();
+            }
+            
+            // Create user roles
+            if (class_exists('CareersUserRoles')) {
+                $user_roles = new CareersUserRoles();
+                if (method_exists($user_roles, 'create_roles')) {
+                    $user_roles->create_roles();
+                }
+            }
+            
+            // Add rewrite rules before flushing
+            $this->add_rewrite_rules();
+            
+            // Flush rewrite rules
+            flush_rewrite_rules();
+            
+        } catch (Exception $e) {
+            // Log the error and deactivate
+            error_log('Careers Plugin Activation Error: ' . $e->getMessage());
+            deactivate_plugins(plugin_basename(__FILE__));
+            wp_die('Careers plugin activation failed: ' . $e->getMessage());
         }
-        
-        // Create database table
-        if (class_exists('CareersApplicationDB')) {
-            CareersApplicationDB::create_table();
-        }
-        
-        // Flush rewrite rules
-        flush_rewrite_rules();
     }
     
     /**
@@ -215,64 +238,22 @@ class CareersManager {
         flush_rewrite_rules();
     }
     
-    /**
-     * Load single template for career_job posts
-     */
-    public function single_template($template) {
-        if (is_singular('career_job')) {
-            $plugin_template = CAREERS_PLUGIN_PATH . 'templates/single-career_job.php';
-            if (file_exists($plugin_template)) {
-                return $plugin_template;
-            }
-        }
-        return $template;
-    }
     
     /**
-     * Load archive template for career_job posts
-     */
-    public function archive_template($template) {
-        if (is_post_type_archive('career_job')) {
-            $plugin_template = CAREERS_PLUGIN_PATH . 'templates/archive-career_job.php';
-            if (file_exists($plugin_template)) {
-                return $plugin_template;
-            }
-        }
-        return $template;
-    }
-    
-    /**
-     * Filter career job permalinks to ensure proper URL structure
-     */
-    public function career_job_permalink($permalink, $post) {
-        if ($post->post_type !== 'career_job') {
-            return $permalink;
-        }
-        
-        // If using plain permalinks, don't modify
-        if (empty(get_option('permalink_structure'))) {
-            return $permalink;
-        }
-        
-        // Ensure we're using the correct structure
-        return home_url('/job/' . $post->post_name . '/');
-    }
-    
-    /**
-     * Add custom rewrite rules for job posts and dashboard
+     * Add custom rewrite rules for positions and dashboard
      */
     public function add_rewrite_rules() {
-        // Add rewrite rule for /job/job-name/
+        // Add rewrite rule for /open-positions/123
         add_rewrite_rule(
-            '^job/([^/]+)/?$',
-            'index.php?career_job=$matches[1]',
+            '^open-positions/([0-9]+)/?$',
+            'index.php?careers_position_id=$matches[1]',
             'top'
         );
         
-        // Alternative rule using post name
+        // Add rewrite rule for /open-positions (listings page)
         add_rewrite_rule(
-            '^job/([^/]+)/?$',
-            'index.php?post_type=career_job&name=$matches[1]',
+            '^open-positions/?$',
+            'index.php?careers_positions=1',
             'top'
         );
         
@@ -306,7 +287,8 @@ class CareersManager {
      * Add custom query vars
      */
     public function add_query_vars($vars) {
-        $vars[] = 'career_job';
+        $vars[] = 'careers_position_id';
+        $vars[] = 'careers_positions';
         $vars[] = 'careers_dashboard';
         $vars[] = 'careers_action';
         $vars[] = 'careers_id';
@@ -314,49 +296,77 @@ class CareersManager {
     }
     
     /**
-     * Handle job redirect
+     * Handle position redirect
      */
-    public function handle_job_redirect() {
-        // Check if we're on a job URL
-        if (preg_match('/^\/job\/([^\/]+)\/?$/', $_SERVER['REQUEST_URI'], $matches)) {
-            $job_slug = $matches[1];
+    public function handle_position_redirect() {
+        global $wp_query;
+        
+        // Check if we're on a position detail page
+        $position_id = get_query_var('careers_position_id');
+        if ($position_id) {
+            $wp_query->is_404 = false;
+            $wp_query->is_single = true;
+            $wp_query->is_singular = true;
             
-            // Find the job by slug
-            $args = array(
-                'name' => $job_slug,
-                'post_type' => 'career_job',
-                'post_status' => 'publish',
-                'posts_per_page' => 1
-            );
-            
-            $jobs = get_posts($args);
-            
-            if (!empty($jobs)) {
-                global $wp_query, $post;
-                
-                // Set up the query
-                $post = $jobs[0];
-                $wp_query->post = $post;
-                $wp_query->posts = array($post);
-                $wp_query->queried_object = $post;
-                $wp_query->queried_object_id = $post->ID;
-                $wp_query->found_posts = 1;
-                $wp_query->post_count = 1;
-                $wp_query->is_single = true;
-                $wp_query->is_singular = true;
-                $wp_query->is_404 = false;
-                
-                // Setup post data
-                setup_postdata($post);
-                
-                // Load the template
-                $template = $this->single_template('');
-                if ($template) {
-                    include($template);
-                    exit;
-                }
-            }
+            $this->load_position_detail_template($position_id);
+            return;
         }
+        
+        // Check if we're on the positions listing page
+        $positions_page = get_query_var('careers_positions');
+        if ($positions_page) {
+            $wp_query->is_404 = false;
+            $wp_query->is_page = true;
+            $wp_query->is_singular = true;
+            
+            $this->load_positions_list_template();
+            return;
+        }
+    }
+    
+    /**
+     * Load positions list template
+     */
+    private function load_positions_list_template() {
+        get_header();
+        
+        echo '<div class="careers-positions-page">';
+        echo '<div class="container">';
+        echo '<h1>Open Positions</h1>';
+        
+        // Load the shortcode class and display the list
+        if (class_exists('CareersShortcodes')) {
+            $shortcodes = new CareersShortcodes();
+            echo $shortcodes->careers_list_shortcode(array());
+        }
+        
+        echo '</div>';
+        echo '</div>';
+        
+        get_footer();
+        exit;
+    }
+    
+    /**
+     * Load position detail template
+     */
+    private function load_position_detail_template($position_id) {
+        get_header();
+        
+        echo '<div class="careers-position-detail-page">';
+        echo '<div class="container">';
+        
+        // Load the shortcode class and display the position detail
+        if (class_exists('CareersShortcodes')) {
+            $shortcodes = new CareersShortcodes();
+            echo $shortcodes->careers_position_detail_shortcode(array('id' => $position_id));
+        }
+        
+        echo '</div>';
+        echo '</div>';
+        
+        get_footer();
+        exit;
     }
 }
 
