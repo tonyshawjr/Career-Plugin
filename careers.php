@@ -349,18 +349,11 @@ class CareersManager {
     private function load_positions_list_template() {
         get_header();
         
-        echo '<div class="careers-positions-page">';
-        echo '<div class="container">';
-        echo '<h1>Open Positions</h1>';
-        
         // Load the shortcode class and display the list
         if (class_exists('CareersShortcodes')) {
             $shortcodes = new CareersShortcodes();
             echo $shortcodes->careers_list_shortcode(array());
         }
-        
-        echo '</div>';
-        echo '</div>';
         
         get_footer();
         exit;
