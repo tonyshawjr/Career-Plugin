@@ -391,4 +391,20 @@ class CareersApplicationDB {
         
         return $stats;
     }
+    
+    /**
+     * Get application count for a specific job
+     */
+    public static function get_applications_count_by_job($job_id) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . self::$table_name;
+        
+        $count = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM $table_name WHERE job_id = %d",
+            $job_id
+        ));
+        
+        return intval($count);
+    }
 } 

@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('CAREERS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CAREERS_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('CAREERS_PLUGIN_VERSION', '1.0.0');
+define('CAREERS_PLUGIN_VERSION', '1.0.1');
 
 /**
  * Main Careers Manager class
@@ -257,6 +257,13 @@ class CareersManager {
             'top'
         );
         
+        // Add rewrite rule for /apply/123 (application page)
+        add_rewrite_rule(
+            '^apply/([0-9]+)/?$',
+            'index.php?careers_apply_id=$matches[1]',
+            'top'
+        );
+        
         // Add rewrite rules for dashboard and sub-pages
         add_rewrite_rule(
             '^dashboard/?$',
@@ -289,6 +296,7 @@ class CareersManager {
     public function add_query_vars($vars) {
         $vars[] = 'careers_position_id';
         $vars[] = 'careers_positions';
+        $vars[] = 'careers_apply_id';
         $vars[] = 'careers_dashboard';
         $vars[] = 'careers_action';
         $vars[] = 'careers_id';
@@ -309,6 +317,17 @@ class CareersManager {
             $wp_query->is_singular = true;
             
             $this->load_position_detail_template($position_id);
+            return;
+        }
+        
+        // Check if we're on an application page
+        $apply_id = get_query_var('careers_apply_id');
+        if ($apply_id) {
+            $wp_query->is_404 = false;
+            $wp_query->is_page = true;
+            $wp_query->is_singular = true;
+            
+            $this->load_application_template($apply_id);
             return;
         }
         
@@ -360,6 +379,40 @@ class CareersManager {
         if (class_exists('CareersShortcodes')) {
             $shortcodes = new CareersShortcodes();
             echo $shortcodes->careers_position_detail_shortcode(array('id' => $position_id));
+        }
+        
+        echo '</div>';
+        echo '</div>';
+        
+        get_footer();
+        exit;
+    }
+    
+    /**
+     * Load application template
+     */
+    private function load_application_template($position_id) {
+        // First verify the position exists
+        if (class_exists('CareersPositionsDB')) {
+            $position = CareersPositionsDB::get_position($position_id);
+            if (!$position || $position->status !== 'published') {
+                global $wp_query;
+                $wp_query->set_404();
+                status_header(404);
+                get_template_part('404');
+                exit;
+            }
+        }
+        
+        get_header();
+        
+        echo '<div class="careers-application-page">';
+        echo '<div class="container">';
+        
+        // Load the shortcode class and display the application form
+        if (class_exists('CareersShortcodes')) {
+            $shortcodes = new CareersShortcodes();
+            echo $shortcodes->careers_application_page_shortcode(array('position_id' => $position_id));
         }
         
         echo '</div>';
