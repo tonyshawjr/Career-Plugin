@@ -119,9 +119,9 @@ class CareersManager {
             'includes/class-positions-db.php',
             'includes/class-application-db.php',
             'includes/class-user-roles.php',
-            'includes/class-shortcodes-new.php',
+            'includes/class-shortcodes.php',
             'includes/class-auth.php',
-            'includes/class-dashboard-new.php',
+            'includes/class-dashboard.php',
             'includes/class-admin.php',
             'includes/class-emails.php',
             'includes/class-elementor-widgets.php'
