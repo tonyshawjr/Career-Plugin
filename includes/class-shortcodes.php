@@ -270,7 +270,7 @@ class CareersShortcodes {
                     </div>
                 </div>
                 <div class="hero-actions">
-                    <button class="apply-btn" onclick="scrollToApplication()">Apply Now</button>
+                    <a href="<?php echo home_url('/apply/' . $position_id); ?>" class="apply-btn">Apply Now</a>
                 </div>
             </div>
 
@@ -408,16 +408,19 @@ class CareersShortcodes {
                     <div class="info-box cta-box">
                         <h3>Take the First Step</h3>
                         <p>Submit your application today and join our team of mobile diagnostic professionals.</p>
-                        <button class="apply-btn-full" onclick="scrollToApplication()">Apply Now →</button>
+                        <a href="<?php echo home_url('/apply/' . $position_id); ?>" class="apply-btn-full">Apply Now →</a>
                     </div>
                     
                 </div>
             </div>
             
-            <!-- Application Section -->
-            <div id="application-section" class="application-section">
-                <h2>Apply for this Position</h2>
-                <?php echo $this->careers_form_shortcode(array('position_id' => $position_id)); ?>
+            <!-- Apply Button Section -->
+            <div class="bottom-apply-section">
+                <div class="apply-container">
+                    <h3>Ready to Apply?</h3>
+                    <p>Take the next step in your career journey.</p>
+                    <a href="<?php echo home_url('/apply/' . $position_id); ?>" class="apply-btn-large">Apply for this Position →</a>
+                </div>
             </div>
         </div>
         
@@ -461,12 +464,14 @@ class CareersShortcodes {
             border-radius: 4px;
             font-size: 1rem;
             font-weight: 500;
-            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
             transition: background 0.2s ease;
         }
         
         .apply-btn:hover, .apply-btn-full:hover {
             background: #333;
+            color: white;
         }
         
         .apply-btn-full {
@@ -600,19 +605,39 @@ class CareersShortcodes {
             opacity: 0.8;
         }
         
-        .application-section {
+        .bottom-apply-section {
             background: #f9f9f9;
             padding: 2.5rem 2rem;
             border-radius: 4px;
             margin-top: 3rem;
+            text-align: center;
         }
         
-        .application-section h2 {
-            text-align: center;
+        .apply-container h3 {
             font-size: 1.5rem;
             font-weight: 500;
             color: #111;
+            margin-bottom: 0.5rem;
+        }
+        
+        .apply-container p {
+            color: #666;
             margin-bottom: 2rem;
+        }
+        
+        .apply-btn-large {
+            background: #000;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            transition: background 0.2s ease;
+        }
+        
+        .apply-btn-large:hover {
+            background: #333;
         }
         
         @media (max-width: 768px) {
@@ -632,13 +657,126 @@ class CareersShortcodes {
         }
         </style>
         
-        <script>
-        function scrollToApplication() {
-            document.getElementById('application-section').scrollIntoView({ 
-                behavior: 'smooth' 
-            });
+        <?php
+        
+        return ob_get_clean();
+    }
+    
+    /**
+     * Application page shortcode
+     */
+    public function careers_application_page_shortcode($atts) {
+        $position_id = intval($atts['position_id']);
+        
+        if (empty($position_id)) {
+            return '<p>Invalid position.</p>';
         }
-        </script>
+        
+        $position = CareersPositionsDB::get_position($position_id);
+        
+        if (!$position || $position->status !== 'published') {
+            return '<p>Position not found or no longer available.</p>';
+        }
+        
+        ob_start();
+        ?>
+        <div class="application-page">
+            <!-- Header Section -->
+            <div class="application-header">
+                <div class="breadcrumb">
+                    <a href="<?php echo home_url('/open-positions/' . $position_id); ?>">← Back to Job Details</a>
+                </div>
+                <h1>Apply for <?php echo esc_html($position->position_name); ?></h1>
+                <div class="position-location">
+                    📍 <?php echo esc_html($position->location); ?>
+                </div>
+                <p class="application-intro">
+                    Ready to take the next step in your career? Complete the application below and we'll be in touch soon.
+                </p>
+            </div>
+
+            <!-- Application Form -->
+            <div class="application-form-container">
+                <?php echo $this->careers_form_shortcode(array('position_id' => $position_id)); ?>
+            </div>
+        </div>
+        
+        <style>
+        .application-page {
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #333;
+        }
+        
+        .application-header {
+            padding: 2rem 0 3rem 0;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 3rem;
+        }
+        
+        .breadcrumb {
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        
+        .breadcrumb a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb a:hover {
+            color: #000;
+        }
+        
+        .application-header h1 {
+            font-size: 2rem;
+            font-weight: 500;
+            margin: 0 0 0.5rem 0;
+            color: #111;
+        }
+        
+        .application-header .position-location {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .application-intro {
+            color: #555;
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        .application-form-container {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .application-page {
+                margin: 0 1rem;
+            }
+            
+            .application-header {
+                padding: 1.5rem 0 2rem 0;
+            }
+            
+            .application-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .application-form-container {
+                padding: 1.5rem;
+            }
+        }
+        </style>
         <?php
         
         return ob_get_clean();
