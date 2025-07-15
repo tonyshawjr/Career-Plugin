@@ -26,12 +26,16 @@ class CareersShortcodes {
     public function careers_list_shortcode($atts) {
         $atts = shortcode_atts(array(
             'location' => '',
+            'modality' => '',
+            'certification' => '',
             'limit' => 20,
             'show_filter' => 'true'
         ), $atts);
         
-        // Get filter from URL if present
+        // Get filters from URL if present
         $location_filter = !empty($_GET['location']) ? sanitize_text_field($_GET['location']) : $atts['location'];
+        $modality_filter = !empty($_GET['modality']) ? sanitize_text_field($_GET['modality']) : $atts['modality'];
+        $certification_filter = !empty($_GET['certification']) ? sanitize_text_field($_GET['certification']) : $atts['certification'];
         
         // Get positions
         $args = array(
@@ -43,193 +47,439 @@ class CareersShortcodes {
             $args['location'] = $location_filter;
         }
         
+        if (!empty($modality_filter)) {
+            $args['job_type'] = $modality_filter;
+        }
+        
+        if (!empty($certification_filter)) {
+            $args['search'] = $certification_filter; // Search for certification in job content
+        }
+        
         $positions = CareersPositionsDB::get_positions($args);
+        
+        // Get filter options
+        $all_locations = CareersPositionsDB::get_locations();
+        $locations_by_state = array();
+        foreach ($all_locations as $location) {
+            $locations_by_state[$location->state][] = $location;
+        }
+        ksort($locations_by_state);
+        foreach ($locations_by_state as $state => $cities) {
+            usort($locations_by_state[$state], function($a, $b) {
+                return strcmp($a->city, $b->city);
+            });
+        }
+        
+        $modalities = array('Full-Time', 'Part-Time', 'Contract', 'Per-Diem', 'Travel');
+        $certifications = array('ARRT', 'ARDMS', 'X-Ray', 'Ultrasound', 'MRI', 'CT', 'Mammography');
         
         ob_start();
         ?>
-        <div class="careers-listings">
-            <?php if ($atts['show_filter'] === 'true'): ?>
-                <div class="careers-filter">
-                    <form method="get" action="">
-                        <label for="location-filter">Filter by Location:</label>
-                        <select id="location-filter" name="location" onchange="this.form.submit()">
-                            <option value="">All Locations</option>
-                            <?php 
-                            $locations_by_state = CareersPositionsDB::get_locations_by_state();
-                            foreach ($locations_by_state as $state => $cities): ?>
-                                <optgroup label="<?php echo esc_attr($state); ?>">
-                                    <?php foreach ($cities as $location): ?>
-                                        <option value="<?php echo esc_attr($location->display_name); ?>"
-                                                <?php selected($location_filter, $location->display_name); ?>>
-                                            <?php echo esc_html($location->city); ?>
+        <div class="open-positions-page">
+            <div class="page-header">
+                <h1>Open Positions</h1>
+                <p>Browse our current opportunities at National Mobile X-Ray. Filter by modality, location, and certification to find the perfect fit for your career.</p>
+            </div>
+            
+            <div class="positions-layout">
+                <?php if ($atts['show_filter'] === 'true'): ?>
+                    <div class="filters-sidebar">
+                        <div class="filters-header">
+                            <h3>Filters</h3>
+                            <a href="/open-positions/" class="clear-filters">Clear all filters</a>
+                        </div>
+                        
+                        <form method="get" action="" class="filters-form">
+                            <div class="filter-group">
+                                <h4>Modality</h4>
+                                <select name="modality" onchange="this.form.submit()">
+                                    <option value="">All Modalities</option>
+                                    <?php foreach ($modalities as $modality): ?>
+                                        <option value="<?php echo esc_attr($modality); ?>" <?php selected($modality_filter, $modality); ?>>
+                                            <?php echo esc_html($modality); ?>
                                         </option>
                                     <?php endforeach; ?>
-                                </optgroup>
-                            <?php endforeach; ?>
-                        </select>
-                    </form>
-                </div>
-            <?php endif; ?>
-            
-            <div class="careers-positions-grid">
-                <?php if (empty($positions)): ?>
-                    <p class="no-positions">No positions available at this time.</p>
-                <?php else: ?>
-                    <?php foreach ($positions as $position): ?>
-                        <div class="career-position-card">
-                            <h3 class="position-title">
-                                <a href="/open-positions/<?php echo esc_attr($position->id); ?>">
-                                    <?php echo esc_html($position->position_name); ?>
-                                </a>
-                            </h3>
-                            
-                            <div class="position-meta">
-                                <div class="position-location">
-                                    <strong>📍 Location:</strong> <?php echo esc_html($position->location); ?>
-                                </div>
-                                
-                                <?php if (!empty($position->job_type)): ?>
-                                    <div class="position-type">
-                                        <strong>💼 Type:</strong> <?php echo esc_html($position->job_type); ?>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($position->salary_range)): ?>
-                                    <div class="position-salary">
-                                        <strong>💰 Salary:</strong> <?php echo esc_html($position->salary_range); ?>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($position->experience_level)): ?>
-                                    <div class="position-experience">
-                                        <strong>⭐ Experience:</strong> <?php echo esc_html($position->experience_level); ?>
-                                    </div>
-                                <?php endif; ?>
+                                </select>
                             </div>
                             
-                            <?php if (!empty($position->position_overview)): ?>
-                                <div class="position-excerpt">
-                                    <?php 
-                                    $excerpt = wp_trim_words($position->position_overview, 25, '...');
-                                    echo wp_kses_post($excerpt);
-                                    ?>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <div class="position-actions">
-                                <a href="/open-positions/<?php echo esc_attr($position->id); ?>" 
-                                   class="apply-button">View Details & Apply</a>
+                            <div class="filter-group">
+                                <h4>Location</h4>
+                                <select name="location" onchange="this.form.submit()">
+                                    <option value="">All Locations</option>
+                                    <?php foreach ($locations_by_state as $state => $cities): ?>
+                                        <optgroup label="<?php echo esc_attr($state); ?>">
+                                            <?php foreach ($cities as $location): ?>
+                                                <option value="<?php echo esc_attr($location->city . ', ' . $location->state); ?>" <?php selected($location_filter, $location->city . ', ' . $location->state); ?>>
+                                                    <?php echo esc_html($location->city); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </optgroup>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
+                            
+                            <div class="filter-group">
+                                <h4>Certification</h4>
+                                <select name="certification" onchange="this.form.submit()">
+                                    <option value="">All Certifications</option>
+                                    <?php foreach ($certifications as $cert): ?>
+                                        <option value="<?php echo esc_attr($cert); ?>" <?php selected($certification_filter, $cert); ?>>
+                                            <?php echo esc_html($cert); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
                 <?php endif; ?>
+                
+                <div class="positions-content">
+                    <div class="positions-grid">
+                        <?php if (empty($positions)): ?>
+                            <div class="no-positions">
+                                <h3>No positions available</h3>
+                                <p>Try adjusting your filters or check back later for new opportunities.</p>
+                            </div>
+                        <?php else: ?>
+                            <?php foreach ($positions as $position): ?>
+                                <div class="position-card">
+                                    <div class="position-header">
+                                        <h3 class="position-title">
+                                            <a href="/open-positions/<?php echo esc_attr($position->id); ?>">
+                                                <?php echo esc_html($position->position_name); ?>
+                                            </a>
+                                        </h3>
+                                        <div class="position-badges">
+                                            <?php if (!empty($position->job_type)): ?>
+                                                <span class="badge badge-<?php echo esc_attr(strtolower(str_replace([' ', '-'], '-', $position->job_type))); ?>">
+                                                    <?php echo esc_html($position->job_type); ?>
+                                                </span>
+                                            <?php endif; ?>
+                                            
+                                            <?php if (!empty($position->certification_required)): ?>
+                                                <?php 
+                                                $certs = explode(',', $position->certification_required);
+                                                foreach ($certs as $cert): 
+                                                    $cert = trim($cert);
+                                                    if (!empty($cert)):
+                                                ?>
+                                                    <span class="badge badge-cert"><?php echo esc_html($cert); ?></span>
+                                                <?php 
+                                                    endif;
+                                                endforeach; 
+                                                ?>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="position-location">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5Z" fill="#666"/>
+                                        </svg>
+                                        <?php echo esc_html($position->location); ?>
+                                    </div>
+                                    
+                                    <?php if (!empty($position->position_overview)): ?>
+                                        <div class="position-description">
+                                            <?php 
+                                            $excerpt = wp_trim_words($position->position_overview, 20, '...');
+                                            echo wp_kses_post($excerpt);
+                                            ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <div class="position-meta">
+                                        <div class="position-date">
+                                            Posted: <?php echo esc_html(date('M j, Y', strtotime($position->created_at))); ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="position-actions">
+                                        <a href="/open-positions/<?php echo esc_attr($position->id); ?>" 
+                                           class="view-details-btn">View Details</a>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
             </div>
         </div>
         
         <style>
-        .careers-listings {
-            max-width: 1200px;
+        .open-positions-page {
+            max-width: 1280px;
             margin: 0 auto;
+            padding: 2rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #333;
         }
         
-        .careers-filter {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
+        .page-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
         }
         
-        .careers-filter select {
-            padding: 8px 12px;
-            margin-left: 10px;
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 500;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.2;
+            color: #111;
+        }
+        
+        .page-header p {
+            color: #666;
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .positions-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+        
+        .filters-sidebar {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .filters-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #111;
+        }
+        
+        .clear-filters {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .clear-filters:hover {
+            color: #333;
+        }
+        
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-group h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #111;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
-        }
-        
-        .careers-positions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
-        }
-        
-        .career-position-card {
+            font-size: 1rem;
+            color: #333;
             background: #fff;
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: border-color 0.2s ease;
         }
         
-        .career-position-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .filter-group select:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .positions-content {
+            min-width: 0;
+        }
+        
+        .positions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .position-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .position-header {
+            margin-bottom: 1rem;
         }
         
         .position-title {
-            margin: 0 0 12px 0;
-            font-size: 1.4em;
+            margin: 0 0 0.75rem 0;
+            font-size: 1.125rem;
+            font-weight: 500;
+            line-height: 1.3;
+            color: #111;
         }
         
         .position-title a {
-            color: #2c3e50;
+            color: #111;
             text-decoration: none;
         }
         
         .position-title a:hover {
-            color: #3498db;
+            color: #333;
         }
         
-        .position-meta {
-            margin-bottom: 16px;
+        .position-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
         
-        .position-meta > div {
-            margin-bottom: 8px;
-            font-size: 14px;
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+        
+        .badge-full-time {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .badge-part-time {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .badge-contract {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+        
+        .badge-per-diem {
+            background: #ecfdf5;
+            color: #059669;
+        }
+        
+        .badge-travel {
+            background: #fce7f3;
+            color: #be185d;
+        }
+        
+        .badge-cert {
+            background: #fff9c4;
+            color: #f9a825;
+        }
+        
+        .position-location {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
             color: #666;
         }
         
-        .position-meta strong {
-            color: #2c3e50;
-        }
-        
-        .position-excerpt {
-            margin-bottom: 20px;
+        .position-description {
+            margin-bottom: 1rem;
             line-height: 1.6;
             color: #555;
         }
         
-        .apply-button {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 12px 24px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            transition: background-color 0.2s ease;
+        .position-meta {
+            margin-bottom: 1rem;
         }
         
-        .apply-button:hover {
-            background: #2980b9;
-            color: white;
+        .position-date {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .view-details-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: #fff;
+            color: #333;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .view-details-btn:hover {
+            background: #f5f5f5;
+            color: #333;
         }
         
         .no-positions {
+            grid-column: 1 / -1;
             text-align: center;
-            font-size: 1.1em;
+            padding: 4rem 2rem;
             color: #666;
-            padding: 40px 20px;
+        }
+        
+        .no-positions h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #111;
+        }
+        
+        .no-positions p {
+            margin: 0;
+        }
+        
+        @media (max-width: 1024px) {
+            .positions-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .filters-sidebar {
+                position: static;
+                margin-bottom: 1rem;
+            }
+            
+            .positions-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         @media (max-width: 768px) {
-            .careers-positions-grid {
-                grid-template-columns: 1fr;
+            .open-positions-page {
+                padding: 1rem;
             }
             
-            .career-position-card {
-                padding: 20px;
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .positions-grid {
+                grid-template-columns: 1fr;
             }
         }
         </style>
