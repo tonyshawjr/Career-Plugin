@@ -13,6 +13,7 @@ class CareersDashboard {
     public function __construct() {
         add_action('wp_ajax_careers_position_action', array($this, 'handle_position_action'));
         add_action('wp_ajax_careers_location_action', array($this, 'handle_location_action'));
+        add_action('wp_ajax_careers_bulk_position_action', array($this, 'handle_bulk_position_action'));
         
         // Handle frontend dashboard routing
         add_action('wp', array($this, 'handle_dashboard_routing'));
@@ -561,27 +562,23 @@ class CareersDashboard {
             <div id="applicants-tab" class="tab-content">
                 <div class="applicant-status-grid">
                     <div class="status-card">
-                        <div class="status-number">7</div>
-                        <div class="status-label">New</div>
+                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['pending'] ?? 0); ?></div>
+                        <div class="status-label">Pending</div>
                     </div>
                     <div class="status-card">
-                        <div class="status-number">10</div>
-                        <div class="status-label">Under Review</div>
+                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['reviewed'] ?? 0); ?></div>
+                        <div class="status-label">Reviewed</div>
                     </div>
                     <div class="status-card">
-                        <div class="status-number">0</div>
-                        <div class="status-label">Contacted</div>
+                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['interviewing'] ?? 0); ?></div>
+                        <div class="status-label">Interviewing</div>
                     </div>
                     <div class="status-card">
-                        <div class="status-number">2</div>
-                        <div class="status-label">Interview</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-number">5</div>
+                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['hired'] ?? 0); ?></div>
                         <div class="status-label">Hired</div>
                     </div>
                     <div class="status-card">
-                        <div class="status-number">4</div>
+                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['rejected'] ?? 0); ?></div>
                         <div class="status-label">Rejected</div>
                     </div>
                 </div>
@@ -611,6 +608,22 @@ class CareersDashboard {
      */
     private function render_position_creation_form() {
         $locations = CareersPositionsDB::get_locations();
+        
+        // Group locations by state for better organization
+        $locations_by_state = array();
+        foreach ($locations as $location) {
+            $locations_by_state[$location->state][] = $location;
+        }
+        
+        // Sort states alphabetically
+        ksort($locations_by_state);
+        
+        // Sort cities within each state alphabetically
+        foreach ($locations_by_state as $state => $cities) {
+            usort($locations_by_state[$state], function($a, $b) {
+                return strcmp($a->city, $b->city);
+            });
+        }
         
         ?>
         <style>
@@ -736,10 +749,14 @@ class CareersDashboard {
                         <label for="location">Location *</label>
                         <select id="location" name="location" required>
                             <option value="">Select Location</option>
-                            <?php foreach ($locations as $location): ?>
-                                <option value="<?php echo esc_attr($location->display_name); ?>">
-                                    <?php echo esc_html($location->display_name); ?>
-                                </option>
+                            <?php foreach ($locations_by_state as $state => $cities): ?>
+                                <optgroup label="<?php echo esc_attr($state); ?>">
+                                    <?php foreach ($cities as $location): ?>
+                                        <option value="<?php echo esc_attr($location->display_name); ?>">
+                                            <?php echo esc_html($location->city); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </optgroup>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -918,6 +935,22 @@ class CareersDashboard {
         $position = CareersPositionsDB::get_position($id);
         $locations = CareersPositionsDB::get_locations();
         
+        // Group locations by state for better organization
+        $locations_by_state = array();
+        foreach ($locations as $location) {
+            $locations_by_state[$location->state][] = $location;
+        }
+        
+        // Sort states alphabetically
+        ksort($locations_by_state);
+        
+        // Sort cities within each state alphabetically
+        foreach ($locations_by_state as $state => $cities) {
+            usort($locations_by_state[$state], function($a, $b) {
+                return strcmp($a->city, $b->city);
+            });
+        }
+        
         if (!$position) {
             echo '<div class="error">Position not found.</div>';
             return;
@@ -1041,11 +1074,15 @@ class CareersDashboard {
                         <label for="location">Location *</label>
                         <select id="location" name="location" required>
                             <option value="">Select Location</option>
-                            <?php foreach ($locations as $location): ?>
-                                <option value="<?php echo esc_attr($location->display_name); ?>"
-                                        <?php selected($position->location, $location->display_name); ?>>
-                                    <?php echo esc_html($location->display_name); ?>
-                                </option>
+                            <?php foreach ($locations_by_state as $state => $cities): ?>
+                                <optgroup label="<?php echo esc_attr($state); ?>">
+                                    <?php foreach ($cities as $location): ?>
+                                        <option value="<?php echo esc_attr($location->display_name); ?>"
+                                                <?php selected($position->location, $location->display_name); ?>>
+                                            <?php echo esc_html($location->city); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </optgroup>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -1223,10 +1260,69 @@ class CareersDashboard {
     }
     
     /**
-     * Render position management
+     * Render position management - Enhanced with filtering, search, and bulk actions
      */
     private function render_position_management() {
-        $positions = CareersPositionsDB::get_positions(array('limit' => 50));
+        // Get filter parameters
+        $status_filter = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
+        $search_query = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
+        $job_type_filter = isset($_GET['job_type']) ? sanitize_text_field($_GET['job_type']) : '';
+        $location_filter = isset($_GET['location']) ? sanitize_text_field($_GET['location']) : '';
+        $page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+        $per_page = 20;
+        
+        // Build query arguments
+        $args = array(
+            'limit' => $per_page,
+            'offset' => ($page - 1) * $per_page,
+            'orderby' => 'created_at',
+            'order' => 'DESC'
+        );
+        
+        if (!empty($status_filter)) {
+            $args['status'] = $status_filter;
+        }
+        
+        if (!empty($search_query)) {
+            $args['search'] = $search_query;
+        }
+        
+        if (!empty($job_type_filter)) {
+            $args['job_type'] = $job_type_filter;
+        }
+        
+        if (!empty($location_filter)) {
+            $args['location'] = $location_filter;
+        }
+        
+        // Get positions and total count
+        $positions = CareersPositionsDB::get_positions($args);
+        $total_args = $args;
+        unset($total_args['limit'], $total_args['offset']);
+        $total_positions = CareersPositionsDB::get_positions_count($total_args);
+        
+        // Get filter options
+        $all_locations = CareersPositionsDB::get_locations();
+        $job_types = array('Full-Time', 'Part-Time', 'Contract', 'Per-Diem', 'Travel');
+        
+        // Group locations by state for better organization
+        $locations_by_state = array();
+        foreach ($all_locations as $location) {
+            $locations_by_state[$location->state][] = $location;
+        }
+        
+        // Sort states alphabetically
+        ksort($locations_by_state);
+        
+        // Sort cities within each state alphabetically
+        foreach ($locations_by_state as $state => $cities) {
+            usort($locations_by_state[$state], function($a, $b) {
+                return strcmp($a->city, $b->city);
+            });
+        }
+        
+        // Pagination calculations
+        $total_pages = ceil($total_positions / $per_page);
         
         ?>
         <style>
@@ -1241,7 +1337,7 @@ class CareersDashboard {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid #eee;
         }
@@ -1281,6 +1377,126 @@ class CareersDashboard {
             background: #e8e8e8;
             color: #333;
         }
+        
+        /* Filter Section */
+        .filters-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #555;
+        }
+        .filter-group input,
+        .filter-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        .filter-button {
+            background: #000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            height: fit-content;
+        }
+        .filter-button:hover {
+            background: #333;
+        }
+        .clear-filters {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+            margin-left: 0.5rem;
+        }
+        .clear-filters:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        /* Bulk Actions */
+        .bulk-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+        .bulk-select-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .bulk-select-group input[type="checkbox"] {
+            margin: 0;
+        }
+        .bulk-select-group label {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .bulk-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .bulk-actions select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            min-width: 120px;
+        }
+        .bulk-apply-btn {
+            background: #000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+        .bulk-apply-btn:hover {
+            background: #333;
+        }
+        .bulk-apply-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Results Info */
+        .results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        
+        /* Position Cards */
         .positions-grid {
             display: grid;
             gap: 1rem;
@@ -1291,21 +1507,37 @@ class CareersDashboard {
             border-radius: 4px;
             padding: 1.5rem;
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: auto 1fr auto;
             gap: 1rem;
             align-items: center;
         }
+        .position-checkbox {
+            margin: 0;
+        }
         .position-info {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 1rem;
-            align-items: center;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        .position-info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .position-info-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
         }
         .position-name {
             font-size: 1.125rem;
             font-weight: 500;
             color: #111;
-            margin: 0;
+            margin: 0 0 0.25rem 0;
         }
         .position-location {
             color: #666;
@@ -1331,6 +1563,10 @@ class CareersDashboard {
         .position-date {
             color: #666;
             font-size: 0.9rem;
+        }
+        .position-apps {
+            font-weight: 500;
+            color: #059669;
         }
         .position-actions {
             display: flex;
@@ -1371,6 +1607,39 @@ class CareersDashboard {
             background: #b91c1c;
             color: white;
         }
+        
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 1rem;
+        }
+        .pagination a,
+        .pagination span {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.875rem;
+        }
+        .pagination a:hover {
+            background: #f5f5f5;
+        }
+        .pagination .current {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        .pagination .disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
@@ -1385,16 +1654,52 @@ class CareersDashboard {
         .empty-state p {
             margin: 0 0 2rem 0;
         }
+        
+        /* Mobile Responsive */
         @media (max-width: 1024px) {
-            .position-info {
-                grid-template-columns: 1fr;
-                gap: 0.5rem;
+            .filters-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
             }
             .position-card {
                 grid-template-columns: 1fr;
+                gap: 1rem;
             }
-            .position-actions {
-                justify-content: flex-start;
+            .position-info {
+                display: block;
+            }
+            .position-info-item {
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            .position-info-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+            .position-info-label {
+                font-size: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+            .position-name {
+                font-size: 1.25rem;
+                line-height: 1.3;
+            }
+            .position-location {
+                font-size: 0.95rem;
+            }
+            .position-status {
+                font-size: 0.875rem;
+                padding: 0.375rem 0.75rem;
+            }
+            .position-type {
+                font-size: 0.875rem;
+            }
+            .position-date {
+                font-size: 0.95rem;
+            }
+            .position-apps {
+                font-size: 0.875rem;
             }
         }
         @media (max-width: 768px) {
@@ -1411,53 +1716,171 @@ class CareersDashboard {
             .create-button {
                 text-align: center;
             }
-            .position-actions {
-                flex-wrap: wrap;
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            .bulk-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .bulk-actions-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .bulk-actions select {
+                flex: 1;
+                margin-right: 0.5rem;
+            }
+            .results-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
             }
         }
         </style>
+        
         <div class="careers-position-management">
             <div class="management-header">
                 <h1>Manage Job Positions</h1>
                 <div class="header-actions">
                     <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
-                        ➕ Create New Position
+                        Create New Position
                     </a>
                     <a href="<?php echo home_url('/dashboard/locations'); ?>" class="create-button secondary">
-                        📍 Manage Locations
+                        Manage Locations
                     </a>
                 </div>
             </div>
             
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <form method="GET" action="" id="filters-form">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="search">Search Jobs</label>
+                            <input type="text" id="search" name="search" value="<?php echo esc_attr($search_query); ?>" 
+                                   placeholder="Search by job title...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="published" <?php selected($status_filter, 'published'); ?>>Published</option>
+                                <option value="draft" <?php selected($status_filter, 'draft'); ?>>Draft</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="job_type">Job Type</label>
+                            <select id="job_type" name="job_type">
+                                <option value="">All Types</option>
+                                <?php foreach ($job_types as $type): ?>
+                                    <option value="<?php echo esc_attr($type); ?>" <?php selected($job_type_filter, $type); ?>>
+                                        <?php echo esc_html($type); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="location">Location</label>
+                            <select id="location" name="location">
+                                <option value="">All Locations</option>
+                                <?php foreach ($locations_by_state as $state => $cities): ?>
+                                    <optgroup label="<?php echo esc_attr($state); ?>">
+                                        <?php foreach ($cities as $location): ?>
+                                            <option value="<?php echo esc_attr($location->city . ', ' . $location->state); ?>" <?php selected($location_filter, $location->city . ', ' . $location->state); ?>>
+                                                <?php echo esc_html($location->city); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="filter-button">Filter</button>
+                            <a href="<?php echo home_url('/dashboard/positions'); ?>" class="filter-button clear-filters">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
             <?php if (empty($positions)): ?>
                 <div class="empty-state">
-                    <h3>No positions yet</h3>
-                    <p>Create your first job position to get started.</p>
-                    <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
-                        Create Your First Position
-                    </a>
+                    <h3><?php echo $search_query || $status_filter || $job_type_filter || $location_filter ? 'No positions found' : 'No positions yet'; ?></h3>
+                    <p><?php echo $search_query || $status_filter || $job_type_filter || $location_filter ? 'Try adjusting your filters.' : 'Create your first job position to get started.'; ?></p>
+                    <?php if (!$search_query && !$status_filter && !$job_type_filter && !$location_filter): ?>
+                        <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
+                            Create Your First Position
+                        </a>
+                    <?php endif; ?>
                 </div>
             <?php else: ?>
+                <!-- Bulk Actions -->
+                <div class="bulk-actions">
+                    <div class="bulk-select-group">
+                        <input type="checkbox" id="select-all" class="position-checkbox">
+                        <label for="select-all">Select All</label>
+                    </div>
+                    <div class="bulk-actions-group">
+                        <select id="bulk-action">
+                            <option value="">Bulk Actions</option>
+                            <option value="publish">Publish</option>
+                            <option value="draft">Move to Draft</option>
+                            <option value="delete">Delete</option>
+                        </select>
+                        <button type="button" class="bulk-apply-btn" id="apply-bulk-action" disabled>Apply</button>
+                    </div>
+                </div>
+                
+                <!-- Results Info -->
+                <div class="results-info">
+                    <span>Showing <?php echo count($positions); ?> of <?php echo $total_positions; ?> positions</span>
+                    <span>Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
+                </div>
+                
+                <!-- Positions Grid -->
                 <div class="positions-grid">
                     <?php foreach ($positions as $position): ?>
                         <div class="position-card">
+                            <input type="checkbox" class="position-checkbox" value="<?php echo esc_attr($position->id); ?>">
                             <div class="position-info">
-                                <div>
+                                <div class="position-info-item">
+                                    <div class="position-info-label">Job Title</div>
                                     <h3 class="position-name"><?php echo esc_html($position->position_name); ?></h3>
-                                    <div class="position-location">📍 <?php echo esc_html($position->location); ?></div>
+                                    <div class="position-location"><?php echo esc_html($position->location); ?></div>
                                 </div>
-                                <div>
+                                <div class="position-info-item">
+                                    <div class="position-info-label">Status</div>
                                     <span class="position-status <?php echo esc_attr($position->status); ?>">
                                         <?php echo esc_html(ucfirst($position->status)); ?>
                                     </span>
                                 </div>
-                                <div class="position-date">
-                                    <?php echo esc_html(date('M j, Y', strtotime($position->created_at))); ?>
+                                <div class="position-info-item">
+                                    <div class="position-info-label">Job Type</div>
+                                    <?php if (!empty($position->job_type)): ?>
+                                        <span class="position-type"><?php echo esc_html($position->job_type); ?></span>
+                                    <?php else: ?>
+                                        <span class="position-type">Not specified</span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="position-info-item">
+                                    <div class="position-info-label">Posted Date</div>
+                                    <div class="position-date">
+                                        <?php echo esc_html(date('M j, Y', strtotime($position->created_at))); ?>
+                                    </div>
+                                </div>
+                                <div class="position-info-item">
+                                    <div class="position-info-label">Applications</div>
+                                    <div class="position-apps">
+                                        <?php echo esc_html(CareersApplicationDB::get_applications_count_by_job($position->id)); ?>
+                                    </div>
                                 </div>
                             </div>
                             <div class="position-actions">
                                 <a href="<?php echo home_url('/dashboard/positions/edit/' . esc_attr($position->id)); ?>" 
                                    class="action-button primary">Edit</a>
+                                <a href="<?php echo home_url('/dashboard/positions/applications/' . esc_attr($position->id)); ?>" 
+                                   class="action-button">Applications</a>
                                 <a href="<?php echo home_url('/open-positions/' . esc_attr($position->id)); ?>" 
                                    class="action-button" target="_blank">View</a>
                                 <button class="action-button danger delete-position" 
@@ -1466,11 +1889,97 @@ class CareersDashboard {
                         </div>
                     <?php endforeach; ?>
                 </div>
+                
+                <!-- Pagination -->
+                <?php if ($total_pages > 1): ?>
+                    <div class="pagination">
+                        <?php if ($page > 1): ?>
+                            <a href="<?php echo esc_url(add_query_arg('paged', $page - 1)); ?>">&laquo; Previous</a>
+                        <?php else: ?>
+                            <span class="disabled">&laquo; Previous</span>
+                        <?php endif; ?>
+                        
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                            <?php if ($i == $page): ?>
+                                <span class="current"><?php echo $i; ?></span>
+                            <?php else: ?>
+                                <a href="<?php echo esc_url(add_query_arg('paged', $i)); ?>"><?php echo $i; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+                        
+                        <?php if ($page < $total_pages): ?>
+                            <a href="<?php echo esc_url(add_query_arg('paged', $page + 1)); ?>">Next &raquo;</a>
+                        <?php else: ?>
+                            <span class="disabled">Next &raquo;</span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
         
         <script>
         jQuery(document).ready(function($) {
+            // Select all checkbox functionality
+            $('#select-all').on('change', function() {
+                $('.position-checkbox').not(this).prop('checked', this.checked);
+                toggleBulkActions();
+            });
+            
+            // Individual checkbox functionality
+            $('.position-checkbox').on('change', function() {
+                if (!this.checked) {
+                    $('#select-all').prop('checked', false);
+                }
+                toggleBulkActions();
+            });
+            
+            // Toggle bulk actions button
+            function toggleBulkActions() {
+                var checkedCount = $('.position-checkbox:checked').not('#select-all').length;
+                $('#apply-bulk-action').prop('disabled', checkedCount === 0);
+            }
+            
+            // Bulk actions handler
+            $('#apply-bulk-action').on('click', function() {
+                var action = $('#bulk-action').val();
+                var selectedIds = [];
+                
+                $('.position-checkbox:checked').not('#select-all').each(function() {
+                    selectedIds.push($(this).val());
+                });
+                
+                if (!action || selectedIds.length === 0) {
+                    alert('Please select an action and at least one position.');
+                    return;
+                }
+                
+                if (action === 'delete' && !confirm('Are you sure you want to delete the selected positions?')) {
+                    return;
+                }
+                
+                $.ajax({
+                    url: careers_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'careers_bulk_position_action',
+                        bulk_action: action,
+                        position_ids: selectedIds,
+                        nonce: careers_ajax.nonce
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert('Error: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error performing bulk action. Please try again.');
+                    }
+                });
+            });
+            
+            // Delete position handler
             $('.delete-position').on('click', function(e) {
                 e.preventDefault();
                 
@@ -1479,7 +1988,7 @@ class CareersDashboard {
                 }
                 
                 var positionId = $(this).data('id');
-                var row = $(this).closest('tr');
+                var card = $(this).closest('.position-card');
                 
                 $.ajax({
                     url: careers_ajax.ajax_url,
@@ -1492,7 +2001,7 @@ class CareersDashboard {
                     },
                     success: function(response) {
                         if (response.success) {
-                            row.fadeOut();
+                            card.fadeOut();
                         } else {
                             alert('Error: ' + response.data);
                         }
@@ -1516,75 +2025,142 @@ class CareersDashboard {
         ?>
         <style>
         .careers-location-management {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #333;
         }
-        .careers-location-management h1 {
-            color: #2c3e50;
-            margin-bottom: 30px;
-            text-align: center;
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
         }
-        .location-form {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .location-header h1 {
+            font-size: 2.5rem;
+            font-weight: 500;
+            margin: 0;
+            line-height: 1.2;
+            color: #111;
         }
-        .location-form h3 {
-            margin-top: 0;
-            color: #2c3e50;
-            margin-bottom: 20px;
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .dashboard-action-btn {
+            background: #f5f5f5;
+            color: #333;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s ease;
+        }
+        .dashboard-action-btn:hover {
+            background: #e8e8e8;
+            color: #333;
+        }
+        .location-form-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .location-form-card h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #111;
+            margin: 0 0 1.5rem 0;
         }
         .location-form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr auto;
-            gap: 15px;
+            gap: 1rem;
             align-items: end;
         }
-        .location-form input, .location-form select {
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 6px;
-            font-size: 14px;
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
-        .location-form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #2c3e50;
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #333;
         }
-        .locations-by-state {
+        .form-group input {
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        .add-location-btn {
+            background: #000;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            height: fit-content;
+        }
+        .add-location-btn:hover {
+            background: #333;
+        }
+        .locations-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .state-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
             overflow: hidden;
         }
-        .state-group {
-            border-bottom: 1px solid #e1e5e9;
-        }
-        .state-group:last-child {
-            border-bottom: none;
-        }
         .state-header {
-            background: #3498db;
-            color: white;
-            padding: 15px 20px;
-            font-weight: 600;
-            font-size: 16px;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
         }
-        .cities-list {
-            padding: 0;
+        .state-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #111;
             margin: 0;
-            list-style: none;
+        }
+        .state-count {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        .cities-grid {
+            display: grid;
+            gap: 0;
         }
         .city-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
-            border-bottom: 1px solid #f1f1f1;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
         }
         .city-item:last-child {
             border-bottom: none;
@@ -1593,85 +2169,215 @@ class CareersDashboard {
             background: #f8f9fa;
         }
         .city-name {
-            font-size: 14px;
-            color: #2c3e50;
+            font-size: 0.875rem;
+            color: #333;
+            font-weight: 500;
         }
         .delete-location {
-            background: #e74c3c;
+            background: #dc2626;
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 0.5rem 1rem;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s ease;
         }
         .delete-location:hover {
-            background: #c0392b;
+            background: #b91c1c;
         }
-        .no-locations {
+        .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 4rem 2rem;
             color: #666;
-            font-style: italic;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .empty-state h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #111;
+            margin: 0 0 0.5rem 0;
+        }
+        .empty-state p {
+            margin: 0 0 2rem 0;
+            font-size: 0.875rem;
+        }
+        .create-first-btn {
+            background: #000;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s ease;
+        }
+        .create-first-btn:hover {
+            background: #333;
+            color: white;
+        }
+        .locations-section {
+            margin-top: 2rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #111;
+            margin: 0 0 1.5rem 0;
+        }
+        .locations-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #111;
+            margin: 0 0 0.5rem 0;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0;
+        }
+        @media (max-width: 1024px) {
+            .location-form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            .add-location-btn {
+                grid-column: 1 / -1;
+                justify-self: start;
+            }
         }
         @media (max-width: 768px) {
+            .careers-location-management {
+                padding: 1rem;
+            }
+            .location-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+            }
+            .dashboard-action-btn {
+                text-align: center;
+            }
             .location-form-grid {
                 grid-template-columns: 1fr;
+            }
+            .locations-stats {
+                grid-template-columns: 1fr;
+            }
+            .city-item {
+                padding: 0.75rem 1rem;
             }
         }
         </style>
         
         <div class="careers-location-management">
-            <h1>Manage Locations</h1>
+            <div class="location-header">
+                <h1>Manage Locations</h1>
+                <div class="header-actions">
+                    <a href="<?php echo home_url('/dashboard'); ?>" class="dashboard-action-btn">
+                        Back to Dashboard
+                    </a>
+                    <a href="<?php echo home_url('/dashboard/jobs'); ?>" class="dashboard-action-btn">
+                        Manage Jobs
+                    </a>
+                </div>
+            </div>
             
-            <div class="location-form">
+            <?php if (!empty($locations_by_state)): ?>
+                <div class="locations-stats">
+                    <div class="stat-card">
+                        <div class="stat-number"><?php echo count($locations_by_state); ?></div>
+                        <div class="stat-label">States</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            <?php 
+                            $total_cities = 0;
+                            foreach ($locations_by_state as $cities) {
+                                $total_cities += count($cities);
+                            }
+                            echo $total_cities;
+                            ?>
+                        </div>
+                        <div class="stat-label">Cities</div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            
+            <div class="location-form-card">
                 <h3>Add New Location</h3>
                 <form id="add-location-form">
                     <?php wp_nonce_field('careers_location_action', 'careers_nonce'); ?>
                     <div class="location-form-grid">
-                        <div>
+                        <div class="form-group">
                             <label for="location_state">State *</label>
                             <input type="text" id="location_state" name="location_state" 
                                    placeholder="e.g. Texas" required>
                         </div>
-                        <div>
+                        <div class="form-group">
                             <label for="location_city">City *</label>
                             <input type="text" id="location_city" name="location_city" 
                                    placeholder="e.g. Dallas" required>
                         </div>
                         <div>
-                            <button type="submit" class="button button-primary">Add Location</button>
+                            <button type="submit" class="add-location-btn">Add Location</button>
                         </div>
                     </div>
                 </form>
             </div>
             
-            <div class="locations-by-state">
-                <h3 style="padding: 20px; margin: 0; background: #ecf0f1; color: #2c3e50;">Existing Locations</h3>
+            <div class="locations-section">
+                <h3 class="section-title">Existing Locations</h3>
                 
                 <?php if (empty($locations_by_state)): ?>
-                    <div class="no-locations">
-                        No locations added yet. Add your first location above.
+                    <div class="empty-state">
+                        <h3>No locations added yet</h3>
+                        <p>Add your first location above to get started with job postings.</p>
                     </div>
                 <?php else: ?>
-                    <?php foreach ($locations_by_state as $state => $cities): ?>
-                        <div class="state-group">
-                            <div class="state-header">
-                                <?php echo esc_html($state); ?> (<?php echo count($cities); ?> cities)
+                    <div class="locations-grid">
+                        <?php foreach ($locations_by_state as $state => $cities): ?>
+                            <div class="state-card">
+                                <div class="state-header">
+                                    <h4 class="state-title"><?php echo esc_html($state); ?></h4>
+                                    <div class="state-count"><?php echo count($cities); ?> <?php echo count($cities) === 1 ? 'city' : 'cities'; ?></div>
+                                </div>
+                                <div class="cities-grid">
+                                    <?php foreach ($cities as $location): ?>
+                                        <div class="city-item">
+                                            <span class="city-name"><?php echo esc_html($location->city); ?></span>
+                                            <button class="delete-location" data-id="<?php echo esc_attr($location->id); ?>">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
-                            <ul class="cities-list">
-                                <?php foreach ($cities as $location): ?>
-                                    <li class="city-item">
-                                        <span class="city-name"><?php echo esc_html($location->city); ?></span>
-                                        <button class="delete-location" data-id="<?php echo esc_attr($location->id); ?>">
-                                            Delete
-                                        </button>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
@@ -1909,6 +2615,62 @@ class CareersDashboard {
                     wp_send_json_error('Failed to delete location');
                 }
                 break;
+        }
+        
+        wp_die();
+    }
+    
+    /**
+     * Handle bulk position actions
+     */
+    public function handle_bulk_position_action() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'careers_nonce')) {
+            wp_send_json_error('Invalid nonce');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+        }
+        
+        $action = sanitize_text_field($_POST['bulk_action']);
+        $position_ids = array_map('intval', $_POST['position_ids']);
+        
+        if (empty($action) || empty($position_ids)) {
+            wp_send_json_error('Missing action or position IDs');
+        }
+        
+        switch ($action) {
+            case 'publish':
+                $result = CareersPositionsDB::bulk_update_status($position_ids, 'published');
+                if ($result !== false) {
+                    wp_send_json_success('Positions published successfully');
+                } else {
+                    wp_send_json_error('Failed to publish positions');
+                }
+                break;
+                
+            case 'draft':
+                $result = CareersPositionsDB::bulk_update_status($position_ids, 'draft');
+                if ($result !== false) {
+                    wp_send_json_success('Positions moved to draft successfully');
+                } else {
+                    wp_send_json_error('Failed to move positions to draft');
+                }
+                break;
+                
+            case 'delete':
+                $result = CareersPositionsDB::bulk_delete_positions($position_ids);
+                if ($result !== false) {
+                    wp_send_json_success('Positions deleted successfully');
+                } else {
+                    wp_send_json_error('Failed to delete positions');
+                }
+                break;
+                
+            default:
+                wp_send_json_error('Invalid bulk action');
         }
         
         wp_die();

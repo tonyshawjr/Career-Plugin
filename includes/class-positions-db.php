@@ -275,65 +275,6 @@ class CareersPositionsDB {
         ));
     }
     
-    /**
-     * Get all positions with filters
-     */
-    public static function get_positions($args = array()) {
-        global $wpdb;
-        
-        $table_name = $wpdb->prefix . self::$table_name;
-        
-        $defaults = array(
-            'location' => '',
-            'status' => 'published',
-            'limit' => 20,
-            'offset' => 0,
-            'orderby' => 'created_at',
-            'order' => 'DESC',
-            'search' => ''
-        );
-        
-        $args = wp_parse_args($args, $defaults);
-        
-        $where_conditions = array();
-        $where_values = array();
-        
-        if (!empty($args['status'])) {
-            $where_conditions[] = "status = %s";
-            $where_values[] = $args['status'];
-        }
-        
-        if (!empty($args['location'])) {
-            $where_conditions[] = "location = %s";
-            $where_values[] = $args['location'];
-        }
-        
-        if (!empty($args['search'])) {
-            $where_conditions[] = "(position_name LIKE %s OR position_overview LIKE %s OR responsibilities LIKE %s OR requirements LIKE %s)";
-            $search_term = '%' . $wpdb->esc_like($args['search']) . '%';
-            $where_values[] = $search_term;
-            $where_values[] = $search_term;
-            $where_values[] = $search_term;
-            $where_values[] = $search_term;
-        }
-        
-        $where_clause = '';
-        if (!empty($where_conditions)) {
-            $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
-        }
-        
-        $orderby = sanitize_sql_orderby($args['orderby'] . ' ' . $args['order']);
-        if (!$orderby) {
-            $orderby = 'created_at DESC';
-        }
-        
-        $query = "SELECT * FROM $table_name $where_clause ORDER BY $orderby LIMIT %d OFFSET %d";
-        
-        $where_values[] = $args['limit'];
-        $where_values[] = $args['offset'];
-        
-        return $wpdb->get_results($wpdb->prepare($query, $where_values));
-    }
     
     /**
      * Delete position
@@ -506,5 +447,188 @@ class CareersPositionsDB {
         $html .= '</ul>';
         
         return $html;
+    }
+    
+    /**
+     * Get positions count with filtering support
+     */
+    public static function get_positions_count($args = array()) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . self::$table_name;
+        
+        $defaults = array(
+            'status' => '',
+            'search' => '',
+            'job_type' => '',
+            'location' => ''
+        );
+        
+        $args = wp_parse_args($args, $defaults);
+        
+        $where_conditions = array();
+        $where_values = array();
+        
+        // Status filter
+        if (!empty($args['status'])) {
+            $where_conditions[] = "status = %s";
+            $where_values[] = $args['status'];
+        }
+        
+        // Search filter - search across multiple fields
+        if (!empty($args['search'])) {
+            $where_conditions[] = "(position_name LIKE %s OR position_overview LIKE %s OR responsibilities LIKE %s OR requirements LIKE %s)";
+            $search_term = '%' . $wpdb->esc_like($args['search']) . '%';
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+        }
+        
+        // Job type filter
+        if (!empty($args['job_type'])) {
+            $where_conditions[] = "job_type = %s";
+            $where_values[] = $args['job_type'];
+        }
+        
+        // Location filter
+        if (!empty($args['location'])) {
+            $where_conditions[] = "location = %s";
+            $where_values[] = $args['location'];
+        }
+        
+        $where_clause = '';
+        if (!empty($where_conditions)) {
+            $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
+        }
+        
+        $query = "SELECT COUNT(*) FROM $table_name $where_clause";
+        
+        if (!empty($where_values)) {
+            $query = $wpdb->prepare($query, $where_values);
+        }
+        
+        return intval($wpdb->get_var($query));
+    }
+    
+    /**
+     * Enhanced get_positions method with search and filtering support
+     */
+    public static function get_positions($args = array()) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . self::$table_name;
+        
+        $defaults = array(
+            'status' => '',
+            'search' => '',
+            'job_type' => '',
+            'location' => '',
+            'limit' => 50,
+            'offset' => 0,
+            'orderby' => 'created_at',
+            'order' => 'DESC'
+        );
+        
+        $args = wp_parse_args($args, $defaults);
+        
+        $where_conditions = array();
+        $where_values = array();
+        
+        // Status filter
+        if (!empty($args['status'])) {
+            $where_conditions[] = "status = %s";
+            $where_values[] = $args['status'];
+        }
+        
+        // Search filter - search across multiple fields
+        if (!empty($args['search'])) {
+            $where_conditions[] = "(position_name LIKE %s OR position_overview LIKE %s OR responsibilities LIKE %s OR requirements LIKE %s)";
+            $search_term = '%' . $wpdb->esc_like($args['search']) . '%';
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+            $where_values[] = $search_term;
+        }
+        
+        // Job type filter
+        if (!empty($args['job_type'])) {
+            $where_conditions[] = "job_type = %s";
+            $where_values[] = $args['job_type'];
+        }
+        
+        // Location filter
+        if (!empty($args['location'])) {
+            $where_conditions[] = "location = %s";
+            $where_values[] = $args['location'];
+        }
+        
+        $where_clause = '';
+        if (!empty($where_conditions)) {
+            $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
+        }
+        
+        // Sanitize orderby and order
+        $allowed_orderby = array('id', 'position_name', 'location', 'status', 'created_at');
+        $orderby = in_array($args['orderby'], $allowed_orderby) ? $args['orderby'] : 'created_at';
+        $order = strtoupper($args['order']) === 'ASC' ? 'ASC' : 'DESC';
+        
+        $query = "SELECT * FROM $table_name $where_clause ORDER BY $orderby $order LIMIT %d OFFSET %d";
+        
+        $where_values[] = $args['limit'];
+        $where_values[] = $args['offset'];
+        
+        $query = $wpdb->prepare($query, $where_values);
+        
+        return $wpdb->get_results($query);
+    }
+    
+    /**
+     * Bulk update positions status
+     */
+    public static function bulk_update_status($position_ids, $status) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . self::$table_name;
+        
+        if (empty($position_ids) || !is_array($position_ids)) {
+            return false;
+        }
+        
+        $valid_statuses = array('published', 'draft');
+        if (!in_array($status, $valid_statuses)) {
+            return false;
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($position_ids), '%d'));
+        
+        $query = $wpdb->prepare(
+            "UPDATE $table_name SET status = %s WHERE id IN ($placeholders)",
+            array_merge(array($status), $position_ids)
+        );
+        
+        return $wpdb->query($query);
+    }
+    
+    /**
+     * Bulk delete positions
+     */
+    public static function bulk_delete_positions($position_ids) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . self::$table_name;
+        
+        if (empty($position_ids) || !is_array($position_ids)) {
+            return false;
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($position_ids), '%d'));
+        
+        $query = $wpdb->prepare(
+            "DELETE FROM $table_name WHERE id IN ($placeholders)",
+            $position_ids
+        );
+        
+        return $wpdb->query($query);
     }
 }
