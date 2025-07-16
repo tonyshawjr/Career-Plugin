@@ -40,669 +40,6 @@ class CareersDashboard {
         $active_jobs = CareersPositionsDB::get_positions(array('status' => 'published', 'limit' => 10));
         
         ?>
-        <style>
-        .careers-dashboard-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 2rem 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            color: #333;
-            font-size: 16px !important;
-        }
-        .careers-dashboard-container * {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        /* High specificity CSS overrides to fix font and underline issues */
-        .careers-dashboard-container,
-        .careers-dashboard-container * {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            font-size: 16px !important;
-            line-height: 1.5 !important;
-        }
-        
-        /* Remove all underlines and text decorations with maximum specificity */
-        .careers-dashboard-container a,
-        .careers-dashboard-container a:link,
-        .careers-dashboard-container a:visited,
-        .careers-dashboard-container a:hover,
-        .careers-dashboard-container a:active,
-        .careers-dashboard-container a:focus,
-        .careers-dashboard-container button,
-        .careers-dashboard-container button:link,
-        .careers-dashboard-container button:visited,
-        .careers-dashboard-container button:hover,
-        .careers-dashboard-container button:active,
-        .careers-dashboard-container button:focus,
-        .careers-dashboard-container .action-btn,
-        .careers-dashboard-container .action-btn:link,
-        .careers-dashboard-container .action-btn:visited,
-        .careers-dashboard-container .action-btn:hover,
-        .careers-dashboard-container .action-btn:active,
-        .careers-dashboard-container .action-btn:focus,
-        .careers-dashboard-container .dashboard-action-btn,
-        .careers-dashboard-container .dashboard-action-btn:link,
-        .careers-dashboard-container .dashboard-action-btn:visited,
-        .careers-dashboard-container .dashboard-action-btn:hover,
-        .careers-dashboard-container .dashboard-action-btn:active,
-        .careers-dashboard-container .dashboard-action-btn:focus,
-        .careers-dashboard-container .create-button,
-        .careers-dashboard-container .create-button:link,
-        .careers-dashboard-container .create-button:visited,
-        .careers-dashboard-container .create-button:hover,
-        .careers-dashboard-container .create-button:active,
-        .careers-dashboard-container .create-button:focus {
-            text-decoration: none !important;
-            border-bottom: none !important;
-            box-shadow: none !important;
-            outline: none !important;
-            text-underline-offset: unset !important;
-            text-decoration-line: none !important;
-            text-decoration-color: transparent !important;
-            text-decoration-style: none !important;
-            text-decoration-thickness: 0 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        /* Force button styles with extreme specificity */
-        .careers-dashboard-container .dashboard-actions .dashboard-action-btn {
-            background: #000 !important;
-            color: white !important;
-            padding: 0.75rem 1.5rem !important;
-            border: none !important;
-            border-radius: 4px !important;
-            font-size: 1rem !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            display: inline-block !important;
-            transition: background 0.2s ease !important;
-            cursor: pointer !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        .careers-dashboard-container .dashboard-actions .dashboard-action-btn:hover {
-            background: #333 !important;
-            color: white !important;
-            text-decoration: none !important;
-        }
-        
-        /* Override theme table styles */
-        .careers-dashboard-container table .action-btn {
-            background: #fff !important;
-            color: #333 !important;
-            border: 1px solid #ddd !important;
-            border-radius: 4px !important;
-            padding: 0.5rem 1rem !important;
-            font-size: 0.875rem !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            display: inline-block !important;
-            margin-right: 0.5rem !important;
-            transition: all 0.2s ease !important;
-            cursor: pointer !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        .careers-dashboard-container table .action-btn:hover {
-            background: #f5f5f5 !important;
-            color: #333 !important;
-            text-decoration: none !important;
-        }
-        
-        /* Improved table typography for better UX */
-        .careers-dashboard-container table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 1rem 0;
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .careers-dashboard-container table th {
-            background: #f8f9fa !important;
-            color: #6b7280 !important;
-            font-size: 12px !important;
-            font-weight: 600 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
-            padding: 1rem 0.75rem !important;
-            text-align: left !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        .careers-dashboard-container table td {
-            padding: 1rem 0.75rem !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            font-size: 14px !important;
-            color: #374151 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        .careers-dashboard-container table tr:hover {
-            background: #f9fafb !important;
-        }
-        
-        .careers-dashboard-container table tr:last-child td {
-            border-bottom: none !important;
-        }
-        
-        /* Flat job card design matching manage jobs mobile layout */
-        .careers-dashboard-container .job-card {
-            background: #fff !important;
-            border: 1px solid #eee !important;
-            border-radius: 4px !important;
-            padding: 1.5rem !important;
-            margin-bottom: 1rem !important;
-            display: grid !important;
-            grid-template-columns: 1fr auto !important;
-            gap: 1rem !important;
-            align-items: start !important;
-        }
-        
-        .careers-dashboard-container .job-info {
-            display: grid !important;
-            grid-template-columns: 2fr 1.5fr 1fr 1.5fr 1fr !important;
-            gap: 1.5rem !important;
-            align-items: start !important;
-        }
-        
-        .careers-dashboard-container .job-info-item {
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 0.25rem !important;
-        }
-        
-        .careers-dashboard-container .job-info-label {
-            font-size: 0.75rem !important;
-            font-weight: 500 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-            color: #666 !important;
-            margin-bottom: 0.25rem !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        .careers-dashboard-container .job-title {
-            font-size: 1.125rem !important;
-            font-weight: 600 !important;
-            color: #111 !important;
-            margin: 0 !important;
-            line-height: 1.3 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        .careers-dashboard-container .job-location,
-        .careers-dashboard-container .app-count,
-        .careers-dashboard-container .posted-date {
-            font-size: 0.875rem !important;
-            color: #374151 !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        
-        .careers-dashboard-container .employment-type {
-            display: inline-block !important;
-            padding: 0.25rem 0.5rem !important;
-            border-radius: 12px !important;
-            font-size: 0.75rem !important;
-            font-weight: 500 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-            background: #f3f4f6 !important;
-            color: #374151 !important;
-        }
-        
-        .careers-dashboard-container .employment-type.full-time {
-            background: #d1fae5 !important;
-            color: #065f46 !important;
-        }
-        
-        .careers-dashboard-container .employment-type.part-time {
-            background: #fef3c7 !important;
-            color: #92400e !important;
-        }
-        
-        .careers-dashboard-container .job-actions {
-            display: flex !important;
-            gap: 0.5rem !important;
-            align-items: flex-start !important;
-        }
-        
-        /* Mobile responsive layout matching manage jobs */
-        @media (max-width: 1024px) {
-            .careers-dashboard-container .job-card {
-                grid-template-columns: 1fr !important;
-                gap: 1rem !important;
-            }
-            
-            .careers-dashboard-container .job-info {
-                display: block !important;
-            }
-            
-            .careers-dashboard-container .job-info-item {
-                margin-bottom: 1rem !important;
-                padding-bottom: 0.75rem !important;
-                border-bottom: 1px solid #f0f0f0 !important;
-            }
-            
-            .careers-dashboard-container .job-info-item:last-child {
-                border-bottom: none !important;
-                margin-bottom: 0 !important;
-            }
-            
-            .careers-dashboard-container .job-title {
-                font-size: 1.25rem !important;
-                line-height: 1.3 !important;
-            }
-            
-            .careers-dashboard-container .employment-type {
-                font-size: 0.875rem !important;
-                padding: 0.375rem 0.75rem !important;
-            }
-            
-            .careers-dashboard-container .job-actions {
-                justify-content: flex-start !important;
-                flex-wrap: wrap !important;
-            }
-        }
-        
-        /* Fix button cutting issue */
-        .careers-dashboard-container .action-btn {
-            line-height: 1.4 !important;
-            padding: 0.5rem 1rem !important;
-            border: 1px solid #ddd !important;
-            border-radius: 4px !important;
-            font-size: 0.875rem !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            display: inline-block !important;
-            background: #fff !important;
-            color: #333 !important;
-            cursor: pointer !important;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            vertical-align: top !important;
-            box-sizing: border-box !important;
-        }
-        
-        .careers-dashboard-container .action-btn:hover {
-            background: #f5f5f5 !important;
-            color: #333 !important;
-            text-decoration: none !important;
-        }
-        .careers-dashboard-container h1,
-        .careers-dashboard-container h2,
-        .careers-dashboard-container h3,
-        .careers-dashboard-container h4,
-        .careers-dashboard-container h5,
-        .careers-dashboard-container h6 {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            font-weight: 500 !important;
-        }
-        .careers-dashboard-container p,
-        .careers-dashboard-container span,
-        .careers-dashboard-container div {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        .careers-dashboard-container table,
-        .careers-dashboard-container th,
-        .careers-dashboard-container td {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        .careers-dashboard-container .dashboard-header {
-            margin-bottom: 3rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid #eee;
-        }
-        .careers-dashboard-container .dashboard-title {
-            font-size: 2.5rem !important;
-            font-weight: 500 !important;
-            margin: 0 0 0.5rem 0 !important;
-            line-height: 1.2 !important;
-            color: #111 !important;
-        }
-        .careers-dashboard-container .dashboard-subtitle {
-            color: #666 !important;
-            margin: 0 !important;
-            font-size: 1rem !important;
-        }
-        .careers-dashboard-container .dashboard-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            background: #f5f5f5;
-            padding: 0.25rem;
-            border-radius: 4px;
-            width: fit-content;
-        }
-        .careers-dashboard-container .dashboard-tab {
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            border: none;
-            border-radius: 4px;
-            font-size: 0.875rem !important;
-            font-weight: 500;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none !important;
-        }
-        .careers-dashboard-container .dashboard-tab.active {
-            background: #fff;
-            color: #111;
-        }
-        .careers-dashboard-container .tab-content {
-            display: none;
-        }
-        .careers-dashboard-container .tab-content.active {
-            display: block;
-        }
-        .careers-dashboard-container .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 3rem;
-        }
-        .careers-dashboard-container .metric-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 1.5rem;
-            text-align: center;
-        }
-        .careers-dashboard-container .metric-number {
-            font-size: 2.5rem !important;
-            font-weight: 500;
-            color: #111;
-            margin: 0 0 0.5rem 0;
-        }
-        .careers-dashboard-container .metric-label {
-            font-size: 0.875rem !important;
-            color: #666;
-            margin: 0;
-        }
-        .careers-dashboard-container .applicant-status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-bottom: 3rem;
-        }
-        .careers-dashboard-container .status-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .careers-dashboard-container .status-number {
-            font-size: 1.5rem !important;
-            font-weight: 500;
-            color: #111;
-            margin: 0 0 0.25rem 0;
-        }
-        .careers-dashboard-container .status-label {
-            font-size: 0.75rem !important;
-            color: #666;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .careers-dashboard-container .jobs-section {
-            margin-top: 3rem;
-        }
-        .careers-dashboard-container .section-title {
-            font-size: 1.25rem !important;
-            font-weight: 500;
-            color: #111;
-            margin: 0 0 1.5rem 0;
-        }
-        .careers-dashboard-container .jobs-grid {
-            display: grid;
-            gap: 1rem;
-        }
-        .careers-dashboard-container .job-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 1.5rem;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 1rem;
-            align-items: center;
-        }
-        .job-info {
-            display: grid;
-            grid-template-columns: 2fr 1.5fr 1fr 1.5fr 1fr;
-            gap: 1.5rem;
-            align-items: start;
-        }
-        .job-info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-        .job-info-label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.25rem;
-        }
-        .job-title {
-            font-size: 1.125rem;
-            font-weight: 500;
-            color: #111;
-            margin: 0;
-        }
-        .job-location {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        .app-count {
-            font-weight: 500;
-            color: #059669;
-            background: #d1fae5;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            text-align: center;
-            min-width: 2rem;
-            display: inline-block;
-        }
-        .employment-type {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: #f3f4f6;
-            color: #666;
-        }
-        .employment-type.full-time {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-        .employment-type.part-time {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        .employment-type.contract {
-            background: #f3e8ff;
-            color: #7c3aed;
-        }
-        .employment-type.per-diem {
-            background: #ecfdf5;
-            color: #059669;
-        }
-        .employment-type.travel {
-            background: #fce7f3;
-            color: #be185d;
-        }
-        .posted-date {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        .job-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .careers-dashboard-container .action-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.875rem !important;
-            font-weight: 500;
-            text-decoration: none !important;
-            display: inline-block;
-            transition: all 0.2s ease;
-            background: #fff;
-            color: #333;
-            cursor: pointer;
-        }
-        .careers-dashboard-container .action-btn:hover {
-            background: #f5f5f5;
-            color: #333;
-            text-decoration: none !important;
-        }
-        .careers-dashboard-container .action-btn.primary {
-            background: #000;
-            color: white;
-            border-color: #000;
-        }
-        .careers-dashboard-container .action-btn.primary:hover {
-            background: #333;
-            color: white;
-            text-decoration: none !important;
-        }
-        .careers-dashboard-container .action-btn.danger {
-            background: #dc2626;
-            color: white;
-            border-color: #dc2626;
-        }
-        .careers-dashboard-container .action-btn.danger:hover {
-            background: #b91c1c;
-            color: white;
-            text-decoration: none !important;
-        }
-        .dashboard-actions {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-        .careers-dashboard-container .dashboard-action-btn {
-            background: #000;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem !important;
-            font-weight: 500;
-            text-decoration: none !important;
-            display: inline-block;
-            transition: background 0.2s ease;
-        }
-        .careers-dashboard-container .dashboard-action-btn:hover {
-            background: #333;
-            color: white;
-            text-decoration: none !important;
-        }
-        .careers-dashboard-container .dashboard-action-btn.secondary {
-            background: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-        .careers-dashboard-container .dashboard-action-btn.secondary:hover {
-            background: #e8e8e8;
-            color: #333;
-            text-decoration: none !important;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #666;
-        }
-        .empty-state h3 {
-            font-size: 1.125rem;
-            font-weight: 500;
-            color: #111;
-            margin: 0 0 0.5rem 0;
-        }
-        @media (max-width: 768px) {
-            .dashboard-container {
-                padding: 1rem;
-            }
-            .dashboard-title {
-                font-size: 2rem;
-            }
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-            .applicant-status-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .dashboard-actions {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .dashboard-action-btn {
-                text-align: center;
-            }
-            .job-card {
-                padding: 1rem;
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            .job-info {
-                display: block;
-            }
-            .job-info-item {
-                margin-bottom: 1rem;
-                padding-bottom: 0.75rem;
-                border-bottom: 1px solid #f0f0f0;
-            }
-            .job-info-item:last-child {
-                border-bottom: none;
-                margin-bottom: 0;
-            }
-            .job-info-label {
-                font-size: 0.75rem;
-                margin-bottom: 0.5rem;
-            }
-            .job-title {
-                font-size: 1.25rem;
-                line-height: 1.3;
-            }
-            .job-location {
-                font-size: 0.95rem;
-            }
-            .app-count {
-                font-size: 0.875rem;
-                padding: 0.375rem 0.75rem;
-            }
-            .employment-type {
-                font-size: 0.875rem;
-                padding: 0.375rem 0.75rem;
-            }
-            .posted-date {
-                font-size: 0.95rem;
-            }
-            .job-actions {
-                justify-content: stretch;
-                gap: 0.5rem;
-            }
-            .action-btn {
-                flex: 1;
-                text-align: center;
-                padding: 0.75rem 0.5rem;
-                font-size: 0.875rem;
-            }
-        }
-        </style>
-        
         <div class="careers-dashboard-container">
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Dashboard</h1>
@@ -860,113 +197,11 @@ class CareersDashboard {
         }
         
         ?>
-        <style>
-        .careers-position-form {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 2rem 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #333;
-        }
-        .careers-position-form h1 {
-            font-size: 2.5rem;
-            font-weight: 500;
-            margin: 0 0 3rem 0;
-            line-height: 1.2;
-            color: #111;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid #eee;
-        }
-        .form-row {
-            margin-bottom: 2rem;
-        }
-        .form-row label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #111;
-            font-size: 1rem;
-        }
-        .form-row input, .form-row textarea, .form-row select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.2s ease;
-            background: #fff;
-        }
-        .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
-            outline: none;
-            border-color: #333;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
-        }
-        .form-row small {
-            display: block;
-            margin-top: 0.25rem;
-            color: #666;
-            font-size: 0.875rem;
-        }
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid #eee;
-        }
-        .button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-            transition: background 0.2s ease;
-        }
-        .button-primary {
-            background: #000;
-            color: white;
-        }
-        .button-primary:hover {
-            background: #333;
-        }
-        .button:not(.button-primary) {
-            background: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-        .button:not(.button-primary):hover {
-            background: #e8e8e8;
-        }
-        .checkbox-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .checkbox-row input[type="checkbox"] {
-            width: auto;
-            margin: 0;
-        }
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            .form-actions {
-                flex-direction: column;
-            }
-        }
-        </style>
-        
-        <div class="careers-position-form">
-            <h1>Create New Job Position</h1>
+        <div class="careers-dashboard-container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Create New Job Position</h1>
+                <p class="dashboard-subtitle">Add a new position to your careers system</p>
+            </div>
             
             <form id="careers-position-form" method="post" action="">
                 <?php wp_nonce_field('careers_position_action', 'careers_nonce'); ?>
@@ -1192,33 +427,120 @@ class CareersDashboard {
         
         ?>
         <style>
-        .careers-position-form {
+        .careers-dashboard-container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 2rem 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             color: #333;
+            font-size: 16px !important;
         }
-        .careers-position-form h1 {
-            font-size: 2.5rem;
-            font-weight: 500;
-            margin: 0 0 3rem 0;
-            line-height: 1.2;
-            color: #111;
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        /* High specificity CSS overrides to fix font and underline issues */
+        .careers-dashboard-container,
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Remove all underlines and text decorations with maximum specificity */
+        .careers-dashboard-container a,
+        .careers-dashboard-container a:link,
+        .careers-dashboard-container a:visited,
+        .careers-dashboard-container a:hover,
+        .careers-dashboard-container a:active,
+        .careers-dashboard-container a:focus,
+        .careers-dashboard-container button,
+        .careers-dashboard-container button:link,
+        .careers-dashboard-container button:visited,
+        .careers-dashboard-container button:hover,
+        .careers-dashboard-container button:active,
+        .careers-dashboard-container button:focus,
+        .careers-dashboard-container .action-btn,
+        .careers-dashboard-container .action-btn:link,
+        .careers-dashboard-container .action-btn:visited,
+        .careers-dashboard-container .action-btn:hover,
+        .careers-dashboard-container .action-btn:active,
+        .careers-dashboard-container .action-btn:focus,
+        .careers-dashboard-container .dashboard-action-btn,
+        .careers-dashboard-container .dashboard-action-btn:link,
+        .careers-dashboard-container .dashboard-action-btn:visited,
+        .careers-dashboard-container .dashboard-action-btn:hover,
+        .careers-dashboard-container .dashboard-action-btn:active,
+        .careers-dashboard-container .dashboard-action-btn:focus,
+        .careers-dashboard-container .create-button,
+        .careers-dashboard-container .create-button:link,
+        .careers-dashboard-container .create-button:visited,
+        .careers-dashboard-container .create-button:hover,
+        .careers-dashboard-container .create-button:active,
+        .careers-dashboard-container .create-button:focus,
+        .careers-dashboard-container .button,
+        .careers-dashboard-container .button:link,
+        .careers-dashboard-container .button:visited,
+        .careers-dashboard-container .button:hover,
+        .careers-dashboard-container .button:active,
+        .careers-dashboard-container .button:focus {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            text-underline-offset: unset !important;
+            text-decoration-line: none !important;
+            text-decoration-color: transparent !important;
+            text-decoration-style: none !important;
+            text-decoration-thickness: 0 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container h1,
+        .careers-dashboard-container h2,
+        .careers-dashboard-container h3,
+        .careers-dashboard-container h4,
+        .careers-dashboard-container h5,
+        .careers-dashboard-container h6 {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        .careers-dashboard-container p,
+        .careers-dashboard-container span,
+        .careers-dashboard-container div {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container .dashboard-header {
+            margin-bottom: 3rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid #eee;
         }
-        .form-row {
+        .careers-dashboard-container .dashboard-title {
+            font-size: 2.5rem !important;
+            font-weight: 500 !important;
+            margin: 0 0 0.5rem 0 !important;
+            line-height: 1.2 !important;
+            color: #111 !important;
+        }
+        .careers-dashboard-container .dashboard-subtitle {
+            color: #666 !important;
+            margin: 0 !important;
+            font-size: 1rem !important;
+        }
+        
+        .careers-dashboard-container .form-row {
             margin-bottom: 2rem;
         }
-        .form-row label {
+        .careers-dashboard-container .form-row label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: #111;
             font-size: 1rem;
         }
-        .form-row input, .form-row textarea, .form-row select {
+        .careers-dashboard-container .form-row input, 
+        .careers-dashboard-container .form-row textarea, 
+        .careers-dashboard-container .form-row select {
             width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid #ddd;
@@ -1227,69 +549,84 @@ class CareersDashboard {
             box-sizing: border-box;
             transition: border-color 0.2s ease;
             background: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .form-row input:focus, .form-row textarea:focus, .form-row select:focus {
+        .careers-dashboard-container .form-row input:focus, 
+        .careers-dashboard-container .form-row textarea:focus, 
+        .careers-dashboard-container .form-row select:focus {
             outline: none;
             border-color: #333;
             box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
         }
-        .form-row small {
+        .careers-dashboard-container .form-row small {
             display: block;
             margin-top: 0.25rem;
             color: #666;
             font-size: 0.875rem;
         }
-        .form-grid {
+        .careers-dashboard-container .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
-        .form-actions {
+        .careers-dashboard-container .form-actions {
             display: flex;
             gap: 1rem;
             margin-top: 3rem;
             padding-top: 2rem;
             border-top: 1px solid #eee;
         }
-        .button {
+        .careers-dashboard-container .button {
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 1rem !important;
             font-weight: 500;
             cursor: pointer;
-            text-decoration: none;
+            text-decoration: none !important;
             text-align: center;
             transition: background 0.2s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .button-primary {
-            background: #000;
-            color: white;
+        .careers-dashboard-container .button-primary {
+            background: #000 !important;
+            color: white !important;
         }
-        .button-primary:hover {
-            background: #333;
+        .careers-dashboard-container .button-primary:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
         }
-        .button:not(.button-primary) {
-            background: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
+        .careers-dashboard-container .button:not(.button-primary) {
+            background: #f5f5f5 !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
         }
-        .button:not(.button-primary):hover {
-            background: #e8e8e8;
+        .careers-dashboard-container .button:not(.button-primary):hover {
+            background: #e8e8e8 !important;
+            color: #333 !important;
+            text-decoration: none !important;
         }
-        .checkbox-row {
+        .careers-dashboard-container .checkbox-row {
             display: flex;
             align-items: center;
             gap: 10px;
         }
+        .careers-dashboard-container .checkbox-row input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
         @media (max-width: 768px) {
-            .form-grid {
+            .careers-dashboard-container .form-grid {
                 grid-template-columns: 1fr;
             }
         }
         </style>
-        <div class="careers-position-form">
-            <h1>Edit Job Position</h1>
+        <div class="careers-dashboard-container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Edit Job Position</h1>
+                <p class="dashboard-subtitle">Update your position details</p>
+            </div>
             
             <form id="careers-position-edit-form" method="post" action="">
                 <?php wp_nonce_field('careers_position_action', 'careers_nonce'); ?>
@@ -1560,114 +897,293 @@ class CareersDashboard {
         
         ?>
         <style>
-        .careers-position-management {
+        .careers-dashboard-container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 2rem 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             color: #333;
+            font-size: 16px !important;
         }
-        .management-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        /* High specificity CSS overrides to fix font and underline issues */
+        .careers-dashboard-container,
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Remove all underlines and text decorations with maximum specificity */
+        .careers-dashboard-container a,
+        .careers-dashboard-container a:link,
+        .careers-dashboard-container a:visited,
+        .careers-dashboard-container a:hover,
+        .careers-dashboard-container a:active,
+        .careers-dashboard-container a:focus,
+        .careers-dashboard-container button,
+        .careers-dashboard-container button:link,
+        .careers-dashboard-container button:visited,
+        .careers-dashboard-container button:hover,
+        .careers-dashboard-container button:active,
+        .careers-dashboard-container button:focus,
+        .careers-dashboard-container .action-btn,
+        .careers-dashboard-container .action-btn:link,
+        .careers-dashboard-container .action-btn:visited,
+        .careers-dashboard-container .action-btn:hover,
+        .careers-dashboard-container .action-btn:active,
+        .careers-dashboard-container .action-btn:focus,
+        .careers-dashboard-container .dashboard-action-btn,
+        .careers-dashboard-container .dashboard-action-btn:link,
+        .careers-dashboard-container .dashboard-action-btn:visited,
+        .careers-dashboard-container .dashboard-action-btn:hover,
+        .careers-dashboard-container .dashboard-action-btn:active,
+        .careers-dashboard-container .dashboard-action-btn:focus,
+        .careers-dashboard-container .create-button,
+        .careers-dashboard-container .create-button:link,
+        .careers-dashboard-container .create-button:visited,
+        .careers-dashboard-container .create-button:hover,
+        .careers-dashboard-container .create-button:active,
+        .careers-dashboard-container .create-button:focus,
+        .careers-dashboard-container .button,
+        .careers-dashboard-container .button:link,
+        .careers-dashboard-container .button:visited,
+        .careers-dashboard-container .button:hover,
+        .careers-dashboard-container .button:active,
+        .careers-dashboard-container .button:focus {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            text-underline-offset: unset !important;
+            text-decoration-line: none !important;
+            text-decoration-color: transparent !important;
+            text-decoration-style: none !important;
+            text-decoration-thickness: 0 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container h1,
+        .careers-dashboard-container h2,
+        .careers-dashboard-container h3,
+        .careers-dashboard-container h4,
+        .careers-dashboard-container h5,
+        .careers-dashboard-container h6 {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        .careers-dashboard-container p,
+        .careers-dashboard-container span,
+        .careers-dashboard-container div {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container .dashboard-header {
+            margin-bottom: 3rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid #eee;
         }
-        .management-header h1 {
-            font-size: 2.5rem;
-            font-weight: 500;
-            margin: 0;
-            line-height: 1.2;
-            color: #111;
+        .careers-dashboard-container .dashboard-title {
+            font-size: 2.5rem !important;
+            font-weight: 500 !important;
+            margin: 0 0 0.5rem 0 !important;
+            line-height: 1.2 !important;
+            color: #111 !important;
         }
-        .header-actions {
+        .careers-dashboard-container .dashboard-subtitle {
+            color: #666 !important;
+            margin: 0 !important;
+            font-size: 1rem !important;
+        }
+        
+        .careers-dashboard-container .form-row {
+            margin-bottom: 2rem;
+        }
+        .careers-dashboard-container .form-row label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #111;
+            font-size: 1rem;
+        }
+        .careers-dashboard-container .form-row input, 
+        .careers-dashboard-container .form-row textarea, 
+        .careers-dashboard-container .form-row select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+            background: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .form-row input:focus, 
+        .careers-dashboard-container .form-row textarea:focus, 
+        .careers-dashboard-container .form-row select:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        .careers-dashboard-container .form-row small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        .careers-dashboard-container .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .careers-dashboard-container .form-actions {
             display: flex;
             gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
         }
-        .create-button {
-            background: #000;
-            color: white;
+        .careers-dashboard-container .button {
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 1rem !important;
             font-weight: 500;
-            text-decoration: none;
-            display: inline-block;
+            cursor: pointer;
+            text-decoration: none !important;
+            text-align: center;
             transition: background 0.2s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .create-button:hover {
-            background: #333;
-            color: white;
+        .careers-dashboard-container .button-primary {
+            background: #000 !important;
+            color: white !important;
         }
-        .create-button.secondary {
-            background: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
+        .careers-dashboard-container .button-primary:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
         }
-        .create-button.secondary:hover {
-            background: #e8e8e8;
-            color: #333;
+        .careers-dashboard-container .button:not(.button-primary) {
+            background: #f5f5f5 !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+        .careers-dashboard-container .button:not(.button-primary):hover {
+            background: #e8e8e8 !important;
+            color: #333 !important;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .careers-dashboard-container .checkbox-row input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        /* Position Management Specific Styles */
+        .careers-dashboard-container .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .careers-dashboard-container .create-button {
+            background: #000 !important;
+            color: white !important;
+            padding: 0.75rem 1.5rem !important;
+            border: none !important;
+            border-radius: 4px !important;
+            font-size: 1rem !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+            transition: background 0.2s ease !important;
+            cursor: pointer !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .create-button:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .create-button.secondary {
+            background: #f5f5f5 !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+        .careers-dashboard-container .create-button.secondary:hover {
+            background: #e8e8e8 !important;
+            color: #333 !important;
+            text-decoration: none !important;
         }
         
         /* Filter Section */
-        .filters-section {
+        .careers-dashboard-container .filters-section {
             background: #f8f9fa;
             padding: 1.5rem;
             border-radius: 8px;
             margin-bottom: 2rem;
         }
-        .filters-grid {
+        .careers-dashboard-container .filters-grid {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr auto;
             gap: 1rem;
             align-items: end;
         }
-        .filter-group {
+        .careers-dashboard-container .filter-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
-        .filter-group label {
+        .careers-dashboard-container .filter-group label {
             font-size: 0.875rem;
             font-weight: 500;
             color: #555;
         }
-        .filter-group input,
-        .filter-group select {
+        .careers-dashboard-container .filter-group input,
+        .careers-dashboard-container .filter-group select {
             padding: 0.5rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 0.875rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .filter-button {
-            background: #000;
-            color: white;
+        .careers-dashboard-container .filter-button {
+            background: #000 !important;
+            color: white !important;
             padding: 0.5rem 1rem;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.875rem;
             height: fit-content;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .filter-button:hover {
-            background: #333;
+        .careers-dashboard-container .filter-button:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
         }
-        .clear-filters {
-            background: transparent;
-            color: #666;
-            border: 1px solid #ddd;
+        .careers-dashboard-container .clear-filters {
+            background: transparent !important;
+            color: #666 !important;
+            border: 1px solid #ddd !important;
             margin-left: 0.5rem;
         }
-        .clear-filters:hover {
-            background: #f5f5f5;
-            color: #333;
+        .careers-dashboard-container .clear-filters:hover {
+            background: #f5f5f5 !important;
+            color: #333 !important;
+            text-decoration: none !important;
         }
         
         /* Bulk Actions */
-        .bulk-actions {
+        .careers-dashboard-container .bulk-actions {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -1677,51 +1193,56 @@ class CareersDashboard {
             border-radius: 8px;
             flex-wrap: wrap;
         }
-        .bulk-select-group {
+        .careers-dashboard-container .bulk-select-group {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        .bulk-select-group input[type="checkbox"] {
+        .careers-dashboard-container .bulk-select-group input[type="checkbox"] {
             margin: 0;
         }
-        .bulk-select-group label {
+        .careers-dashboard-container .bulk-select-group label {
             margin: 0;
             font-size: 0.875rem;
             font-weight: 500;
         }
-        .bulk-actions-group {
+        .careers-dashboard-container .bulk-actions-group {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        .bulk-actions select {
+        .careers-dashboard-container .bulk-actions select {
             padding: 0.5rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 0.875rem;
             min-width: 120px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .bulk-apply-btn {
-            background: #000;
-            color: white;
+        .careers-dashboard-container .bulk-apply-btn {
+            background: #000 !important;
+            color: white !important;
             padding: 0.5rem 1rem;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.875rem;
             white-space: nowrap;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .bulk-apply-btn:hover {
-            background: #333;
+        .careers-dashboard-container .bulk-apply-btn:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
         }
-        .bulk-apply-btn:disabled {
-            background: #ccc;
+        .careers-dashboard-container .bulk-apply-btn:disabled {
+            background: #ccc !important;
             cursor: not-allowed;
         }
         
         /* Results Info */
-        .results-info {
+        .careers-dashboard-container .results-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1731,11 +1252,11 @@ class CareersDashboard {
         }
         
         /* Position Cards */
-        .positions-grid {
+        .careers-dashboard-container .positions-grid {
             display: grid;
             gap: 1rem;
         }
-        .position-card {
+        .careers-dashboard-container .position-card {
             background: #fff;
             border: 1px solid #eee;
             border-radius: 4px;
@@ -1745,21 +1266,21 @@ class CareersDashboard {
             gap: 1rem;
             align-items: center;
         }
-        .position-checkbox {
+        .careers-dashboard-container .position-checkbox {
             margin: 0;
         }
-        .position-info {
+        .careers-dashboard-container .position-info {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
             gap: 1.5rem;
             align-items: start;
         }
-        .position-info-item {
+        .careers-dashboard-container .position-info-item {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
         }
-        .position-info-label {
+        .careers-dashboard-container .position-info-label {
             font-size: 0.75rem;
             font-weight: 500;
             color: #666;
@@ -1767,17 +1288,17 @@ class CareersDashboard {
             letter-spacing: 0.05em;
             margin-bottom: 0.25rem;
         }
-        .position-name {
+        .careers-dashboard-container .position-name {
             font-size: 1.125rem;
             font-weight: 500;
             color: #111;
             margin: 0 0 0.25rem 0;
         }
-        .position-location {
+        .careers-dashboard-container .position-location {
             color: #666;
             font-size: 0.9rem;
         }
-        .position-status {
+        .careers-dashboard-container .position-status {
             display: inline-block;
             padding: 0.25rem 0.5rem;
             border-radius: 12px;
@@ -1786,64 +1307,68 @@ class CareersDashboard {
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        .position-status.published {
+        .careers-dashboard-container .position-status.published {
             background: #d1fae5;
             color: #065f46;
         }
-        .position-status.draft {
+        .careers-dashboard-container .position-status.draft {
             background: #fef3c7;
             color: #92400e;
         }
-        .position-date {
+        .careers-dashboard-container .position-date {
             color: #666;
             font-size: 0.9rem;
         }
-        .position-apps {
+        .careers-dashboard-container .position-apps {
             font-weight: 500;
             color: #059669;
         }
-        .position-actions {
+        .careers-dashboard-container .position-actions {
             display: flex;
             gap: 0.5rem;
         }
-        .action-button {
+        .careers-dashboard-container .action-button {
             padding: 0.5rem 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 0.875rem;
             font-weight: 500;
-            text-decoration: none;
+            text-decoration: none !important;
             display: inline-block;
             transition: all 0.2s ease;
             background: #fff;
             color: #333;
             cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .action-button:hover {
+        .careers-dashboard-container .action-button:hover {
             background: #f5f5f5;
             color: #333;
+            text-decoration: none !important;
         }
-        .action-button.primary {
+        .careers-dashboard-container .action-button.primary {
             background: #000;
             color: white;
             border-color: #000;
         }
-        .action-button.primary:hover {
+        .careers-dashboard-container .action-button.primary:hover {
             background: #333;
             color: white;
+            text-decoration: none !important;
         }
-        .action-button.danger {
+        .careers-dashboard-container .action-button.danger {
             background: #dc2626;
             color: white;
             border-color: #dc2626;
         }
-        .action-button.danger:hover {
+        .careers-dashboard-container .action-button.danger:hover {
             background: #b91c1c;
             color: white;
+            text-decoration: none !important;
         }
         
         /* Pagination */
-        .pagination {
+        .careers-dashboard-container .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1851,122 +1376,92 @@ class CareersDashboard {
             margin-top: 2rem;
             padding: 1rem;
         }
-        .pagination a,
-        .pagination span {
+        .careers-dashboard-container .pagination a,
+        .careers-dashboard-container .pagination span {
             padding: 0.5rem 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
-            text-decoration: none;
+            text-decoration: none !important;
             color: #333;
             font-size: 0.875rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .pagination a:hover {
+        .careers-dashboard-container .pagination a:hover {
             background: #f5f5f5;
+            text-decoration: none !important;
         }
-        .pagination .current {
+        .careers-dashboard-container .pagination .current {
             background: #000;
             color: white;
             border-color: #000;
         }
-        .pagination .disabled {
+        .careers-dashboard-container .pagination .disabled {
             color: #ccc;
             cursor: not-allowed;
         }
         
         /* Empty State */
-        .empty-state {
+        .careers-dashboard-container .empty-state {
             text-align: center;
             padding: 4rem 2rem;
             color: #666;
         }
-        .empty-state h3 {
+        .careers-dashboard-container .empty-state h3 {
             font-size: 1.25rem;
             font-weight: 500;
             color: #111;
             margin: 0 0 0.5rem 0;
         }
-        .empty-state p {
+        .careers-dashboard-container .empty-state p {
             margin: 0 0 2rem 0;
         }
         
-        /* Mobile Responsive */
         @media (max-width: 1024px) {
-            .filters-grid {
+            .careers-dashboard-container .filters-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 1rem;
             }
-            .position-card {
+            .careers-dashboard-container .position-card {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-            .position-info {
+            .careers-dashboard-container .position-info {
                 display: block;
             }
-            .position-info-item {
+            .careers-dashboard-container .position-info-item {
                 margin-bottom: 1rem;
                 padding-bottom: 0.75rem;
                 border-bottom: 1px solid #f0f0f0;
             }
-            .position-info-item:last-child {
+            .careers-dashboard-container .position-info-item:last-child {
                 border-bottom: none;
                 margin-bottom: 0;
             }
-            .position-info-label {
-                font-size: 0.75rem;
-                margin-bottom: 0.5rem;
-            }
-            .position-name {
-                font-size: 1.25rem;
-                line-height: 1.3;
-            }
-            .position-location {
-                font-size: 0.95rem;
-            }
-            .position-status {
-                font-size: 0.875rem;
-                padding: 0.375rem 0.75rem;
-            }
-            .position-type {
-                font-size: 0.875rem;
-            }
-            .position-date {
-                font-size: 0.95rem;
-            }
-            .position-apps {
-                font-size: 0.875rem;
-            }
         }
         @media (max-width: 768px) {
-            .management-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-            .header-actions {
-                flex-direction: column;
-                gap: 0.5rem;
-                width: 100%;
-            }
-            .create-button {
-                text-align: center;
-            }
-            .filters-grid {
+            .careers-dashboard-container .form-grid {
                 grid-template-columns: 1fr;
             }
-            .bulk-actions {
+            .careers-dashboard-container .form-actions {
+                flex-direction: column;
+            }
+            .careers-dashboard-container .header-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .careers-dashboard-container .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            .careers-dashboard-container .bulk-actions {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 1rem;
             }
-            .bulk-actions-group {
+            .careers-dashboard-container .bulk-actions-group {
                 width: 100%;
                 justify-content: space-between;
             }
-            .bulk-actions select {
-                flex: 1;
-                margin-right: 0.5rem;
-            }
-            .results-info {
+            .careers-dashboard-container .results-info {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
@@ -1974,9 +1469,9 @@ class CareersDashboard {
         }
         </style>
         
-        <div class="careers-position-management">
-            <div class="management-header">
-                <h1>Manage Job Positions</h1>
+        <div class="careers-dashboard-container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Manage Job Positions</h1>
                 <div class="header-actions">
                     <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
                         Create New Position
@@ -2258,78 +1753,121 @@ class CareersDashboard {
         
         ?>
         <style>
-        .careers-location-management {
+        .careers-dashboard-container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 2rem 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             color: #333;
+            font-size: 16px !important;
         }
-        .location-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        /* High specificity CSS overrides to fix font and underline issues */
+        .careers-dashboard-container,
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Remove all underlines and text decorations with maximum specificity */
+        .careers-dashboard-container a,
+        .careers-dashboard-container a:link,
+        .careers-dashboard-container a:visited,
+        .careers-dashboard-container a:hover,
+        .careers-dashboard-container a:active,
+        .careers-dashboard-container a:focus,
+        .careers-dashboard-container button,
+        .careers-dashboard-container button:link,
+        .careers-dashboard-container button:visited,
+        .careers-dashboard-container button:hover,
+        .careers-dashboard-container button:active,
+        .careers-dashboard-container button:focus,
+        .careers-dashboard-container .action-btn,
+        .careers-dashboard-container .action-btn:link,
+        .careers-dashboard-container .action-btn:visited,
+        .careers-dashboard-container .action-btn:hover,
+        .careers-dashboard-container .action-btn:active,
+        .careers-dashboard-container .action-btn:focus,
+        .careers-dashboard-container .dashboard-action-btn,
+        .careers-dashboard-container .dashboard-action-btn:link,
+        .careers-dashboard-container .dashboard-action-btn:visited,
+        .careers-dashboard-container .dashboard-action-btn:hover,
+        .careers-dashboard-container .dashboard-action-btn:active,
+        .careers-dashboard-container .dashboard-action-btn:focus,
+        .careers-dashboard-container .create-button,
+        .careers-dashboard-container .create-button:link,
+        .careers-dashboard-container .create-button:visited,
+        .careers-dashboard-container .create-button:hover,
+        .careers-dashboard-container .create-button:active,
+        .careers-dashboard-container .create-button:focus,
+        .careers-dashboard-container .button,
+        .careers-dashboard-container .button:link,
+        .careers-dashboard-container .button:visited,
+        .careers-dashboard-container .button:hover,
+        .careers-dashboard-container .button:active,
+        .careers-dashboard-container .button:focus {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            text-underline-offset: unset !important;
+            text-decoration-line: none !important;
+            text-decoration-color: transparent !important;
+            text-decoration-style: none !important;
+            text-decoration-thickness: 0 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container h1,
+        .careers-dashboard-container h2,
+        .careers-dashboard-container h3,
+        .careers-dashboard-container h4,
+        .careers-dashboard-container h5,
+        .careers-dashboard-container h6 {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        .careers-dashboard-container p,
+        .careers-dashboard-container span,
+        .careers-dashboard-container div {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container .dashboard-header {
+            margin-bottom: 3rem;
             padding-bottom: 2rem;
             border-bottom: 1px solid #eee;
         }
-        .location-header h1 {
-            font-size: 2.5rem;
-            font-weight: 500;
-            margin: 0;
-            line-height: 1.2;
-            color: #111;
+        .careers-dashboard-container .dashboard-title {
+            font-size: 2.5rem !important;
+            font-weight: 500 !important;
+            margin: 0 0 0.5rem 0 !important;
+            line-height: 1.2 !important;
+            color: #111 !important;
         }
-        .header-actions {
-            display: flex;
-            gap: 1rem;
+        .careers-dashboard-container .dashboard-subtitle {
+            color: #666 !important;
+            margin: 0 !important;
+            font-size: 1rem !important;
         }
-        .dashboard-action-btn {
-            background: #f5f5f5;
-            color: #333;
-            padding: 0.75rem 1.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-block;
-            transition: background 0.2s ease;
-        }
-        .dashboard-action-btn:hover {
-            background: #e8e8e8;
-            color: #333;
-        }
-        .location-form-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 2rem;
+        
+        .careers-dashboard-container .form-row {
             margin-bottom: 2rem;
         }
-        .location-form-card h3 {
-            font-size: 1.25rem;
+        .careers-dashboard-container .form-row label {
+            display: block;
+            margin-bottom: 0.5rem;
             font-weight: 500;
             color: #111;
-            margin: 0 0 1.5rem 0;
+            font-size: 1rem;
         }
-        .location-form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 1rem;
-            align-items: end;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .form-group label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #333;
-        }
-        .form-group input {
+        .careers-dashboard-container .form-row input, 
+        .careers-dashboard-container .form-row textarea, 
+        .careers-dashboard-container .form-row select {
+            width: 100%;
             padding: 0.75rem 1rem;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -2337,58 +1875,192 @@ class CareersDashboard {
             box-sizing: border-box;
             transition: border-color 0.2s ease;
             background: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .form-group input:focus {
+        .careers-dashboard-container .form-row input:focus, 
+        .careers-dashboard-container .form-row textarea:focus, 
+        .careers-dashboard-container .form-row select:focus {
             outline: none;
             border-color: #333;
             box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
         }
-        .add-location-btn {
-            background: #000;
-            color: white;
+        .careers-dashboard-container .form-row small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        .careers-dashboard-container .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .careers-dashboard-container .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+        .careers-dashboard-container .button {
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 4px;
+            font-size: 1rem !important;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none !important;
+            text-align: center;
+            transition: background 0.2s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .button-primary {
+            background: #000 !important;
+            color: white !important;
+        }
+        .careers-dashboard-container .button-primary:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .button:not(.button-primary) {
+            background: #f5f5f5 !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+        .careers-dashboard-container .button:not(.button-primary):hover {
+            background: #e8e8e8 !important;
+            color: #333 !important;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .careers-dashboard-container .checkbox-row input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        /* Location Management Specific Styles */
+        .careers-dashboard-container .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .careers-dashboard-container .dashboard-action-btn {
+            background: #f5f5f5 !important;
+            color: #333 !important;
+            padding: 0.75rem 1.5rem !important;
+            border: 1px solid #ddd !important;
+            border-radius: 4px !important;
+            font-size: 1rem !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+            transition: background 0.2s ease !important;
+            cursor: pointer !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .dashboard-action-btn:hover {
+            background: #e8e8e8 !important;
+            color: #333 !important;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .location-form-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .careers-dashboard-container .location-form-card h3 {
+            font-size: 1.25rem !important;
+            font-weight: 500 !important;
+            color: #111;
+            margin: 0 0 1.5rem 0 !important;
+        }
+        .careers-dashboard-container .location-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        .careers-dashboard-container .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .careers-dashboard-container .form-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .careers-dashboard-container .form-group input {
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+            background: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .form-group input:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        .careers-dashboard-container .add-location-btn {
+            background: #000 !important;
+            color: white !important;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem !important;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s ease;
             height: fit-content;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .add-location-btn:hover {
-            background: #333;
+        .careers-dashboard-container .add-location-btn:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
         }
-        .locations-grid {
+        .careers-dashboard-container .locations-grid {
             display: grid;
             gap: 1rem;
         }
-        .state-card {
+        .careers-dashboard-container .state-card {
             background: #fff;
             border: 1px solid #eee;
             border-radius: 4px;
             overflow: hidden;
         }
-        .state-header {
+        .careers-dashboard-container .state-header {
             background: #f8f9fa;
             padding: 1.5rem;
             border-bottom: 1px solid #eee;
         }
-        .state-title {
-            font-size: 1.125rem;
-            font-weight: 500;
+        .careers-dashboard-container .state-title {
+            font-size: 1.125rem !important;
+            font-weight: 500 !important;
             color: #111;
-            margin: 0;
+            margin: 0 !important;
         }
-        .state-count {
+        .careers-dashboard-container .state-count {
             font-size: 0.875rem;
             color: #666;
             margin-top: 0.25rem;
         }
-        .cities-grid {
+        .careers-dashboard-container .cities-grid {
             display: grid;
             gap: 0;
         }
-        .city-item {
+        .careers-dashboard-container .city-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -2396,20 +2068,20 @@ class CareersDashboard {
             border-bottom: 1px solid #f0f0f0;
             transition: background 0.2s ease;
         }
-        .city-item:last-child {
+        .careers-dashboard-container .city-item:last-child {
             border-bottom: none;
         }
-        .city-item:hover {
+        .careers-dashboard-container .city-item:hover {
             background: #f8f9fa;
         }
-        .city-name {
+        .careers-dashboard-container .city-name {
             font-size: 0.875rem;
             color: #333;
             font-weight: 500;
         }
-        .delete-location {
-            background: #dc2626;
-            color: white;
+        .careers-dashboard-container .delete-location {
+            background: #dc2626 !important;
+            color: white !important;
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 4px;
@@ -2417,11 +2089,15 @@ class CareersDashboard {
             font-size: 0.875rem;
             font-weight: 500;
             transition: background 0.2s ease;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .delete-location:hover {
-            background: #b91c1c;
+        .careers-dashboard-container .delete-location:hover {
+            background: #b91c1c !important;
+            color: white !important;
+            text-decoration: none !important;
         }
-        .empty-state {
+        .careers-dashboard-container .empty-state {
             text-align: center;
             padding: 4rem 2rem;
             color: #666;
@@ -2429,107 +2105,106 @@ class CareersDashboard {
             border: 1px solid #eee;
             border-radius: 4px;
         }
-        .empty-state h3 {
-            font-size: 1.25rem;
-            font-weight: 500;
+        .careers-dashboard-container .empty-state h3 {
+            font-size: 1.25rem !important;
+            font-weight: 500 !important;
             color: #111;
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 0.5rem 0 !important;
         }
-        .empty-state p {
-            margin: 0 0 2rem 0;
+        .careers-dashboard-container .empty-state p {
+            margin: 0 0 2rem 0 !important;
             font-size: 0.875rem;
         }
-        .create-first-btn {
-            background: #000;
-            color: white;
+        .careers-dashboard-container .create-first-btn {
+            background: #000 !important;
+            color: white !important;
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 4px;
-            font-size: 1rem;
+            font-size: 1rem !important;
             font-weight: 500;
-            text-decoration: none;
+            text-decoration: none !important;
             display: inline-block;
             transition: background 0.2s ease;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
-        .create-first-btn:hover {
-            background: #333;
-            color: white;
+        .careers-dashboard-container .create-first-btn:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
         }
-        .locations-section {
+        .careers-dashboard-container .locations-section {
             margin-top: 2rem;
         }
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 500;
+        .careers-dashboard-container .section-title {
+            font-size: 1.25rem !important;
+            font-weight: 500 !important;
             color: #111;
-            margin: 0 0 1.5rem 0;
+            margin: 0 0 1.5rem 0 !important;
         }
-        .locations-stats {
+        .careers-dashboard-container .locations-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-bottom: 2rem;
         }
-        .stat-card {
+        .careers-dashboard-container .stat-card {
             background: #fff;
             border: 1px solid #eee;
             border-radius: 4px;
             padding: 1.5rem;
             text-align: center;
         }
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 500;
+        .careers-dashboard-container .stat-number {
+            font-size: 2rem !important;
+            font-weight: 500 !important;
             color: #111;
-            margin: 0 0 0.5rem 0;
+            margin: 0 0 0.5rem 0 !important;
         }
-        .stat-label {
+        .careers-dashboard-container .stat-label {
             font-size: 0.875rem;
             color: #666;
-            margin: 0;
+            margin: 0 !important;
         }
+        
         @media (max-width: 1024px) {
-            .location-form-grid {
+            .careers-dashboard-container .location-form-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 1rem;
             }
-            .add-location-btn {
+            .careers-dashboard-container .add-location-btn {
                 grid-column: 1 / -1;
                 justify-self: start;
             }
         }
         @media (max-width: 768px) {
-            .careers-location-management {
-                padding: 1rem;
+            .careers-dashboard-container .form-grid {
+                grid-template-columns: 1fr;
             }
-            .location-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-            .header-actions {
+            .careers-dashboard-container .header-actions {
                 flex-direction: column;
                 gap: 0.5rem;
                 width: 100%;
             }
-            .dashboard-action-btn {
+            .careers-dashboard-container .dashboard-action-btn {
                 text-align: center;
             }
-            .location-form-grid {
+            .careers-dashboard-container .location-form-grid {
                 grid-template-columns: 1fr;
             }
-            .locations-stats {
+            .careers-dashboard-container .locations-stats {
                 grid-template-columns: 1fr;
             }
-            .city-item {
+            .careers-dashboard-container .city-item {
                 padding: 0.75rem 1rem;
             }
         }
         </style>
         
-        <div class="careers-location-management">
-            <div class="location-header">
-                <h1>Manage Locations</h1>
+        <div class="careers-dashboard-container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Manage Locations</h1>
                 <div class="header-actions">
                     <a href="<?php echo home_url('/dashboard'); ?>" class="dashboard-action-btn">
                         Back to Dashboard
@@ -2577,7 +2252,7 @@ class CareersDashboard {
                                    placeholder="e.g. Dallas" required>
                         </div>
                         <div>
-                            <button type="submit" class="add-location-btn">Add Location</button>
+                            <button type="submit" class="button button-primary">Add Location</button>
                         </div>
                     </div>
                 </form>

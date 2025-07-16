@@ -380,7 +380,7 @@ class CareersPageHandler {
                 font-size: 16px !important;
                 margin: 0 0 1.5rem 0;
             }
-            /* Management specific styles */
+            /* Management specific styles - flat design */
             .careers-dashboard-container .management-header {
                 display: flex;
                 justify-content: space-between;
@@ -404,8 +404,9 @@ class CareersPageHandler {
             .careers-dashboard-container .filters-section {
                 background: #f8f9fa;
                 padding: 1.5rem;
-                border-radius: 8px;
+                border-radius: 4px;
                 margin-bottom: 2rem;
+                border: 1px solid #eee;
             }
             .careers-dashboard-container .filters-grid {
                 display: grid;
@@ -440,54 +441,158 @@ class CareersPageHandler {
                 color: white !important;
                 text-decoration: none !important;
             }
+            
+            /* Flat position card design matching main dashboard */
             .careers-dashboard-container .positions-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-                gap: 1.5rem;
-                margin-bottom: 2rem;
+                gap: 1rem;
             }
             .careers-dashboard-container .position-card {
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 8px;
-                padding: 1.5rem;
-                transition: box-shadow 0.2s ease;
+                background: white !important;
+                border: 1px solid #eee !important;
+                border-radius: 4px !important;
+                padding: 1.5rem !important;
+                display: grid !important;
+                grid-template-columns: auto 1fr auto !important;
+                gap: 1rem !important;
+                align-items: center !important;
             }
-            .careers-dashboard-container .position-card:hover {
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            .careers-dashboard-container .position-info {
+                display: grid !important;
+                grid-template-columns: 2fr 1fr 1fr 1fr 1fr !important;
+                gap: 1.5rem !important;
+                align-items: start !important;
             }
-            .careers-dashboard-container .position-card h3 {
-                font-size: 1.25rem !important;
-                font-weight: 600;
-                margin: 0 0 0.5rem 0;
-                color: #111827;
+            .careers-dashboard-container .position-info-item {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.25rem !important;
             }
-            .careers-dashboard-container .position-card p {
-                font-size: 14px !important;
-                color: #6b7280;
-                margin: 0.25rem 0;
+            .careers-dashboard-container .position-info-label {
+                font-size: 0.75rem !important;
+                font-weight: 500 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
+                color: #666 !important;
+                margin-bottom: 0.25rem !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             }
-            .careers-dashboard-container .position-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: start;
-                margin-bottom: 1rem;
+            .careers-dashboard-container .position-name {
+                font-size: 1.125rem !important;
+                font-weight: 600 !important;
+                color: #111 !important;
+                margin: 0 !important;
+                line-height: 1.3 !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             }
-            .careers-dashboard-container .position-meta {
-                margin-bottom: 1rem;
+            .careers-dashboard-container .position-location,
+            .careers-dashboard-container .position-date,
+            .careers-dashboard-container .position-applications {
+                font-size: 0.875rem !important;
+                color: #374151 !important;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             }
-            .careers-dashboard-container .position-meta .meta-item {
-                margin-bottom: 0.5rem;
-                font-size: 14px !important;
-                color: #6b7280;
+            .careers-dashboard-container .position-status {
+                display: inline-block !important;
+                padding: 0.25rem 0.5rem !important;
+                border-radius: 12px !important;
+                font-size: 0.75rem !important;
+                font-weight: 500 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
+                background: #f3f4f6 !important;
+                color: #374151 !important;
             }
-            .careers-dashboard-container .position-meta .meta-item strong {
-                color: #374151;
+            .careers-dashboard-container .position-status.published {
+                background: #d1fae5 !important;
+                color: #065f46 !important;
+            }
+            .careers-dashboard-container .position-status.draft {
+                background: #fef3c7 !important;
+                color: #92400e !important;
             }
             .careers-dashboard-container .position-actions {
+                display: flex !important;
+                gap: 0.5rem !important;
+                align-items: flex-start !important;
+            }
+            
+            /* Mobile responsive for manage jobs */
+            @media (max-width: 1024px) {
+                .careers-dashboard-container .filters-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 1rem !important;
+                }
+                .careers-dashboard-container .position-card {
+                    grid-template-columns: 1fr !important;
+                    gap: 1rem !important;
+                }
+                .careers-dashboard-container .position-info {
+                    display: block !important;
+                }
+                .careers-dashboard-container .position-info-item {
+                    margin-bottom: 1rem !important;
+                    padding-bottom: 0.75rem !important;
+                    border-bottom: 1px solid #f0f0f0 !important;
+                }
+                .careers-dashboard-container .position-info-item:last-child {
+                    border-bottom: none !important;
+                    margin-bottom: 0 !important;
+                }
+                .careers-dashboard-container .position-name {
+                    font-size: 1.25rem !important;
+                    line-height: 1.3 !important;
+                }
+                .careers-dashboard-container .position-status {
+                    font-size: 0.875rem !important;
+                    padding: 0.375rem 0.75rem !important;
+                }
+                .careers-dashboard-container .position-actions {
+                    justify-content: flex-start !important;
+                    flex-wrap: wrap !important;
+                }
+            }
+            
+            /* Dashboard tabs */
+            .careers-dashboard-container .dashboard-tabs {
                 display: flex;
-                gap: 0.5rem;
-                flex-wrap: wrap;
+                gap: 1rem;
+                margin-bottom: 2rem;
+                border-bottom: 2px solid #e5e7eb;
+                padding-bottom: 0;
+            }
+            .careers-dashboard-container .dashboard-tab {
+                background: none;
+                border: none;
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem !important;
+                font-weight: 500;
+                color: #6b7280;
+                cursor: pointer;
+                position: relative;
+                transition: color 0.2s ease;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            }
+            .careers-dashboard-container .dashboard-tab:hover {
+                color: #374151;
+            }
+            .careers-dashboard-container .dashboard-tab.active {
+                color: #111827;
+            }
+            .careers-dashboard-container .dashboard-tab.active::after {
+                content: "";
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: #000;
+            }
+            .careers-dashboard-container .tab-content {
+                display: none;
+            }
+            .careers-dashboard-container .tab-content.active {
+                display: block;
             }
             
             /* Metrics grid */
@@ -525,26 +630,162 @@ class CareersPageHandler {
                 margin-top: 0.5rem;
                 color: #6b7280;
             }
+            .careers-dashboard-container .metric-card .metric-number {
+                font-size: 2.5rem !important;
+                font-weight: 600;
+                color: #111827;
+                margin: 0;
+                line-height: 1;
+            }
+            .careers-dashboard-container .metric-card .metric-label {
+                font-size: 14px !important;
+                font-weight: 500;
+                color: #6b7280;
+                margin-top: 0.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.025em;
+            }
             
-            /* Location management */
-            .careers-dashboard-container .location-form {
+            /* Jobs section */
+            .careers-dashboard-container .jobs-section {
+                margin-top: 2rem;
+            }
+            .careers-dashboard-container .section-title {
+                font-size: 1.5rem !important;
+                font-weight: 600;
+                margin: 2rem 0 1.5rem 0;
+                color: #111;
+            }
+            .careers-dashboard-container .jobs-grid {
+                display: grid;
+                gap: 1rem;
+            }
+            .careers-dashboard-container .job-card {
                 background: white;
                 border: 1px solid #e5e7eb;
                 border-radius: 8px;
+                padding: 1.5rem;
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 1.5rem;
+                align-items: center;
+                transition: box-shadow 0.2s ease;
+            }
+            .careers-dashboard-container .job-card:hover {
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            }
+            .careers-dashboard-container .job-info {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 1.5rem;
+                align-items: start;
+            }
+            .careers-dashboard-container .job-info-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            .careers-dashboard-container .job-info-label {
+                font-size: 12px !important;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #6b7280;
+                margin-bottom: 0.25rem;
+            }
+            .careers-dashboard-container .job-title {
+                font-size: 1.125rem !important;
+                font-weight: 600;
+                color: #111;
+                margin: 0;
+                line-height: 1.3;
+            }
+            .careers-dashboard-container .job-location,
+            .careers-dashboard-container .posted-date,
+            .careers-dashboard-container .app-count {
+                font-size: 0.875rem !important;
+                color: #374151;
+            }
+            .careers-dashboard-container .employment-type {
+                display: inline-block;
+                padding: 0.25rem 0.5rem;
+                border-radius: 12px;
+                font-size: 0.75rem !important;
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                background: #f3f4f6;
+                color: #374151;
+            }
+            .careers-dashboard-container .employment-type.full-time {
+                background: #dbeafe;
+                color: #1e40af;
+            }
+            .careers-dashboard-container .employment-type.part-time {
+                background: #fef3c7;
+                color: #92400e;
+            }
+            .careers-dashboard-container .employment-type.contract {
+                background: #e0e7ff;
+                color: #4338ca;
+            }
+            .careers-dashboard-container .job-actions {
+                display: flex;
+                gap: 0.5rem;
+                align-items: center;
+            }
+            
+            /* Status cards for applicants */
+            .careers-dashboard-container .applicant-status-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+            .careers-dashboard-container .status-card {
+                background: white;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 1.5rem;
+                text-align: center;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+            .careers-dashboard-container .status-card .status-number {
+                font-size: 2.5rem !important;
+                font-weight: 600;
+                color: #111827;
+                margin: 0;
+                line-height: 1;
+            }
+            .careers-dashboard-container .status-card .status-label {
+                font-size: 14px !important;
+                font-weight: 500;
+                color: #6b7280;
+                margin-top: 0.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.025em;
+            }
+            
+            /* Location management - flat design */
+            .careers-dashboard-container .location-form {
+                background: white;
+                border: 1px solid #eee;
+                border-radius: 4px;
                 padding: 1.5rem;
                 margin-bottom: 2rem;
             }
             .careers-dashboard-container .locations-list {
                 background: white;
-                border: 1px solid #e5e7eb;
-                border-radius: 8px;
+                border: 1px solid #eee;
+                border-radius: 4px;
                 padding: 1.5rem;
             }
             .careers-dashboard-container .locations-list h3 {
                 font-size: 1.25rem !important;
                 font-weight: 600;
                 margin: 0 0 1rem 0;
-                color: #111827;
+                color: #111;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             }
             .careers-dashboard-container .location-items {
                 list-style: none;
@@ -555,15 +796,33 @@ class CareersPageHandler {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 0.75rem;
-                border-bottom: 1px solid #e5e7eb;
+                padding: 1rem;
+                border-bottom: 1px solid #f0f0f0;
+                background: #fff;
             }
             .careers-dashboard-container .location-item:last-child {
                 border-bottom: none;
             }
+            .careers-dashboard-container .location-item:hover {
+                background: #f9fafb;
+            }
             .careers-dashboard-container .location-name {
-                font-size: 16px !important;
+                font-size: 1rem !important;
                 color: #374151;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+                font-weight: 500;
+            }
+            
+            /* Mobile location layout */
+            @media (max-width: 768px) {
+                .careers-dashboard-container .location-item {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                }
+                .careers-dashboard-container .location-item .action-btn {
+                    align-self: flex-end;
+                }
             }
             .careers-dashboard-container .action-btn {
                 padding: 0.5rem 1rem !important;
@@ -618,6 +877,24 @@ class CareersPageHandler {
                 }
                 .careers-dashboard-container .positions-grid {
                     grid-template-columns: 1fr;
+                }
+                .careers-dashboard-container .job-info {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                }
+                .careers-dashboard-container .job-card {
+                    grid-template-columns: 1fr;
+                }
+                .careers-dashboard-container .job-actions {
+                    justify-content: flex-start;
+                    margin-top: 1rem;
+                }
+                .careers-dashboard-container .dashboard-tabs {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
+                }
+                .careers-dashboard-container .dashboard-tab {
+                    white-space: nowrap;
                 }
             }
             ';
