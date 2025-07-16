@@ -115,6 +115,26 @@ class CareersSettings {
             'careers_page_mapping',
             array('id' => 'application_view_page', 'description' => 'Select the page for viewing individual applications')
         );
+        
+        // Job Detail/Open Positions page
+        add_settings_field(
+            'job_detail_page',
+            __('Job Detail Page', 'careers-manager'),
+            array($this, 'page_dropdown_callback'),
+            'careers-settings',
+            'careers_page_mapping',
+            array('id' => 'job_detail_page', 'description' => 'Select the page for viewing individual job postings (open positions)')
+        );
+        
+        // Open Positions List page
+        add_settings_field(
+            'open_positions_page',
+            __('Open Positions Page', 'careers-manager'),
+            array($this, 'page_dropdown_callback'),
+            'careers-settings',
+            'careers_page_mapping',
+            array('id' => 'open_positions_page', 'description' => 'Select the page for viewing the list of all open positions')
+        );
     }
     
     /**
@@ -199,7 +219,9 @@ class CareersSettings {
             'edit_job' => 'edit_job_page',
             'locations' => 'locations_page',
             'applications' => 'applications_page',
-            'application_view' => 'application_view_page'
+            'application_view' => 'application_view_page',
+            'job_detail' => 'job_detail_page',
+            'open_positions' => 'open_positions_page'
         );
         
         $key = isset($map[$function]) ? $map[$function] : '';
