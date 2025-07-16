@@ -15,92 +15,19 @@ class CareersDashboard {
         add_action('wp_ajax_careers_location_action', array($this, 'handle_location_action'));
         add_action('wp_ajax_careers_bulk_position_action', array($this, 'handle_bulk_position_action'));
         
-        // Handle frontend dashboard routing
-        add_action('wp', array($this, 'handle_dashboard_routing'));
+        // Dashboard routing now handled by CareersPageHandler
         
         // Add dashboard shortcode
         add_shortcode('careers_form', array($this, 'job_form_shortcode'));
     }
     
-    /**
-     * Handle dashboard routing for /dashboard URL
-     */
-    public function handle_dashboard_routing() {
-        global $wp;
-        
-        // Check if we're on any dashboard page
-        if (strpos($wp->request, 'dashboard') === 0 || 
-            (isset($wp->query_vars['careers_dashboard']) && !empty($wp->query_vars['careers_dashboard']))) {
-            $this->load_dashboard_template();
-        }
-    }
     
-    /**
-     * Load appropriate dashboard template based on user role
-     */
-    private function load_dashboard_template() {
-        if (!is_user_logged_in()) {
-            wp_redirect(wp_login_url(home_url('/dashboard')));
-            exit;
-        }
-        
-        // Check if user has admin permissions
-        if (!current_user_can('manage_options') && !current_user_can('career_admin')) {
-            wp_redirect(home_url());
-            exit;
-        }
-        
-        // Get the dashboard page and action from query vars
-        $dashboard_page = get_query_var('careers_dashboard', 'main');
-        $action = get_query_var('careers_action', '');
-        $id = get_query_var('careers_id', '');
-        
-        // Route to appropriate dashboard view
-        $this->route_dashboard_view($dashboard_page, $action, $id);
-        exit;
-    }
-    
-    /**
-     * Route dashboard views based on page and action
-     */
-    private function route_dashboard_view($page, $action, $id) {
-        get_header();
-        
-        wp_enqueue_style('careers-dashboard', CAREERS_PLUGIN_URL . 'assets/css/frontend.css', array(), CAREERS_PLUGIN_VERSION);
-        wp_enqueue_script('jquery');
-        
-        echo '<div class="careers-dashboard-container">';
-        
-        switch ($page) {
-            case 'jobs':
-            case 'positions':
-                if ($action === 'create') {
-                    $this->render_position_creation_form();
-                } elseif ($action === 'edit' && $id) {
-                    $this->render_position_edit_form($id);
-                } else {
-                    $this->render_position_management();
-                }
-                break;
-            
-            case 'locations':
-                $this->render_location_management();
-                break;
-            
-            default:
-                $this->render_main_dashboard();
-                break;
-        }
-        
-        echo '</div>';
-        
-        get_footer();
-    }
+    // Old routing methods removed - now handled by CareersPageHandler
     
     /**
      * Render main dashboard
      */
-    private function render_main_dashboard() {
+    public function render_main_dashboard() {
         $stats = CareersPositionsDB::get_stats();
         $application_stats = CareersApplicationDB::get_stats();
         
@@ -606,7 +533,7 @@ class CareersDashboard {
     /**
      * Render position creation form
      */
-    private function render_position_creation_form() {
+    public function render_position_creation_form() {
         $locations = CareersPositionsDB::get_locations();
         
         // Group locations by state for better organization
@@ -931,7 +858,7 @@ class CareersDashboard {
     /**
      * Render position edit form
      */
-    private function render_position_edit_form($id) {
+    public function render_position_edit_form($id) {
         $position = CareersPositionsDB::get_position($id);
         $locations = CareersPositionsDB::get_locations();
         
@@ -1262,7 +1189,7 @@ class CareersDashboard {
     /**
      * Render position management - Enhanced with filtering, search, and bulk actions
      */
-    private function render_position_management() {
+    public function render_position_management() {
         // Get filter parameters
         $status_filter = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
         $search_query = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
@@ -2019,7 +1946,7 @@ class CareersDashboard {
     /**
      * Render location management
      */
-    private function render_location_management() {
+    public function render_location_management() {
         $locations_by_state = CareersPositionsDB::get_locations_by_state();
         
         ?>
