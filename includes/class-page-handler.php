@@ -64,6 +64,16 @@ class CareersPageHandler {
             return $this->get_application_view_content();
         }
         
+        // Job Detail page
+        if ($page_id == CareersSettings::get_page_id('job_detail')) {
+            return $this->get_job_detail_content();
+        }
+        
+        // Open Positions page
+        if ($page_id == CareersSettings::get_page_id('open_positions')) {
+            return $this->get_open_positions_content();
+        }
+        
         return $content;
     }
     
@@ -83,7 +93,9 @@ class CareersPageHandler {
             CareersSettings::get_page_id('edit_job'),
             CareersSettings::get_page_id('locations'),
             CareersSettings::get_page_id('applications'),
-            CareersSettings::get_page_id('application_view')
+            CareersSettings::get_page_id('application_view'),
+            CareersSettings::get_page_id('job_detail'),
+            CareersSettings::get_page_id('open_positions')
         );
         
         if (in_array($page_id, $careers_pages)) {
@@ -1056,6 +1068,47 @@ class CareersPageHandler {
         }
         
         return '<div class="careers-dashboard-error">Applications component not found.</div>';
+    }
+    
+    /**
+     * Get job detail content
+     */
+    private function get_job_detail_content() {
+        $job_id = isset($_GET['job_id']) ? intval($_GET['job_id']) : 0;
+        if (!$job_id) {
+            return '<div class="careers-dashboard-error">No job ID provided.</div>';
+        }
+        
+        // Get job details from database
+        $job = CareersPositionsDB::get_position($job_id);
+        if (!$job || $job->status !== 'published') {
+            return '<div class="careers-dashboard-error">Job not found or not published.</div>';
+        }
+        
+        // Use the existing shortcode system for job details
+        if (class_exists('CareersShortcodes')) {
+            $shortcodes = new CareersShortcodes();
+            ob_start();
+            echo $shortcodes->careers_position_detail_shortcode(array('id' => $job_id));
+            return ob_get_clean();
+        }
+        
+        return '<div class="careers-dashboard-error">Job detail component not found.</div>';
+    }
+    
+    /**
+     * Get open positions content
+     */
+    private function get_open_positions_content() {
+        // Use the existing careers list shortcode
+        if (class_exists('CareersShortcodes')) {
+            $shortcodes = new CareersShortcodes();
+            ob_start();
+            echo $shortcodes->careers_list_shortcode(array());
+            return ob_get_clean();
+        }
+        
+        return '<div class="careers-dashboard-error">Open positions component not found.</div>';
     }
     
     /**

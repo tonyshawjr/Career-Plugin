@@ -222,12 +222,14 @@ function careers_get_secure_file_url($file_path, $user_id) {
  * Get career job permalink
  */
 function careers_get_job_permalink($job_id) {
-    $post = get_post($job_id);
-    if (!$post || $post->post_type !== 'career_job') {
-        return false;
+    // Use the new job detail page from settings
+    if (class_exists('CareersSettings')) {
+        $job_detail_url = CareersSettings::get_page_url('job_detail', array('job_id' => $job_id));
+        if ($job_detail_url) {
+            return $job_detail_url;
+        }
     }
     
-    // For now, let's use a simple approach that we know works
-    // Link to the job detail page using the post ID
+    // Fallback to the old URL structure if no page is configured
     return home_url('/open-positions/?job_id=' . $job_id);
 } 

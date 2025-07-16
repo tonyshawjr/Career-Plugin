@@ -86,7 +86,7 @@ class CareersShortcodes {
                     <div class="filters-sidebar">
                         <div class="filters-header">
                             <h3>Filters</h3>
-                            <a href="/open-positions/" class="clear-filters">Clear all filters</a>
+                            <a href="<?php echo esc_url(CareersSettings::get_page_url('open_positions')); ?>" class="clear-filters">Clear all filters</a>
                         </div>
                         
                         <form method="get" action="" class="filters-form">
@@ -145,7 +145,7 @@ class CareersShortcodes {
                                 <div class="position-card">
                                     <div class="position-header">
                                         <h3 class="position-title">
-                                            <a href="/open-positions/<?php echo esc_attr($position->id); ?>">
+                                            <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>">
                                                 <?php echo esc_html($position->position_name); ?>
                                             </a>
                                         </h3>
@@ -195,7 +195,7 @@ class CareersShortcodes {
                                     </div>
                                     
                                     <div class="position-actions">
-                                        <a href="/open-positions/<?php echo esc_attr($position->id); ?>" 
+                                        <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>" 
                                            class="view-details-btn">View Details</a>
                                     </div>
                                 </div>
@@ -676,7 +676,7 @@ class CareersShortcodes {
         
         <style>
         .position-detail-page {
-            max-width: 1200px;
+            width: 1280px;
             margin: 0 auto;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: #333;
@@ -722,6 +722,7 @@ class CareersShortcodes {
         .apply-btn:hover, .apply-btn-full:hover {
             background: #333;
             color: white;
+            text-decoration: none;
         }
         
         .apply-btn-full {
@@ -888,6 +889,7 @@ class CareersShortcodes {
         
         .apply-btn-large:hover {
             background: #333;
+            text-decoration: none;
         }
         
         @media (max-width: 768px) {
@@ -934,7 +936,7 @@ class CareersShortcodes {
             <!-- Header Section -->
             <div class="application-header">
                 <div class="breadcrumb">
-                    <a href="<?php echo home_url('/open-positions/' . $position_id); ?>">← Back to Job Details</a>
+                    <a href="<?php echo esc_url(careers_get_job_permalink($position_id)); ?>">← Back to Job Details</a>
                 </div>
                 <h1>Apply for <?php echo esc_html($position->position_name); ?></h1>
                 <div class="position-location">
