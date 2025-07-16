@@ -94,6 +94,16 @@ class CareersManager {
                 new CareersEmails();
             }
             
+            // Initialize settings page
+            if (class_exists('CareersSettings')) {
+                new CareersSettings();
+            }
+            
+            // Initialize page handler
+            if (class_exists('CareersPageHandler')) {
+                new CareersPageHandler();
+            }
+            
             // Elementor widgets are initialized in their own class file
             
         } catch (Exception $e) {
@@ -124,7 +134,10 @@ class CareersManager {
             'includes/class-dashboard.php',
             'includes/class-admin.php',
             'includes/class-emails.php',
-            'includes/class-elementor-widgets.php'
+            'includes/class-elementor-widgets.php',
+            'includes/class-settings.php',
+            'includes/class-page-handler.php',
+            'includes/dashboard-styles.php'
         );
         
         foreach ($includes as $file) {
@@ -141,13 +154,15 @@ class CareersManager {
      * Enqueue frontend assets
      */
     public function enqueue_frontend_assets() {
+        // Enqueue widget CSS globally for login/logout widget
         wp_enqueue_style(
-            'careers-frontend',
-            CAREERS_PLUGIN_URL . 'assets/css/frontend.css',
+            'careers-widgets',
+            CAREERS_PLUGIN_URL . 'assets/css/widgets.css',
             array(),
             CAREERS_PLUGIN_VERSION
         );
         
+        // Enqueue JavaScript globally for AJAX functionality
         wp_enqueue_script(
             'careers-frontend',
             CAREERS_PLUGIN_URL . 'assets/js/frontend.js',
@@ -264,30 +279,7 @@ class CareersManager {
             'top'
         );
         
-        // Add rewrite rules for dashboard and sub-pages
-        add_rewrite_rule(
-            '^dashboard/?$',
-            'index.php?careers_dashboard=main',
-            'top'
-        );
-        
-        add_rewrite_rule(
-            '^dashboard/([^/]+)/?$',
-            'index.php?careers_dashboard=$matches[1]',
-            'top'
-        );
-        
-        add_rewrite_rule(
-            '^dashboard/([^/]+)/([^/]+)/?$',
-            'index.php?careers_dashboard=$matches[1]&careers_action=$matches[2]',
-            'top'
-        );
-        
-        add_rewrite_rule(
-            '^dashboard/([^/]+)/([^/]+)/([^/]+)/?$',
-            'index.php?careers_dashboard=$matches[1]&careers_action=$matches[2]&careers_id=$matches[3]',
-            'top'
-        );
+        // Dashboard rewrite rules removed - now using page-based system
     }
     
     /**
@@ -297,9 +289,7 @@ class CareersManager {
         $vars[] = 'careers_position_id';
         $vars[] = 'careers_positions';
         $vars[] = 'careers_apply_id';
-        $vars[] = 'careers_dashboard';
-        $vars[] = 'careers_action';
-        $vars[] = 'careers_id';
+        // Dashboard query vars removed - now using page-based system
         return $vars;
     }
     

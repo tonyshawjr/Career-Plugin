@@ -1,0 +1,122 @@
+/* Careers Widget Styles - Global Loading */
+
+/* CSS Variables for consistency */
+:root {
+    --brand-red: #BF1E2D;
+    --space-2xs: 0.5rem;
+    --space-xs: 0.75rem;
+    --space-s: 1rem;
+    --space-m: 1.5rem;
+    --button-radius: 4px;
+    --text--2: 0.75rem;
+    --text--1: 0.875rem;
+    --text-0: 1rem;
+    --foreground: #333;
+}
+
+/* ===== HEADER NAVIGATION STYLES ===== */
+
+.careers-header-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+}
+
+/* Base button styles for the widget */
+.careers-auth-button {
+    display: inline-block;
+    padding: var(--space-2xs) var(--space-s);
+    background-color: var(--brand-red);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--button-radius);
+    font-weight: 500;
+    font-size: var(--text--1);
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.careers-auth-button:hover {
+    background-color: #9f1c25;
+    color: white;
+    text-decoration: none;
+    opacity: 0.9;
+}
+
+.careers-auth-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(191, 30, 45, 0.1);
+}
+
+.careers-dashboard-link {
+    color: var(--foreground);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: var(--text--1);
+    transition: color 0.2s ease;
+}
+
+.careers-dashboard-link:hover {
+    color: var(--brand-red);
+    text-decoration: none;
+}
+
+/* Ensure Elementor button compatibility */
+.careers-header-nav .elementor-button {
+    background-color: var(--brand-red);
+    color: white;
+    border: none;
+    padding: var(--space-2xs) var(--space-s);
+    border-radius: var(--button-radius);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: var(--text--1);
+    transition: background-color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.careers-header-nav .elementor-button:hover {
+    background-color: var(--brand-red);
+    opacity: 0.9;
+    color: white;
+    text-decoration: none;
+}
+
+.careers-header-nav .elementor-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(191, 30, 45, 0.1);
+}
+
+/* Size variants for Elementor compatibility */
+.careers-header-nav .elementor-size-sm {
+    padding: var(--space-3xs) var(--space-xs);
+    font-size: var(--text--2);
+}
+
+.careers-header-nav .elementor-size-md {
+    padding: var(--space-2xs) var(--space-s);
+    font-size: var(--text--1);
+}
+
+.careers-header-nav .elementor-size-lg {
+    padding: var(--space-xs) var(--space-m);
+    font-size: var(--text-0);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .careers-header-nav {
+        flex-direction: column;
+        gap: var(--space-2xs);
+        align-items: flex-start;
+    }
+    
+    .careers-auth-button {
+        width: 100%;
+        text-align: center;
+    }
+}

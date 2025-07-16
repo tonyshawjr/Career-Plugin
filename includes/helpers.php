@@ -33,6 +33,27 @@ function careers_get_certifications() {
 }
 
 /**
+ * Get careers dashboard URL
+ * Helper function to get proper URLs for dashboard pages
+ */
+if (!function_exists('careers_get_dashboard_url')) {
+    function careers_get_dashboard_url($path = '', $args = array()) {
+        if (class_exists('CareersSettings')) {
+            return CareersSettings::get_dashboard_url($path, $args);
+        }
+        // Fallback to old URL structure
+        $url = home_url('/dashboard');
+        if (!empty($path)) {
+            $url .= '/' . ltrim($path, '/');
+        }
+        if (!empty($args)) {
+            $url = add_query_arg($args, $url);
+        }
+        return $url;
+    }
+}
+
+/**
  * Get US states for dropdown
  */
 function careers_get_states() {
