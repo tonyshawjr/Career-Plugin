@@ -1061,22 +1061,653 @@ class CareersPageHandler {
             return '<div class="careers-dashboard-error">No application ID provided.</div>';
         }
         
+        // Get application data
+        $application = CareersApplicationDB::get_application($application_id);
+        if (!$application) {
+            return '<div class="careers-dashboard-error">Application not found.</div>';
+        }
+        
+        // Get user data
+        $user = get_user_by('id', $application->user_id);
+        
+        // Get position data if applicable
+        $position = null;
+        if (!empty($application->job_id) && $application->job_id > 0) {
+            $position = CareersPositionsDB::get_position($application->job_id);
+        }
+        
+        // Parse metadata
+        $meta = !empty($application->meta) ? json_decode($application->meta, true) : array();
+        
+        // Get applicant's name and email from metadata
+        $applicant_name = 'Unknown Applicant';
+        if (!empty($meta['first_name']) || !empty($meta['last_name'])) {
+            $first_name = !empty($meta['first_name']) ? $meta['first_name'] : '';
+            $last_name = !empty($meta['last_name']) ? $meta['last_name'] : '';
+            $applicant_name = trim($first_name . ' ' . $last_name);
+        } elseif ($user) {
+            $applicant_name = $user->display_name;
+        }
+        
+        $applicant_email = !empty($meta['email']) ? $meta['email'] : ($user ? $user->user_email : 'No email');
+        
+        // Get notes
+        global $wpdb;
+        $notes_table = $wpdb->prefix . 'careers_application_notes';
+        $notes = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM $notes_table WHERE application_id = %d ORDER BY created_at DESC",
+            $application_id
+        ));
+        
+        // Status pipeline
+        $status_pipeline = array(
+            'new' => array('label' => 'New', 'color' => '#3b82f6'),
+            'under_review' => array('label' => 'Under Review', 'color' => '#f59e0b'),
+            'contacted' => array('label' => 'Contacted', 'color' => '#8b5cf6'),
+            'interview' => array('label' => 'Interview', 'color' => '#06b6d4'),
+            'hired' => array('label' => 'Hired', 'color' => '#10b981'),
+            'rejected' => array('label' => 'Rejected', 'color' => '#ef4444')
+        );
+        
         ob_start();
         ?>
+        <style>
+        .careers-dashboard-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .dashboard-title {
+            font-size: 2.5rem !important;
+            font-weight: 600 !important;
+            margin: 0 !important;
+            color: #111 !important;
+        }
+        
+        .dashboard-subtitle {
+            color: #6b7280 !important;
+            margin: 0.5rem 0 0 0 !important;
+            font-size: 1rem !important;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none !important;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .back-button:hover {
+            background: #e5e7eb;
+            color: #111;
+        }
+        
+        .application-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        
+        .main-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .sidebar-column {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .info-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem !important;
+            font-weight: 600 !important;
+            color: #111 !important;
+            margin: 0 !important;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-label {
+            font-size: 0.875rem !important;
+            color: #6b7280 !important;
+            font-weight: 500 !important;
+        }
+        
+        .info-value {
+            font-size: 1rem !important;
+            color: #111 !important;
+            font-weight: 400 !important;
+        }
+        
+        .status-section {
+            background: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-label {
+            font-size: 0.875rem !important;
+            color: #6b7280 !important;
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .status-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .document-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .document-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: #eff6ff;
+            color: #2563eb !important;
+            text-decoration: none !important;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .document-link:hover {
+            background: #dbeafe;
+            color: #1d4ed8 !important;
+        }
+        
+        .notes-section {
+            margin-top: 1.5rem;
+        }
+        
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .notes-title {
+            font-size: 1.125rem !important;
+            font-weight: 600 !important;
+            color: #111 !important;
+        }
+        
+        .add-note-button {
+            padding: 0.5rem 1rem;
+            background: #3b82f6;
+            color: white !important;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-note-button:hover {
+            background: #2563eb;
+        }
+        
+        .note-form {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .note-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            justify-content: flex-end;
+        }
+        
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .note-item {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .note-author {
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        
+        .note-date {
+            color: #6b7280;
+            font-size: 0.75rem;
+        }
+        
+        .note-content {
+            color: #111;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        
+        .empty-notes {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .badge-yes {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-no {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        @media (max-width: 768px) {
+            .application-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        </style>
+        
         <div class="careers-dashboard-container">
             <div class="dashboard-header">
-                <h1 class="dashboard-title">View Application</h1>
-                <p class="dashboard-subtitle">Application details</p>
+                <div>
+                    <h1 class="dashboard-title">Application Details</h1>
+                    <p class="dashboard-subtitle"><?php echo esc_html($applicant_name); ?> - <?php echo $position ? esc_html($position->position_name) : 'General Application'; ?></p>
+                </div>
+                <div class="header-actions">
+                    <a href="<?php echo CareersSettings::get_page_url('applications'); ?>" class="back-button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5"/>
+                        </svg>
+                        Back to Applications
+                    </a>
+                </div>
             </div>
             
-            <div class="application-view-content">
-                <p>Viewing application ID: <?php echo esc_html($application_id); ?></p>
-                <!-- Application details will go here -->
-                <div class="coming-soon-notice">
-                    <p>Application view functionality coming soon.</p>
+            <div class="application-content">
+                <div class="main-column">
+                    <!-- Applicant Information -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Applicant Information</h2>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Full Name</span>
+                                <span class="info-value"><?php echo esc_html($applicant_name); ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email</span>
+                                <span class="info-value"><?php echo esc_html($applicant_email); ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Phone</span>
+                                <span class="info-value"><?php echo !empty($meta['phone']) ? esc_html($meta['phone']) : 'Not provided'; ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Location</span>
+                                <span class="info-value">
+                                    <?php 
+                                    $location = array();
+                                    if (!empty($meta['current_city'])) $location[] = $meta['current_city'];
+                                    if (!empty($meta['current_state'])) $location[] = $meta['current_state'];
+                                    echo !empty($location) ? esc_html(implode(', ', $location)) : 'Not provided';
+                                    ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Application Details -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Application Details</h2>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Role Interested In</span>
+                                <span class="info-value"><?php echo !empty($meta['role_interested']) ? esc_html($meta['role_interested']) : 'Not specified'; ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">How They Heard About Us</span>
+                                <span class="info-value"><?php echo !empty($meta['hear_about_us']) ? esc_html($meta['hear_about_us']) : 'Not specified'; ?></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">New Graduate</span>
+                                <span class="badge <?php echo (!empty($meta['new_graduate']) && $meta['new_graduate'] === 'yes') ? 'badge-yes' : 'badge-no'; ?>">
+                                    <?php echo (!empty($meta['new_graduate']) && $meta['new_graduate'] === 'yes') ? 'Yes' : 'No'; ?>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Has Certifications</span>
+                                <span class="badge <?php echo (!empty($meta['has_certifications']) && $meta['has_certifications'] === 'yes') ? 'badge-yes' : 'badge-no'; ?>">
+                                    <?php echo (!empty($meta['has_certifications']) && $meta['has_certifications'] === 'yes') ? 'Yes' : 'No'; ?>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Willing to Relocate</span>
+                                <span class="badge <?php echo (!empty($meta['willing_relocate']) && $meta['willing_relocate'] === 'yes') ? 'badge-yes' : 'badge-no'; ?>">
+                                    <?php echo (!empty($meta['willing_relocate']) && $meta['willing_relocate'] === 'yes') ? 'Yes' : 'No'; ?>
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Willing to Travel</span>
+                                <span class="badge <?php echo (!empty($meta['willing_travel']) && $meta['willing_travel'] === 'yes') ? 'badge-yes' : 'badge-no'; ?>">
+                                    <?php echo (!empty($meta['willing_travel']) && $meta['willing_travel'] === 'yes') ? 'Yes' : 'No'; ?>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes -->
+                    <div class="info-card">
+                        <div class="notes-section">
+                            <div class="notes-header">
+                                <h3 class="notes-title">Internal Notes</h3>
+                                <button class="add-note-button" id="add-note-toggle">Add Note</button>
+                            </div>
+                            
+                            <div class="note-form" id="note-form" style="display: none;">
+                                <textarea class="note-textarea" id="note-content" placeholder="Add a note about this application..."></textarea>
+                                <div class="note-actions">
+                                    <button class="button" id="cancel-note">Cancel</button>
+                                    <button class="button button-primary" id="save-note" data-application-id="<?php echo esc_attr($application_id); ?>">Save Note</button>
+                                </div>
+                            </div>
+                            
+                            <div class="notes-list" id="notes-list">
+                                <?php if (!empty($notes)): ?>
+                                    <?php foreach ($notes as $note): ?>
+                                        <?php 
+                                        $note_author = get_user_by('id', $note->user_id);
+                                        $author_name = 'Unknown';
+                                        if ($note_author) {
+                                            $first_name = get_user_meta($note->user_id, 'first_name', true);
+                                            $last_name = get_user_meta($note->user_id, 'last_name', true);
+                                            if ($first_name || $last_name) {
+                                                $author_name = trim($first_name . ' ' . $last_name);
+                                            } else {
+                                                $author_name = $note_author->display_name;
+                                            }
+                                        }
+                                        ?>
+                                        <div class="note-item">
+                                            <div class="note-header">
+                                                <span class="note-author"><?php echo esc_html($author_name); ?></span>
+                                                <span class="note-date"><?php echo esc_html(human_time_diff(strtotime($note->created_at), current_time('timestamp')) . ' ago'); ?></span>
+                                            </div>
+                                            <div class="note-content"><?php echo esc_html($note->content); ?></div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="empty-notes">No notes yet. Add the first note about this application.</div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-column">
+                    <!-- Status & Actions -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Status & Actions</h2>
+                        </div>
+                        
+                        <div class="status-section">
+                            <p class="status-label">Application Status</p>
+                            <select class="status-select" id="application-status" data-application-id="<?php echo esc_attr($application_id); ?>">
+                                <?php foreach ($status_pipeline as $status_key => $status_info): ?>
+                                    <option value="<?php echo esc_attr($status_key); ?>" 
+                                            <?php selected($application->status, $status_key); ?>>
+                                        <?php echo esc_html($status_info['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Applied On</span>
+                            <span class="info-value"><?php echo esc_html(date('F j, Y \a\t g:i A', strtotime($application->submitted_at))); ?></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Documents -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Documents</h2>
+                        </div>
+                        
+                        <div class="document-links">
+                            <?php if (!empty($application->resume_url)): ?>
+                                <a href="<?php echo esc_url($application->resume_url); ?>" target="_blank" class="document-link">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                                        <path d="M14 2v6h6"/>
+                                        <path d="M16 13H8"/>
+                                        <path d="M16 17H8"/>
+                                        <path d="M10 9H8"/>
+                                    </svg>
+                                    View Resume
+                                </a>
+                            <?php else: ?>
+                                <p style="color: #6b7280; font-size: 0.875rem;">No resume uploaded</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    
+                    <?php if ($position): ?>
+                    <!-- Position Details -->
+                    <div class="info-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Position Applied For</h2>
+                        </div>
+                        
+                        <div class="info-item" style="margin-bottom: 1rem;">
+                            <span class="info-label">Position</span>
+                            <span class="info-value"><?php echo esc_html($position->position_name); ?></span>
+                        </div>
+                        
+                        <div class="info-item" style="margin-bottom: 1rem;">
+                            <span class="info-label">Location</span>
+                            <span class="info-value"><?php echo esc_html($position->location); ?></span>
+                        </div>
+                        
+                        <div class="info-item" style="margin-bottom: 1rem;">
+                            <span class="info-label">Job Type</span>
+                            <span class="info-value"><?php echo esc_html($position->job_type); ?></span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="info-label">Experience Level</span>
+                            <span class="info-value"><?php echo !empty($position->experience_level) ? esc_html($position->experience_level) : 'Not specified'; ?></span>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            // Toggle note form
+            $('#add-note-toggle').on('click', function() {
+                $('#note-form').slideToggle();
+                $('#note-content').focus();
+            });
+            
+            $('#cancel-note').on('click', function() {
+                $('#note-form').slideUp();
+                $('#note-content').val('');
+            });
+            
+            // Save note
+            $('#save-note').on('click', function() {
+                var $button = $(this);
+                var applicationId = $button.data('application-id');
+                var noteContent = $('#note-content').val().trim();
+                
+                if (!noteContent) {
+                    alert('Please enter a note');
+                    return;
+                }
+                
+                $button.prop('disabled', true).text('Saving...');
+                
+                $.ajax({
+                    url: careers_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'careers_add_application_note',
+                        nonce: careers_ajax.nonce,
+                        application_id: applicationId,
+                        note_content: noteContent
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.data || 'Failed to save note');
+                            $button.prop('disabled', false).text('Save Note');
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to save note');
+                        $button.prop('disabled', false).text('Save Note');
+                    }
+                });
+            });
+            
+            // Update status
+            $('#application-status').on('change', function() {
+                var $select = $(this);
+                var applicationId = $select.data('application-id');
+                var newStatus = $select.val();
+                
+                $.ajax({
+                    url: careers_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'careers_update_application_status',
+                        nonce: careers_ajax.nonce,
+                        application_id: applicationId,
+                        status: newStatus
+                    },
+                    success: function(response) {
+                        if (!response.success) {
+                            alert(response.data || 'Failed to update status');
+                            location.reload();
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to update status');
+                        location.reload();
+                    }
+                });
+            });
+        });
+        </script>
         <?php
         return ob_get_clean();
     }
