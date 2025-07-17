@@ -1,0 +1,21 @@
+{
+  "enabled": true,
+  "name": "PHP Documentation Sync",
+  "description": "Listens to all PHP source files, CSS, and JavaScript files in the repository and triggers documentation updates when changes are detected",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "*.php",
+      "includes/*.php",
+      "includes/elementor-widgets/*.php",
+      "templates/emails/*.php",
+      "assets/css/*.css",
+      "assets/js/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Source code files have been modified in this PHP project. Please review the changes and update the documentation accordingly. If there's a README file, update it to reflect any new features, API changes, or usage instructions. If there's a /docs folder, update the relevant documentation files there as well. Focus on keeping the documentation current with the codebase changes."
+  }
+}
