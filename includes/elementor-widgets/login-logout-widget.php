@@ -90,7 +90,7 @@ class Careers_Login_Logout_Widget extends \Elementor\Widget_Base {
                 'type' => \Elementor\Controls_Manager::URL,
                 'placeholder' => esc_html__('https://your-site.com/dashboard', 'careers-manager'),
                 'default' => [
-                    'url' => home_url('/dashboard/'),
+                    'url' => CareersSettings::get_page_url('dashboard'),
                 ],
             ]
         );
@@ -324,7 +324,7 @@ class Careers_Login_Logout_Widget extends \Elementor\Widget_Base {
     protected function render() {
         $settings = $this->get_settings_for_display();
         
-        $login_redirect = !empty($settings['redirect_after_login']['url']) ? $settings['redirect_after_login']['url'] : home_url('/dashboard/');
+        $login_redirect = !empty($settings['redirect_after_login']['url']) ? $settings['redirect_after_login']['url'] : CareersSettings::get_page_url('dashboard');
         $logout_redirect = !empty($settings['redirect_after_logout']['url']) ? $settings['redirect_after_logout']['url'] : home_url('/');
         
         ?>
@@ -364,7 +364,7 @@ class Careers_Login_Logout_Widget extends \Elementor\Widget_Base {
     protected function content_template() {
         ?>
         <#
-        var loginRedirect = settings.redirect_after_login.url || '<?php echo home_url('/dashboard/'); ?>';
+        var loginRedirect = settings.redirect_after_login.url || '<?php echo CareersSettings::get_page_url('dashboard'); ?>';
         var logoutRedirect = settings.redirect_after_logout.url || '<?php echo home_url('/'); ?>';
         #>
         <div class="careers-header-nav">

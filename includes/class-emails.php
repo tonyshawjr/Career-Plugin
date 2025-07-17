@@ -40,7 +40,7 @@ class CareersEmails {
             'application' => $application,
             'site_name' => get_bloginfo('name'),
             'site_url' => home_url(),
-            'dashboard_url' => home_url('/dashboard/')
+            'dashboard_url' => CareersSettings::get_page_url('dashboard')
         );
         
         $message = self::get_email_template('application-confirmation', $template_data);
@@ -145,7 +145,7 @@ Best regards,
             'status_label' => $status_label,
             'site_name' => get_bloginfo('name'),
             'site_url' => home_url(),
-            'dashboard_url' => home_url('/dashboard/')
+                            'dashboard_url' => CareersSettings::get_page_url('dashboard')
         );
         
         $message = self::get_email_template('status-update', $template_data);
@@ -241,7 +241,7 @@ Best regards,
         $variables = array(
             '{site_name}' => get_bloginfo('name'),
             '{site_url}' => home_url(),
-            '{dashboard_url}' => home_url('/dashboard/'),
+            '{dashboard_url}' => CareersSettings::get_page_url('dashboard'),
             '{jobs_url}' => home_url('/jobs/'),
         );
         
