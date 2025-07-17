@@ -1105,7 +1105,7 @@ class CareersDashboard {
              }
              
              .applications-list .modality-col:before {
-                 content: "Modality: ";
+                 content: "Job Type: ";
              }
              
              .applications-list .location-col:before {
@@ -4492,7 +4492,7 @@ class CareersDashboard {
                     <div class="jobs-table-header applications-table-header">
                         <div class="table-header-cell applicant-col">Applicant</div>
                         <div class="table-header-cell position-col">Position</div>
-                        <div class="table-header-cell modality-col">Modality</div>
+                        <div class="table-header-cell modality-col">Job Type</div>
                         <div class="table-header-cell location-col">Location</div>
                         <div class="table-header-cell status-col">Status</div>
                         <div class="table-header-cell applied-col">Applied</div>
@@ -4518,12 +4518,30 @@ class CareersDashboard {
                             }
                             
                             $meta = !empty($application->meta) ? json_decode($application->meta, true) : array();
+                            
+                            // Get applicant's actual name from metadata
+                            $applicant_name = 'Unknown Applicant';
+                            if (!empty($meta['first_name']) || !empty($meta['last_name'])) {
+                                $first_name = !empty($meta['first_name']) ? $meta['first_name'] : '';
+                                $last_name = !empty($meta['last_name']) ? $meta['last_name'] : '';
+                                $applicant_name = trim($first_name . ' ' . $last_name);
+                            } elseif ($user) {
+                                $applicant_name = $user->display_name;
+                            }
+                            
+                            // Get applicant's email from metadata
+                            $applicant_email = 'No email';
+                            if (!empty($meta['email'])) {
+                                $applicant_email = $meta['email'];
+                            } elseif ($user) {
+                                $applicant_email = $user->user_email;
+                            }
                             ?>
                             <div class="job-row application-row" data-application-id="<?php echo esc_attr($application->id); ?>">
                                 <div class="job-cell applicant-col">
                                     <div class="applicant-info">
-                                        <div class="applicant-name"><?php echo esc_html($user ? $user->display_name : 'Unknown Applicant'); ?></div>
-                                        <div class="applicant-email"><?php echo esc_html($user ? $user->user_email : 'No email'); ?></div>
+                                        <div class="applicant-name"><?php echo esc_html($applicant_name); ?></div>
+                                        <div class="applicant-email"><?php echo esc_html($applicant_email); ?></div>
                                     </div>
                                 </div>
                                 <div class="job-cell position-col" data-label="Position">
@@ -4533,7 +4551,7 @@ class CareersDashboard {
                                         <span class="general-application">General Application</span>
                                     <?php endif; ?>
                                 </div>
-                                <div class="job-cell modality-col" data-label="Modality">
+                                <div class="job-cell modality-col" data-label="Job Type">
                                     <span class="modality-badge"><?php echo esc_html($modality); ?></span>
                                 </div>
                                 <div class="job-cell location-col" data-label="Location">
@@ -4595,7 +4613,7 @@ class CareersDashboard {
                                         <a href="<?php echo CareersSettings::get_page_url('application_view', array('id' => $application->id)); ?>" 
                                            class="action-icon view-icon" 
                                            title="View Application Details"
-                                           aria-label="View application details for <?php echo esc_attr($user ? $user->display_name : 'Unknown Applicant'); ?>">
+                                           aria-label="View application details for <?php echo esc_attr($applicant_name); ?>">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                                 <circle cx="12" cy="12" r="3"/>
@@ -4604,7 +4622,7 @@ class CareersDashboard {
                                         <a href="#" class="action-icon notes-icon notes-toggle" 
                                            data-application-id="<?php echo esc_attr($application->id); ?>"
                                            title="View/Add Notes"
-                                           aria-label="View notes for <?php echo esc_attr($user ? $user->display_name : 'Unknown Applicant'); ?>">
+                                           aria-label="View notes for <?php echo esc_attr($applicant_name); ?>">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M3 3v18l6-6h12V3H3z"/>
                                             </svg>
@@ -4612,7 +4630,7 @@ class CareersDashboard {
                                         <a href="#" class="action-icon delete-icon delete-application" 
                                            data-id="<?php echo esc_attr($application->id); ?>"
                                            title="Delete Application"
-                                           aria-label="Delete application from <?php echo esc_attr($user ? $user->display_name : 'Unknown Applicant'); ?>">
+                                           aria-label="Delete application from <?php echo esc_attr($applicant_name); ?>">
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M3 6h18"/>
                                                 <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
