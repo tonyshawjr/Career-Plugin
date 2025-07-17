@@ -18,6 +18,7 @@ class CareersDashboard {
         // Application management AJAX handlers
         add_action('wp_ajax_careers_update_application_status', array($this, 'handle_update_application_status'));
         add_action('wp_ajax_careers_add_application_note', array($this, 'handle_add_application_note'));
+        add_action('wp_ajax_careers_delete_application', array($this, 'handle_delete_application'));
         add_action('wp_ajax_careers_delete_all_applications', array($this, 'handle_delete_all_applications'));
         
         // Dashboard routing now handled by CareersPageHandler
@@ -5043,6 +5044,44 @@ class CareersDashboard {
         }
         
         wp_send_json_success('Note added successfully');
+    }
+    
+    /**
+     * Handle delete single application AJAX request
+     */
+    public function handle_delete_application() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'careers_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options') && !current_user_can('career_admin')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $application_id = intval($_POST['application_id']);
+        if (!$application_id) {
+            wp_send_json_error('Invalid application ID');
+        }
+        
+        // Verify application exists
+        $application = CareersApplicationDB::get_application($application_id);
+        if (!$application) {
+            wp_send_json_error('Application not found');
+        }
+        
+        // Delete the application
+        $result = CareersApplicationDB::delete_application($application_id);
+        
+        if (!$result) {
+            wp_send_json_error('Failed to delete application');
+        }
+        
+        // Log the deletion for audit purposes
+        error_log('Careers: Application ID ' . $application_id . ' deleted by user ID ' . get_current_user_id());
+        
+        wp_send_json_success('Application deleted successfully');
     }
     
     /**
