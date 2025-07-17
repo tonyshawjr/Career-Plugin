@@ -28,6 +28,9 @@ class CareersAdmin {
         
         // Redirect after login based on user role
         add_filter('login_redirect', array($this, 'custom_login_redirect'), 10, 3);
+        
+        // Force role creation immediately to ensure it happens
+        $this->add_custom_user_roles();
     }
     
     /**
@@ -47,8 +50,11 @@ class CareersAdmin {
             ));
         }
         
-        if (!get_role('career_admin')) {
-            add_role('career_admin', __('Career Administrator', 'careers-manager'), array(
+        // Check if career_admin role exists and update it if needed
+        $career_admin_role = get_role('career_admin');
+        if (!$career_admin_role) {
+            // Role doesn't exist, create it
+            add_role('career_admin', __('Recruiter', 'careers-manager'), array(
                 'read' => true,
                 'edit_posts' => false,
                 'delete_posts' => false,
@@ -60,6 +66,13 @@ class CareersAdmin {
                 'view_career_analytics' => true,
                 'export_applications' => true,
             ));
+        } else {
+            // Role exists, update the display name by removing and re-adding
+            global $wp_roles;
+            if (isset($wp_roles->roles['career_admin'])) {
+                $wp_roles->roles['career_admin']['name'] = __('Recruiter', 'careers-manager');
+                update_option($wp_roles->role_key, $wp_roles->roles);
+            }
         }
     }
     

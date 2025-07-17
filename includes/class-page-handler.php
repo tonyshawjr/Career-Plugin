@@ -64,6 +64,11 @@ class CareersPageHandler {
             return $this->get_application_view_content();
         }
         
+        // Profile page
+        if ($page_id == CareersSettings::get_page_id('profile')) {
+            return $this->get_profile_content();
+        }
+        
         // Job Detail page (public-facing)
         if ($page_id == CareersSettings::get_page_id('job_detail')) {
             return $this->get_job_detail_content();
@@ -99,6 +104,7 @@ class CareersPageHandler {
             CareersSettings::get_page_id('locations'),
             CareersSettings::get_page_id('applications'),
             CareersSettings::get_page_id('application_view'),
+            CareersSettings::get_page_id('profile'),
             CareersSettings::get_page_id('job_detail'),
             CareersSettings::get_page_id('apply'),
             CareersSettings::get_page_id('open_positions')
@@ -1749,4 +1755,34 @@ class CareersPageHandler {
         error_log('=== End Careers Debug: Apply Page Handler ===');
         return '<div class="careers-apply-error">Application system not available.</div>';
     }
+    
+    /**
+     * Render dashboard navigation
+     */
+    private function render_dashboard_navigation($current_page = 'profile') {
+        if (class_exists('CareersDashboard')) {
+            $dashboard = new CareersDashboard();
+            $dashboard->render_dashboard_navigation($current_page);
+        }
+    }
+    
+    /**
+     * Get profile content
+     */
+    private function get_profile_content() {
+        // Check permissions
+        if (!is_user_logged_in()) {
+            return '<div class="careers-dashboard-error">You must be logged in to view your profile.</div>';
+        }
+        
+        if (class_exists('CareersDashboard')) {
+            $dashboard = new CareersDashboard();
+            ob_start();
+            $dashboard->render_profile_management();
+            return ob_get_clean();
+        }
+        
+        return '<div class="careers-dashboard-error">Profile component not found.</div>';
+    }
+    
 }

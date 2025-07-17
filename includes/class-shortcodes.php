@@ -1387,108 +1387,9 @@ class CareersShortcodes {
         error_log('Careers Debug: Position found: ' . $position->position_name . ' (ID: ' . $position->id . ')');
         error_log('=== End Careers Debug: Application Form Rendering ===');
         
-        ob_start();
-        ?>
-        <div class="application-page">
-            <!-- Header Section -->
-            <div class="application-header">
-                <div class="breadcrumb">
-                    <a href="<?php echo esc_url(careers_get_job_permalink($position_id)); ?>">← Back to Job Details</a>
-                </div>
-                <h1>Apply for <?php echo esc_html($position->position_name); ?></h1>
-                <div class="position-location">
-                    📍 <?php echo esc_html($position->location); ?>
-                </div>
-                <p class="application-intro">
-                    Ready to take the next step in your career? Complete the application below and we'll be in touch soon.
-                </p>
-            </div>
-
-            <!-- Application Form -->
-            <div class="application-form-container">
-                <?php echo $this->render_comprehensive_application_form($position_id); ?>
-            </div>
-        </div>
-        
-        <style>
-        .application-page {
-            max-width: 800px;
-            margin: 0 auto;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #333;
-        }
-        
-        .application-header {
-            padding: 2rem 0 3rem 0;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 3rem;
-        }
-        
-        .breadcrumb {
-            margin-bottom: 2rem;
-            text-align: left;
-        }
-        
-        .breadcrumb a {
-            color: #666;
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        
-        .breadcrumb a:hover {
-            color: #000;
-        }
-        
-        .application-header h1 {
-            font-size: 2rem;
-            font-weight: 500;
-            margin: 0 0 0.5rem 0;
-            color: #111;
-        }
-        
-        .application-header .position-location {
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 1.5rem;
-        }
-        
-        .application-intro {
-            color: #555;
-            font-size: 1rem;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-        
-        .application-form-container {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 2rem;
-        }
-        
-        @media (max-width: 768px) {
-            .application-page {
-                margin: 0 1rem;
-            }
-            
-            .application-header {
-                padding: 1.5rem 0 2rem 0;
-            }
-            
-            .application-header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .application-form-container {
-                padding: 1.5rem;
-            }
-        }
-        </style>
-        <?php
-        
-        return ob_get_clean();
+        // Simply call the comprehensive application form method
+        // which already has the proper dashboard styling
+        return $this->render_comprehensive_application_form($position_id);
     }
     
     /**
@@ -1501,7 +1402,29 @@ class CareersShortcodes {
         $existing_application = CareersApplicationDB::get_application_by_user_job($user->ID, $position_id);
         
         if ($existing_application) {
-            return '<div class="application-notice">You have already applied for this position.</div>';
+            $position = CareersPositionsDB::get_position($position_id);
+            ob_start();
+            ?>
+            <div class="careers-dashboard-container">
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <div class="page-header-text">
+                                <h1 class="page-title">Application Already Submitted</h1>
+                                <p class="page-subtitle">You have already applied for <strong><?php echo esc_html($position->position_name); ?></strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="already-applied-message">
+                        <p>Your application has been received and is being reviewed. We will contact you if we need any additional information.</p>
+                        <div class="form-actions">
+                            <a href="<?php echo CareersSettings::get_page_url('job_detail', array('job_id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
         }
         
         ob_start();
@@ -1768,14 +1691,20 @@ class CareersShortcodes {
             ob_start();
             ?>
             <div class="careers-dashboard-container">
-                <div class="dashboard-header">
-                    <h1 class="dashboard-title">Application Submitted Successfully!</h1>
-                    <p class="dashboard-subtitle">Thank you for applying for <strong><?php echo esc_html($position->position_name); ?></strong></p>
-                </div>
-                <div class="success-message">
-                    <p>Your application has been submitted successfully. We will review your application and get back to you soon.</p>
-                    <div class="form-actions">
-                        <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <div class="page-header-text">
+                                <h1 class="page-title">Application Submitted Successfully!</h1>
+                                <p class="page-subtitle">Thank you for applying for <strong><?php echo esc_html($position->position_name); ?></strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="success-message">
+                        <p>Your application has been submitted successfully. We will review your application and get back to you soon.</p>
+                        <div class="form-actions">
+                            <a href="<?php echo CareersSettings::get_page_url('job_detail', array('job_id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1792,16 +1721,22 @@ class CareersShortcodes {
             ob_start();
             ?>
             <div class="careers-dashboard-container">
-                <div class="dashboard-header">
-                    <h1 class="dashboard-title">Login Required</h1>
-                    <p class="dashboard-subtitle">You need to log in to apply for <strong><?php echo esc_html($position->position_name); ?></strong></p>
-                </div>
-                <div class="login-notice">
-                    <p><strong>Please log in to submit your application.</strong></p>
-                    <p>If you don't have an account, please contact us and we'll create one for you.</p>
-                    <div class="form-actions">
-                        <a href="<?php echo wp_login_url(get_permalink()); ?>" class="button button-primary">Log In</a>
-                        <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <div class="page-header-text">
+                                <h1 class="page-title">Login Required</h1>
+                                <p class="page-subtitle">You need to log in to apply for <strong><?php echo esc_html($position->position_name); ?></strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="login-notice">
+                        <p><strong>Please log in to submit your application.</strong></p>
+                        <p>If you don't have an account, please contact us and we'll create one for you.</p>
+                        <div class="form-actions">
+                            <a href="<?php echo wp_login_url(get_permalink()); ?>" class="button button-primary">Log In</a>
+                            <a href="<?php echo CareersSettings::get_page_url('job_detail', array('job_id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1812,7 +1747,28 @@ class CareersShortcodes {
         // Check if user already applied
         $existing_application = CareersApplicationDB::get_application_by_user_job($user->ID, $position_id);
         if ($existing_application) {
-            return '<div class="application-notice">You have already applied for this position.</div>';
+            ob_start();
+            ?>
+            <div class="careers-dashboard-container">
+                <div class="dashboard-content">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <div class="page-header-text">
+                                <h1 class="page-title">Application Already Submitted</h1>
+                                <p class="page-subtitle">You have already applied for <strong><?php echo esc_html($position->position_name); ?></strong></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="already-applied-message">
+                        <p>Your application has been received and is being reviewed. We will contact you if we need any additional information.</p>
+                        <div class="form-actions">
+                            <a href="<?php echo CareersSettings::get_page_url('job_detail', array('job_id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
         }
         
         // Get all states for dropdown
@@ -1844,12 +1800,17 @@ class CareersShortcodes {
         ob_start();
         ?>
         <div class="careers-dashboard-container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Apply Now</h1>
-                <p class="dashboard-subtitle">You are applying for: <strong><?php echo esc_html($position->position_name); ?></strong> in <strong><?php echo esc_html($position->location); ?></strong></p>
-            </div>
-            
-            <form id="comprehensive-application-form" method="post" enctype="multipart/form-data" action="">
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Apply Now</h1>
+                            <p class="page-subtitle">You are applying for: <strong><?php echo esc_html($position->position_name); ?></strong> in <strong><?php echo esc_html($position->location); ?></strong></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="comprehensive-application-form" method="post" enctype="multipart/form-data" action="">
                 <?php wp_nonce_field('careers_application_submit', 'careers_nonce'); ?>
                 <input type="hidden" name="position_id" value="<?php echo esc_attr($position_id); ?>">
                 <input type="hidden" name="action" value="submit_comprehensive_application">
@@ -1982,9 +1943,18 @@ class CareersShortcodes {
                     <button type="submit" class="button button-primary">Submit Application</button>
                 </div>
             </form>
+            </div>
         </div>
         
         <style>
+        /* Apply page specific bottom spacing */
+        .careers-dashboard-container .success-message,
+        .careers-dashboard-container .login-notice,
+        .careers-dashboard-container .already-applied-message,
+        .careers-dashboard-container #comprehensive-application-form {
+            margin-bottom: 4rem;
+        }
+        
         /* Use dashboard minimal styling - no custom form styling needed */
         .careers-dashboard-container .application-form-row {
             display: flex;

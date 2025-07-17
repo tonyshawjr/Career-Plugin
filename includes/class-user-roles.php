@@ -19,6 +19,15 @@ class CareersUserRoles {
         
         // Handle role switching for existing users
         add_action('wp_ajax_careers_change_user_role', array($this, 'change_user_role'));
+        
+        // Hide admin bar for career_admin role
+        add_action('after_setup_theme', array($this, 'hide_admin_bar_for_recruiters'));
+        
+        // Prevent wp-admin access for career_admin role
+        add_action('admin_init', array($this, 'restrict_admin_access'));
+        
+        // Redirect after login for career_admin role
+        add_filter('login_redirect', array($this, 'redirect_after_login'), 10, 3);
     }
     
     /**
@@ -202,6 +211,76 @@ class CareersUserRoles {
             'orderby' => 'registered',
             'order' => 'DESC'
         ));
+    }
+    
+    /**
+     * Hide admin bar for career_admin users
+     */
+    public function hide_admin_bar_for_recruiters() {
+        if (is_user_logged_in()) {
+            $user = wp_get_current_user();
+            if (in_array('career_admin', (array) $user->roles)) {
+                show_admin_bar(false);
+            }
+        }
+    }
+    
+    /**
+     * Restrict wp-admin access for career_admin users
+     */
+    public function restrict_admin_access() {
+        if (!defined('DOING_AJAX') || !DOING_AJAX) {
+            $user = wp_get_current_user();
+            if (in_array('career_admin', (array) $user->roles) && !in_array('administrator', (array) $user->roles)) {
+                // Redirect to careers dashboard
+                wp_redirect(CareersSettings::get_page_url('dashboard'));
+                exit;
+            }
+        }
+    }
+    
+    /**
+     * Redirect career_admin users to dashboard after login
+     */
+    public function redirect_after_login($redirect_to, $request, $user) {
+        if (isset($user->roles) && is_array($user->roles)) {
+            if (in_array('career_admin', $user->roles) && !in_array('administrator', $user->roles)) {
+                return CareersSettings::get_page_url('dashboard');
+            }
+        }
+        return $redirect_to;
+    }
+    
+    /**
+     * Create career roles on plugin activation
+     */
+    public function create_roles() {
+        // Create applicant role
+        if (!get_role('applicant')) {
+            add_role('applicant', __('Job Applicant', 'careers-manager'), array(
+                'read' => true,
+                'edit_posts' => false,
+                'delete_posts' => false,
+                'apply_for_jobs' => true,
+                'view_own_applications' => true,
+                'edit_own_profile' => true,
+            ));
+        }
+        
+        // Create career_admin role (Recruiter)
+        if (!get_role('career_admin')) {
+            add_role('career_admin', __('Recruiter', 'careers-manager'), array(
+                'read' => true,
+                'edit_posts' => false,
+                'delete_posts' => false,
+                'manage_jobs' => true,
+                'view_all_applications' => true,
+                'edit_application_status' => true,
+                'send_applicant_emails' => true,
+                'view_career_analytics' => true,
+                'export_applications' => true,
+            ));
+        }
     }
     
     /**
