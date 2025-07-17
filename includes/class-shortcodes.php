@@ -87,51 +87,90 @@ class CareersShortcodes {
             
             <div class="positions-layout">
                 <?php if ($atts['show_filter'] === 'true'): ?>
-                    <div class="filters-sidebar">
-                        <div class="filters-header">
-                            <h3>Filters</h3>
-                            <a href="<?php echo esc_url(CareersSettings::get_page_url('open_positions')); ?>" class="clear-filters">Clear all filters</a>
+                    <div class="filters-sidebar bg-white rounded-lg shadow-sm border border-gray-200 p-6 lg:sticky lg:top-6 h-fit">
+                        <div class="filters-header flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
+                            <h3 class="text-lg font-semibold text-gray-900 m-0">Filters</h3>
+                            <a href="<?php echo esc_url(CareersSettings::get_page_url('open_positions')); ?>" 
+                               class="clear-filters text-sm font-medium text-brand-red hover:text-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-red focus:ring-offset-2 rounded-md px-2 py-1">
+                                Clear all
+                            </a>
                         </div>
                         
-                        <form method="get" action="" class="filters-form">
+                        <form method="get" action="" class="filters-form space-y-6">
                             <div class="filter-group">
-                                <h4>Modality</h4>
-                                <select name="modality" onchange="this.form.submit()">
-                                    <option value="">All Modalities</option>
-                                    <?php foreach ($modalities as $modality): ?>
-                                        <option value="<?php echo esc_attr($modality); ?>" <?php selected($modality_filter, $modality); ?>>
-                                            <?php echo esc_html($modality); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <label class="filter-label block text-sm font-medium text-gray-700 mb-2" for="modality-select">
+                                    Modality
+                                </label>
+                                <div class="relative">
+                                    <select id="modality-select" 
+                                            name="modality" 
+                                            onchange="this.form.submit()"
+                                            class="filter-select w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-brand-red transition-colors appearance-none cursor-pointer">
+                                        <option value="">All Modalities</option>
+                                        <?php foreach ($modalities as $modality): ?>
+                                            <option value="<?php echo esc_attr($modality); ?>" <?php selected($modality_filter, $modality); ?>>
+                                                <?php echo esc_html($modality); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <div class="select-arrow absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="filter-group">
-                                <h4>Location</h4>
-                                <select name="location" onchange="this.form.submit()">
-                                    <option value="">All Locations</option>
-                                    <?php foreach ($locations_by_state as $state => $cities): ?>
-                                        <optgroup label="<?php echo esc_attr($state); ?>">
-                                            <?php foreach ($cities as $location): ?>
-                                                <option value="<?php echo esc_attr($location->city . ', ' . $location->state); ?>" <?php selected($location_filter, $location->city . ', ' . $location->state); ?>>
-                                                    <?php echo esc_html($location->city); ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </optgroup>
-                                    <?php endforeach; ?>
-                                </select>
+                                <label class="filter-label block text-sm font-medium text-gray-700 mb-2" for="location-select">
+                                    Location
+                                </label>
+                                <div class="relative">
+                                    <select id="location-select" 
+                                            name="location" 
+                                            onchange="this.form.submit()"
+                                            class="filter-select w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-brand-red transition-colors appearance-none cursor-pointer">
+                                        <option value="">All Locations</option>
+                                        <?php foreach ($locations_by_state as $state => $cities): ?>
+                                            <optgroup label="<?php echo esc_attr($state); ?>">
+                                                <?php foreach ($cities as $location): ?>
+                                                    <option value="<?php echo esc_attr($location->city . ', ' . $location->state); ?>" <?php selected($location_filter, $location->city . ', ' . $location->state); ?>>
+                                                        <?php echo esc_html($location->city); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </optgroup>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <div class="select-arrow absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                             
                             <div class="filter-group">
-                                <h4>Certification</h4>
-                                <select name="certification" onchange="this.form.submit()">
-                                    <option value="">All Certifications</option>
-                                    <?php foreach ($certifications as $cert): ?>
-                                        <option value="<?php echo esc_attr($cert); ?>" <?php selected($certification_filter, $cert); ?>>
-                                            <?php echo esc_html($cert); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
+                                <label class="filter-label block text-sm font-medium text-gray-700 mb-2" for="certification-select">
+                                    Certification
+                                </label>
+                                <div class="relative">
+                                    <select id="certification-select" 
+                                            name="certification" 
+                                            onchange="this.form.submit()"
+                                            class="filter-select w-full px-3 py-2.5 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-red focus:border-brand-red transition-colors appearance-none cursor-pointer">
+                                        <option value="">All Certifications</option>
+                                        <?php foreach ($certifications as $cert): ?>
+                                            <option value="<?php echo esc_attr($cert); ?>" <?php selected($certification_filter, $cert); ?>>
+                                                <?php echo esc_html($cert); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <div class="select-arrow absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -140,22 +179,32 @@ class CareersShortcodes {
                 <div class="positions-content">
                     <div class="positions-grid">
                         <?php if (empty($positions)): ?>
-                            <div class="no-positions">
-                                <h3>No positions available</h3>
-                                <p>Try adjusting your filters or check back later for new opportunities.</p>
+                            <div class="empty-state text-center py-16 px-6">
+                                <div class="empty-state-icon w-16 h-16 mx-auto mb-6 text-gray-300">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6.5M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M8 6v10a2 2 0 002 2h4a2 2 0 002-2V6"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">No positions found</h3>
+                                <p class="text-gray-600 mb-6 max-w-md mx-auto">Try adjusting your filters or check back later for new opportunities.</p>
+                                <a href="<?php echo esc_url(CareersSettings::get_page_url('open_positions')); ?>" 
+                                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition-colors">
+                                    Clear Filters
+                                </a>
                             </div>
                         <?php else: ?>
                             <?php foreach ($positions as $position): ?>
-                                <div class="position-card">
-                                    <div class="position-header">
+                                <article class="position-card bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-shadow hover:shadow-md">
+                                    <header class="position-card-header mb-4">
                                         <h3 class="position-title">
-                                            <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>">
+                                            <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>" 
+                                               class="text-gray-900 hover:text-brand-red transition-colors">
                                                 <?php echo esc_html($position->position_name); ?>
                                             </a>
                                         </h3>
-                                        <div class="position-badges">
+                                        <div class="position-badges flex flex-wrap gap-2">
                                             <?php if (!empty($position->job_type)): ?>
-                                                <span class="badge badge-<?php echo esc_attr(strtolower(str_replace([' ', '-'], '-', $position->job_type))); ?>">
+                                                <span class="position-badge position-badge-<?php echo esc_attr(strtolower(str_replace([' ', '-'], '-', $position->job_type))); ?>">
                                                     <?php echo esc_html($position->job_type); ?>
                                                 </span>
                                             <?php endif; ?>
@@ -166,25 +215,33 @@ class CareersShortcodes {
                                                 foreach ($certs as $cert): 
                                                     $cert = trim($cert);
                                                     if (!empty($cert)):
+                                                        $cert_slug = strtolower(str_replace([' ', '-'], '-', $cert));
                                                 ?>
-                                                    <span class="badge badge-cert"><?php echo esc_html($cert); ?></span>
+                                                    <span class="position-badge position-badge-cert position-badge-cert-<?php echo esc_attr($cert_slug); ?>">
+                                                        <?php echo esc_html($cert); ?>
+                                                    </span>
                                                 <?php 
                                                     endif;
                                                 endforeach; 
                                                 ?>
                                             <?php endif; ?>
                                         </div>
-                                    </div>
+                                    </header>
                                     
-                                    <div class="position-location">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5Z" fill="#666"/>
-                                        </svg>
-                                        <?php echo esc_html($position->location); ?>
+                                    <div class="position-meta mb-4">
+                                        <div class="position-location flex items-center text-gray-600 text-sm mb-2">
+                                            <svg class="w-4 h-4 mr-2 flex-shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22S19 14.25 19 9C19 5.13 15.87 2 12 2ZM12 11.5C10.62 11.5 9.5 10.38 9.5 9S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5Z" fill="currentColor"/>
+                                            </svg>
+                                            <?php echo esc_html($position->location); ?>
+                                        </div>
+                                        <div class="position-date text-xs text-gray-500">
+                                            Posted: <?php echo esc_html(date('M j, Y', strtotime($position->created_at))); ?>
+                                        </div>
                                     </div>
                                     
                                     <?php if (!empty($position->position_overview)): ?>
-                                        <div class="position-description">
+                                        <div class="position-description text-gray-600 text-sm leading-relaxed mb-4">
                                             <?php 
                                             $excerpt = wp_trim_words($position->position_overview, 20, '...');
                                             echo wp_kses_post($excerpt);
@@ -192,17 +249,16 @@ class CareersShortcodes {
                                         </div>
                                     <?php endif; ?>
                                     
-                                    <div class="position-meta">
-                                        <div class="position-date">
-                                            Posted: <?php echo esc_html(date('M j, Y', strtotime($position->created_at))); ?>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="position-actions">
+                                    <footer class="position-card-footer mt-auto">
                                         <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>"
-                                           class="view-details-btn">View Details</a>
-                                    </div>
-                                </div>
+                                           class="position-cta-btn inline-flex items-center justify-center w-full px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2">
+                                            View Details
+                                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </a>
+                                    </footer>
+                                </article>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
@@ -211,6 +267,9 @@ class CareersShortcodes {
         </div>
         
         <style>
+        /* Include badge system CSS */
+        @import url('<?php echo plugins_url("assets/css/badge-system.css", dirname(__FILE__)); ?>');
+        
         .open-positions-page {
             max-width: 1280px;
             margin: 0 auto;
@@ -246,14 +305,24 @@ class CareersShortcodes {
             gap: 2rem;
         }
         
+        /* ===== MODERN FILTERS SIDEBAR - TAILWIND INSPIRED ===== */
+        
         .filters-sidebar {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 4px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
             padding: 1.5rem;
             height: fit-content;
-            position: sticky;
-            top: 2rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease;
+        }
+        
+        /* Sticky positioning for desktop */
+        @media (min-width: 1024px) {
+            .filters-sidebar {
+                position: sticky;
+                top: 1.5rem;
+            }
         }
         
         .filters-header {
@@ -262,53 +331,129 @@ class CareersShortcodes {
             align-items: center;
             margin-bottom: 1.5rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e5e7eb;
         }
         
         .filters-header h3 {
             margin: 0;
-            font-size: 1.25rem;
-            font-weight: 500;
-            color: #111;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.4;
         }
         
         .clear-filters {
-            color: #666;
+            color: #BF1E2D;
             text-decoration: none;
             font-size: 0.875rem;
             font-weight: 500;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            transition: all 0.15s ease;
+            border: none;
+            background: transparent;
         }
         
         .clear-filters:hover {
-            color: #333;
+            color: #9f1c25;
+            background-color: rgba(191, 30, 45, 0.05);
+            text-decoration: none;
+        }
+        
+        .clear-filters:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(191, 30, 45, 0.1);
+        }
+        
+        .filters-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
         
         .filter-group {
-            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
         }
         
-        .filter-group h4 {
-            margin: 0 0 0.5rem 0;
+        .filter-label {
+            display: block;
             font-size: 0.875rem;
             font-weight: 500;
-            color: #111;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
         }
         
-        .filter-group select {
+        .filter-select {
             width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            color: #333;
-            background: #fff;
-            transition: border-color 0.2s ease;
+            padding: 0.625rem 0.75rem;
+            padding-right: 2.5rem; /* Space for custom arrow */
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            color: #111827;
+            background: #ffffff;
+            transition: all 0.15s ease;
+            appearance: none;
+            cursor: pointer;
+            line-height: 1.4;
         }
         
-        .filter-group select:focus {
+        .filter-select:hover {
+            border-color: #9ca3af;
+        }
+        
+        .filter-select:focus {
             outline: none;
-            border-color: #333;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+            border-color: #BF1E2D;
+            box-shadow: 0 0 0 3px rgba(191, 30, 45, 0.1);
+        }
+        
+        .filter-select:disabled {
+            background-color: #f9fafb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+        
+        /* Custom select arrow styling */
+        .select-arrow {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            padding-right: 0.5rem;
+            pointer-events: none;
+        }
+        
+        .select-arrow svg {
+            width: 1rem;
+            height: 1rem;
+            color: #6b7280;
+            transition: color 0.15s ease;
+        }
+        
+        .filter-select:focus + .select-arrow svg {
+            color: #BF1E2D;
+        }
+        
+        /* Optgroup styling */
+        .filter-select optgroup {
+            font-weight: 600;
+            color: #374151;
+            background-color: #f9fafb;
+        }
+        
+        .filter-select option {
+            padding: 0.5rem;
+            color: #111827;
+            background-color: #ffffff;
+        }
+        
+        .filter-select option:hover {
+            background-color: #f3f4f6;
         }
         
         .positions-content {
@@ -317,16 +462,22 @@ class CareersShortcodes {
         
         .positions-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
         }
         
         .position-card {
+            display: flex;
+            flex-direction: column;
             background: #fff;
-            border: 1px solid #eee;
-            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
             padding: 1.5rem;
-            transition: all 0.2s ease;
+            transition: box-shadow 0.2s ease;
+        }
+        
+        .position-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         
         .position-header {
@@ -367,6 +518,83 @@ class CareersShortcodes {
             white-space: nowrap;
         }
         
+        /* ===== MODERN BADGE SYSTEM - TAILWIND INSPIRED ===== */
+        
+        /* Base Badge Styles */
+        .position-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem; /* py-1 px-3 */
+            border-radius: 9999px; /* rounded-full */
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 500; /* font-medium */
+            line-height: 1.2;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            letter-spacing: 0.025em;
+        }
+        
+        /* Job Type Badges - Color-Coded System with Improved Contrast */
+        .position-badge-full-time {
+            background-color: #dbeafe; /* blue-100 */
+            color: #1e40af; /* blue-700 - improved contrast */
+            border-color: #bfdbfe; /* blue-200 */
+        }
+        
+        .position-badge-part-time {
+            background-color: #fef3c7; /* amber-100 */
+            color: #b45309; /* amber-700 - improved contrast */
+            border-color: #fde68a; /* amber-200 */
+        }
+        
+        .position-badge-contract {
+            background-color: #f3e8ff; /* violet-100 */
+            color: #6d28d9; /* violet-700 - improved contrast */
+            border-color: #ddd6fe; /* violet-200 */
+        }
+        
+        .position-badge-per-diem,
+        .position-badge-perdiem {
+            background-color: #d1fae5; /* emerald-100 */
+            color: #047857; /* emerald-700 - improved contrast */
+            border-color: #a7f3d0; /* emerald-200 */
+        }
+        
+        .position-badge-travel {
+            background-color: #fce7f3; /* pink-100 */
+            color: #be185d; /* pink-700 - improved contrast */
+            border-color: #fbcfe8; /* pink-200 */
+        }
+        
+        /* Certification Badges - Distinct Visual Treatment */
+        .position-badge-cert {
+            background-color: #f8fafc; /* slate-50 */
+            color: #475569; /* slate-600 - improved contrast */
+            border-color: #e2e8f0; /* slate-200 */
+            font-weight: 600; /* font-semibold for emphasis */
+            position: relative;
+        }
+        
+        .position-badge-cert::before {
+            content: "🏆";
+            margin-right: 0.25rem;
+            font-size: 0.625rem;
+            opacity: 0.8;
+        }
+        
+        /* Hover Effects for Better Interaction */
+        .position-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Enhanced Typography Hierarchy */
+        .position-badge {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        /* Legacy badge support */
         .badge-full-time {
             background: #dbeafe;
             color: #1d4ed8;
@@ -439,51 +667,259 @@ class CareersShortcodes {
             color: #333;
         }
         
-        .no-positions {
+        /* Empty State Styles */
+        .empty-state {
             grid-column: 1 / -1;
             text-align: center;
-            padding: 4rem 2rem;
-            color: #666;
+            padding: 4rem 1.5rem;
+            color: #6b7280;
         }
         
-        .no-positions h3 {
-            margin: 0 0 0.5rem 0;
-            font-size: 1.25rem;
+        .empty-state-icon {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1.5rem;
+            color: #d1d5db;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.125rem;
             font-weight: 500;
-            color: #111;
+            color: #111827;
+            margin-bottom: 0.5rem;
         }
         
-        .no-positions p {
-            margin: 0;
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            max-width: 28rem;
+            margin-left: auto;
+            margin-right: auto;
         }
         
-        @media (max-width: 1024px) {
+        .empty-state a {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: #f3f4f6;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .empty-state a:hover {
+            background-color: #e5e7eb;
+            color: #374151;
+            text-decoration: none;
+        }
+        
+        /* Tailwind-style Utility Classes for Position Cards */
+        .bg-white { background-color: #ffffff; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .border { border-width: 1px; }
+        .border-gray-200 { border-color: #e5e7eb; }
+        .p-6 { padding: 1.5rem; }
+        .transition-shadow { transition-property: box-shadow; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .hover\:shadow-md:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mt-auto { margin-top: auto; }
+        
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .font-semibold { font-weight: 600; }
+        .text-gray-900 { color: #111827; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-700 { color: #374151; }
+        .text-white { color: #ffffff; }
+        .leading-tight { line-height: 1.25; }
+        .leading-relaxed { line-height: 1.625; }
+        
+        .hover\:text-brand-red:hover { color: #BF1E2D; }
+        .transition-colors { transition-property: color, background-color, border-color; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        
+        .flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .gap-2 { gap: 0.5rem; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .rounded-full { border-radius: 9999px; }
+        .rounded-md { border-radius: 0.375rem; }
+        
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .font-medium { font-weight: 500; }
+        
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-gray-900 { background-color: #111827; }
+        
+        .w-4 { width: 1rem; }
+        .h-4 { height: 1rem; }
+        .w-16 { width: 4rem; }
+        .h-16 { height: 4rem; }
+        .mr-2 { margin-right: 0.5rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .flex-shrink-0 { flex-shrink: 0; }
+        
+        .inline-flex { display: inline-flex; }
+        .w-full { width: 100%; }
+        .hover\:bg-gray-800:hover { background-color: #1f2937; }
+        .hover\:bg-gray-200:hover { background-color: #e5e7eb; }
+        
+        .focus\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
+        .focus\:ring-2:focus { box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05); }
+        .focus\:ring-gray-900:focus { box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1); }
+        .focus\:ring-offset-2:focus { box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px rgba(17, 24, 39, 0.1); }
+        
+        .text-center { text-align: center; }
+        .py-16 { padding-top: 4rem; padding-bottom: 4rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .max-w-md { max-width: 28rem; }
+        
+        /* Responsive Grid System - Mobile First */
+        @media (min-width: 640px) {
+            .positions-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .positions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .positions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1280px) {
+            .positions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* ===== RESPONSIVE BEHAVIOR FOR FILTERS SIDEBAR ===== */
+        
+        /* Layout adjustments for smaller screens */
+        @media (max-width: 1023px) {
             .positions-layout {
                 grid-template-columns: 1fr;
-                gap: 1rem;
+                gap: 1.5rem;
             }
             
             .filters-sidebar {
-                position: static;
-                margin-bottom: 1rem;
+                position: static !important;
+                top: auto !important;
+                margin-bottom: 1.5rem;
+                width: 100%;
+                max-width: none;
             }
             
-            .positions-grid {
-                grid-template-columns: 1fr;
+            /* Adjust filter form layout for tablet */
+            .filters-form {
+                gap: 1.25rem;
+            }
+            
+            .filter-group {
+                margin-bottom: 0;
             }
         }
         
-        @media (max-width: 768px) {
+        /* Mobile-specific adjustments */
+        @media (max-width: 767px) {
+            .filters-sidebar {
+                padding: 1.25rem;
+                border-radius: 0.375rem;
+            }
+            
+            .filters-header {
+                margin-bottom: 1.25rem;
+                padding-bottom: 0.75rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .filters-header h3 {
+                font-size: 1rem;
+            }
+            
+            .clear-filters {
+                font-size: 0.813rem;
+                padding: 0.375rem 0.75rem;
+                align-self: flex-end;
+            }
+            
+            .filters-form {
+                gap: 1rem;
+            }
+            
+            .filter-label {
+                font-size: 0.813rem;
+                margin-bottom: 0.375rem;
+            }
+            
+            .filter-select {
+                padding: 0.75rem;
+                padding-right: 2.5rem;
+                font-size: 0.875rem;
+            }
+            
+            .select-arrow {
+                padding-right: 0.75rem;
+            }
+        }
+        
+        /* Extra small screens */
+        @media (max-width: 480px) {
+            .filters-header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .clear-filters {
+                align-self: auto;
+            }
+        }
+        
+        @media (max-width: 767px) {
             .open-positions-page {
                 padding: 1rem;
+            }
+            
+            .page-header {
+                margin-bottom: 2rem;
+                padding-bottom: 1.5rem;
             }
             
             .page-header h1 {
                 font-size: 2rem;
             }
             
+            .position-card {
+                padding: 1.25rem;
+            }
+            
             .positions-grid {
-                grid-template-columns: 1fr;
+                gap: 1rem;
             }
         }
         </style>
