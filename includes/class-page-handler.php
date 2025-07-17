@@ -1728,19 +1728,19 @@ class CareersPageHandler {
         error_log('Careers Debug: GET parameters: ' . print_r($_GET, true));
         error_log('Careers Debug: Position ID from GET: ' . $position_id);
         
-        if (!$position_id) {
-            error_log('Careers Debug: No position_id in URL parameters');
-            return '<div class="careers-apply-error">No position specified for application.</div>';
+        // If no position_id or position_id = 0, treat as general application
+        if ($position_id == 0) {
+            error_log('Careers Debug: General application (position_id = 0)');
+        } else {
+            // Get position data to show in the application form
+            $position = CareersPositionsDB::get_position($position_id);
+            if (!$position || $position->status !== 'published') {
+                error_log('Careers Debug: Position not found or not published for ID: ' . $position_id);
+                return '<div class="careers-apply-error">Position not found or no longer available.</div>';
+            }
+            error_log('Careers Debug: Position found: ' . $position->position_name . ' (ID: ' . $position->id . ')');
         }
         
-        // Get position data to show in the application form
-        $position = CareersPositionsDB::get_position($position_id);
-        if (!$position || $position->status !== 'published') {
-            error_log('Careers Debug: Position not found or not published for ID: ' . $position_id);
-            return '<div class="careers-apply-error">Position not found or no longer available.</div>';
-        }
-        
-        error_log('Careers Debug: Position found: ' . $position->position_name . ' (ID: ' . $position->id . ')');
         error_log('Careers Debug: Calling application page shortcode with position_id: ' . $position_id);
         
         // Use the existing application page shortcode to render the application form
