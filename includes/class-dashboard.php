@@ -30,6 +30,1132 @@ class CareersDashboard {
     // Old routing methods removed - now handled by CareersPageHandler
     
     /**
+     * Render unified dashboard navigation
+     * Used across all dashboard pages for consistent UX
+     */
+    public function render_dashboard_navigation($current_page = 'dashboard') {
+        $nav_items = array(
+            'dashboard' => array(
+                'label' => 'Dashboard', 
+                'url' => CareersSettings::get_page_url('dashboard'),
+                'icon' => 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z'
+            ),
+            'manage_jobs' => array(
+                'label' => 'Manage Positions', 
+                'url' => CareersSettings::get_page_url('manage_jobs'),
+                'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+            ),
+            'create_job' => array(
+                'label' => 'Create Position', 
+                'url' => CareersSettings::get_page_url('create_job'),
+                'icon' => 'M12 4v16m8-8H4'
+            ),
+            'applications' => array(
+                'label' => 'Applications', 
+                'url' => CareersSettings::get_page_url('applications'),
+                'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'
+            ),
+            'locations' => array(
+                'label' => 'Manage Locations', 
+                'url' => CareersSettings::get_page_url('locations'),
+                'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z'
+            )
+        );
+        
+        ?>
+        <div class="careers-dashboard-header">
+            <div class="dashboard-header-container">
+                <!-- Brand/Logo Area -->
+                <div class="dashboard-brand">
+                    <h1 class="brand-title">Career Portal</h1>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="dashboard-nav desktop-nav">
+                    <ul class="nav-list">
+                        <?php foreach ($nav_items as $page_key => $nav_item): ?>
+                            <li class="nav-item">
+                                <a href="<?php echo esc_url($nav_item['url']); ?>" 
+                                   class="nav-link <?php echo $current_page === $page_key ? 'active' : ''; ?>"
+                                   <?php echo $current_page === $page_key ? 'aria-current="page"' : ''; ?>>
+                                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="<?php echo esc_attr($nav_item['icon']); ?>"/>
+                                    </svg>
+                                    <span class="nav-label"><?php echo esc_html($nav_item['label']); ?></span>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-toggle" aria-label="Toggle navigation">
+                    <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Mobile Navigation -->
+            <nav class="dashboard-nav mobile-nav">
+                <ul class="mobile-nav-list">
+                    <?php foreach ($nav_items as $page_key => $nav_item): ?>
+                        <li class="mobile-nav-item">
+                            <a href="<?php echo esc_url($nav_item['url']); ?>" 
+                               class="mobile-nav-link <?php echo $current_page === $page_key ? 'active' : ''; ?>"
+                               <?php echo $current_page === $page_key ? 'aria-current="page"' : ''; ?>>
+                                <svg class="mobile-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="<?php echo esc_attr($nav_item['icon']); ?>"/>
+                                </svg>
+                                <span class="mobile-nav-label"><?php echo esc_html($nav_item['label']); ?></span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </nav>
+        </div>
+        
+        <style>
+        /* Dashboard Navigation Styles - Tailwind Inspired */
+        .careers-dashboard-header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: var(--space-8);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .dashboard-header-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 4rem; /* 64px */
+        }
+        
+        .dashboard-brand .brand-title {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--foreground);
+            margin: 0;
+        }
+        
+        /* Desktop Navigation */
+        .desktop-nav {
+            display: none;
+        }
+        
+        @media (min-width: 768px) {
+            .desktop-nav {
+                display: block;
+            }
+        }
+        
+        .nav-list {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-4);
+            color: var(--muted);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: var(--text-sm);
+            transition: all 0.15s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--foreground);
+            background-color: var(--secondary);
+            text-decoration: none;
+        }
+        
+        .nav-link.active {
+            color: var(--brand-red);
+            background-color: rgba(191, 30, 45, 0.1);
+        }
+        
+        .nav-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+        /* Mobile Menu Button */
+        .mobile-menu-toggle {
+            display: block;
+            background: none;
+            border: none;
+            color: var(--foreground);
+            padding: var(--space-2);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-menu-toggle {
+                display: none;
+            }
+        }
+        
+        .menu-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav {
+            display: none;
+            border-top: 1px solid var(--border);
+            padding: var(--space-4);
+        }
+        
+        .mobile-nav.open {
+            display: block;
+        }
+        
+        .mobile-nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .mobile-nav-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: var(--muted);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+        
+        .mobile-nav-link:hover {
+            color: var(--foreground);
+            background-color: var(--secondary);
+            text-decoration: none;
+        }
+        
+        .mobile-nav-link.active {
+            color: var(--brand-red);
+            background-color: rgba(191, 30, 45, 0.1);
+        }
+        
+        .mobile-nav-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        
+                 /* Hide mobile nav on larger screens */
+         @media (min-width: 768px) {
+             .mobile-nav {
+                 display: none !important;
+             }
+         }
+         
+         /* Action Icon Styles */
+         .action-icon {
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             width: 1.75rem;
+             height: 1.75rem;
+             border-radius: 0.375rem;
+             transition: all 0.15s ease;
+             text-decoration: none;
+             border: none;
+             background: transparent;
+             cursor: pointer;
+             position: relative;
+         }
+         
+         .action-icon svg {
+             display: block !important;
+             width: 0.875rem !important;
+             height: 0.875rem !important;
+             stroke-width: 2 !important;
+             stroke: currentColor !important;
+             fill: none !important;
+         }
+         
+         /* Edit Icon - Primary Blue */
+         .edit-icon {
+             color: #3b82f6;
+             background-color: rgba(59, 130, 246, 0.1);
+         }
+         
+         .edit-icon:hover {
+             color: #2563eb;
+             background-color: rgba(37, 99, 235, 0.15);
+             text-decoration: none;
+         }
+         
+         /* Applications Icon - Neutral Gray */
+         .applications-icon {
+             color: #6b7280;
+             background-color: rgba(107, 114, 128, 0.1);
+         }
+         
+         .applications-icon:hover {
+             color: #374151;
+             background-color: rgba(55, 65, 81, 0.15);
+             text-decoration: none;
+         }
+         
+         /* View Icon - Neutral Gray */
+         .view-icon {
+             color: #6b7280;
+             background-color: rgba(107, 114, 128, 0.1);
+         }
+         
+         .view-icon:hover {
+             color: #374151;
+             background-color: rgba(55, 65, 81, 0.15);
+             text-decoration: none;
+         }
+         
+         /* Delete Icon - Danger Red */
+         .delete-icon {
+            color: white !important;
+             background-color: #dc2626 !important;
+         }
+         
+         .delete-icon:hover {
+            color: white !important;
+             background-color: #b91c1c !important;
+         }
+         
+         .delete-icon svg {
+             display: block !important;
+             width: 0.875rem !important;
+             height: 0.875rem !important;
+             stroke: white !important;
+             fill: none !important;
+             stroke-width: 2 !important;
+         }
+         
+                   /* Action groups styling */
+          .job-actions, .position-actions {
+              display: flex;
+              gap: 0.25rem;
+              align-items: center;
+              justify-content: flex-start;
+          }
+          
+          /* Modern Jobs Table Design */
+          .jobs-table-container {
+              margin-top: var(--space-6);
+              border: 1px solid var(--border);
+              border-radius: var(--radius-lg);
+            overflow: hidden;
+              background: var(--background);
+          }
+          
+          .jobs-table-header {
+              display: grid;
+              grid-template-columns: 2.2fr 1.6fr 0.7fr 0.9fr 1fr 1.2fr;
+              gap: 1rem;
+              background: var(--gray-50);
+              padding: 1rem;
+              border-bottom: 1px solid var(--border);
+          }
+          
+          /* Manage Jobs Table with Checkbox Column */
+          .jobs-table-header:has(.select-col) {
+              grid-template-columns: 0.3fr 2.4fr 1.6fr 0.9fr 0.9fr 1fr 0.6fr 1.2fr;
+          }
+          
+          .table-header-cell {
+              font-size: var(--text-sm);
+              font-weight: 600;
+              color: var(--gray-700);
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+          }
+          
+          .jobs-list {
+              background: var(--background);
+          }
+          
+          .job-row {
+              display: grid;
+              grid-template-columns: 2.2fr 1.6fr 0.7fr 0.9fr 1fr 1.2fr;
+              gap: 1rem;
+              padding: 0.75rem 1rem;
+              transition: background-color 0.15s ease;
+              align-items: center;
+              border-bottom: 1px solid var(--border);
+          }
+          
+          /* Manage Jobs Table Rows with Checkbox Column */
+          .job-row:has(.select-col) {
+              grid-template-columns: 0.3fr 2.4fr 1.6fr 0.9fr 0.9fr 1fr 0.6fr 1.2fr;
+          }
+          
+          .job-row:last-child {
+              border-bottom: none;
+          }
+          
+          .job-row:hover {
+              background-color: var(--gray-50);
+          }
+          
+          .job-cell {
+              display: flex;
+              align-items: center;
+          }
+          
+          .job-title {
+              font-size: var(--text-base);
+              font-weight: 600;
+              color: var(--foreground);
+              margin: 0;
+              line-height: 1.4;
+          }
+          
+          .location-info {
+              display: flex;
+              align-items: center;
+              gap: var(--space-1);
+              color: var(--muted);
+              font-size: var(--text-sm);
+          }
+          
+          .location-icon {
+              width: 0.875rem;
+              height: 0.875rem;
+              flex-shrink: 0;
+          }
+          
+          .applications-count {
+              font-size: var(--text-base);
+              font-weight: 600;
+              color: var(--foreground);
+              background: var(--gray-100);
+              padding: var(--space-1) var(--space-2);
+              border-radius: var(--radius);
+              min-width: 2rem;
+              text-align: center;
+          }
+          
+          .employment-badge {
+              background: var(--gray-100);
+              color: var(--gray-700);
+              padding: var(--space-1) var(--space-3);
+              border-radius: var(--radius-full);
+              font-size: var(--text-xs);
+              font-weight: 500;
+              white-space: nowrap;
+          }
+          
+          .employment-badge.not-specified {
+              background: var(--gray-50);
+              color: var(--gray-500);
+          }
+          
+          .posted-date {
+              color: var(--muted);
+              font-size: var(--text-sm);
+          }
+          
+          /* Status Badge Styling */
+          .status-badge {
+              background: var(--gray-100);
+              color: var(--gray-700);
+              padding: var(--space-1) var(--space-3);
+              border-radius: var(--radius-full);
+              font-size: var(--text-xs);
+              font-weight: 500;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+          }
+          
+          .status-badge.published {
+              background: #d1fae5;
+              color: #065f46;
+          }
+          
+          .status-badge.draft {
+              background: #fef3c7;
+              color: #92400e;
+          }
+          
+          /* Checkbox Column Styling */
+          .select-col {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              padding: 0;
+          }
+          
+          .select-col input[type="checkbox"] {
+              margin: 0;
+              width: 16px;
+              height: 16px;
+          }
+          
+          /* Locations Table Specific Styling */
+          .locations-table-header {
+              grid-template-columns: 1fr 1fr 0.8fr;
+          }
+          
+          .job-row:has(.state-col) {
+              grid-template-columns: 1fr 1fr 0.8fr;
+          }
+          
+          .state-name, .city-name {
+              font-weight: 500;
+              color: var(--foreground);
+          }
+          
+          /* Typography Overrides for Consistent Table Styling */
+          .jobs-table-container .job-title,
+          .jobs-table-container h3.job-title,
+          .jobs-table-container .position-name {
+              font-size: var(--text-base) !important;
+              font-weight: 600 !important;
+              color: var(--foreground) !important;
+              margin: 0 !important;
+            line-height: 1.4 !important;
+              text-transform: none !important;
+              letter-spacing: normal !important;
+          }
+          
+          .jobs-table-container .table-header-cell {
+              font-size: var(--text-sm) !important;
+              font-weight: 600 !important;
+              color: var(--gray-700) !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.05em !important;
+          }
+          
+          .jobs-table-container .location-info {
+              font-size: var(--text-sm) !important;
+              color: var(--muted) !important;
+              font-weight: normal !important;
+          }
+          
+          .jobs-table-container .applications-count {
+              font-size: var(--text-base) !important;
+              font-weight: 600 !important;
+          }
+          
+          .jobs-table-container .posted-date {
+              font-size: var(--text-sm) !important;
+              color: var(--muted) !important;
+              font-weight: normal !important;
+          }
+          
+          .jobs-table-container .employment-badge {
+              font-size: var(--text-xs) !important;
+              font-weight: 500 !important;
+          }
+          
+          .jobs-table-container .status-badge {
+              font-size: var(--text-xs) !important;
+            font-weight: 500 !important;
+              text-transform: uppercase !important;
+              letter-spacing: 0.05em !important;
+          }
+          
+          .jobs-table-container .state-name,
+          .jobs-table-container .city-name {
+              font-size: var(--text-base) !important;
+              font-weight: 500 !important;
+              color: var(--foreground) !important;
+          }
+          
+          /* Override any legacy position info styling */
+          .jobs-table-container .position-info-label,
+          .jobs-table-container .position-info-item,
+          .jobs-table-container .position-location,
+          .jobs-table-container .position-date,
+          .jobs-table-container .position-apps,
+          .jobs-table-container .position-type {
+              font-size: var(--text-sm) !important;
+              font-weight: normal !important;
+              color: var(--muted) !important;
+            margin: 0 !important;
+          }
+          
+          /* Column specific styling */
+          .job-title-col {
+              min-width: 200px;
+          }
+          
+          .actions-col {
+            display: flex;
+              align-items: center;
+              justify-content: flex-start;
+          }
+          
+          .location-col {
+              min-width: 150px;
+          }
+          
+          .applications-col {
+              justify-content: center;
+          }
+          
+          .employment-col {
+              min-width: 120px;
+          }
+          
+          .actions-col, .location-actions-col {
+              justify-content: center;
+          }
+          
+          /* Metrics Grid */
+          .metrics-grid {
+            display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: var(--space-4);
+              margin-bottom: var(--space-8);
+          }
+          
+          .metric-card {
+              background: var(--background);
+              border: 1px solid var(--border);
+              border-radius: var(--radius-lg);
+              padding: var(--space-6);
+            text-align: center;
+        }
+          
+          .metric-number {
+              font-size: var(--text-3xl) !important;
+              font-weight: 700 !important;
+              color: var(--foreground) !important;
+              margin-bottom: var(--space-2) !important;
+          }
+          
+          .metric-label {
+              color: var(--muted) !important;
+              font-size: var(--text-sm) !important;
+              font-weight: 500 !important;
+          }
+          
+          .section-title {
+              font-size: var(--text-xl) !important;
+              font-weight: 600 !important;
+              color: var(--foreground) !important;
+              margin: 0 0 var(--space-4) 0 !important;
+          }
+          
+          /* Mobile Responsive */
+          @media (max-width: 768px) {
+              .jobs-table-container {
+                  border: none;
+                  border-radius: 0;
+                  background: transparent;
+              }
+              
+              .jobs-table-header {
+                  display: none;
+              }
+              
+              .jobs-list {
+                  gap: var(--space-3);
+              }
+              
+              .job-row {
+                  display: block;
+                  background: var(--background);
+                  border: 1px solid var(--border);
+                  border-radius: var(--radius-lg);
+                  margin-bottom: var(--space-3);
+                  padding: var(--space-4);
+              }
+              
+              .job-row:hover {
+                  background: var(--background);
+              }
+              
+              .job-cell {
+                  display: block;
+                  margin-bottom: var(--space-3);
+              }
+              
+              .job-cell:last-child {
+                  margin-bottom: 0;
+              }
+              
+              .job-title-col {
+                  margin-bottom: var(--space-2);
+              }
+              
+              .job-title {
+                  font-size: var(--text-base) !important;
+                  font-weight: 600 !important;
+                  margin-bottom: var(--space-1);
+              }
+              
+              .location-col::before,
+              .applications-col::before,
+              .employment-col::before,
+              .posted-col::before,
+              .status-col::before,
+              .state-col::before,
+              .city-col::before {
+                  content: attr(data-label);
+                  font-size: var(--text-xs);
+                  font-weight: 600;
+                  color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+                  display: block;
+                  margin-bottom: var(--space-1);
+              }
+              
+              .select-col {
+                  display: none;
+              }
+              
+              .metrics-grid {
+                  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                  gap: var(--space-3);
+              }
+          }
+         
+         /* Tooltip styles - using title attribute for now */
+         .action-icon:hover::after {
+             content: attr(title);
+             position: absolute;
+             bottom: 100%;
+             left: 50%;
+             transform: translateX(-50%);
+             background: var(--gray-900);
+             color: white;
+             padding: var(--space-1) var(--space-2);
+             border-radius: var(--radius-sm);
+             font-size: var(--text-xs);
+             white-space: nowrap;
+             z-index: 100;
+             margin-bottom: var(--space-1);
+         }
+         
+         .action-icon:hover::before {
+             content: '';
+             position: absolute;
+             bottom: 100%;
+             left: 50%;
+             transform: translateX(-50%);
+             border: 4px solid transparent;
+             border-top-color: var(--gray-900);
+             z-index: 100;
+         }
+
+         /* Page Header Styles */
+         .careers-dashboard-container {
+             max-width: 1280px;
+             margin: 0 auto;
+             padding: 0 var(--space-4);
+         }
+         
+         .dashboard-content {
+             padding: var(--space-8) 0;
+         }
+         
+         .page-header {
+             margin-bottom: 3rem;
+             padding-bottom: 2rem;
+             border-bottom: 1px solid #e5e7eb;
+         }
+         
+         .page-header-content {
+             display: flex;
+             justify-content: space-between;
+             align-items: flex-start;
+             gap: 2rem;
+         }
+         
+         .page-header-text {
+             flex: 1;
+         }
+         
+         .page-title {
+             font-size: 2.25rem !important;
+             font-weight: 600 !important;
+             color: #111827 !important;
+             margin: 0 0 0.75rem 0 !important;
+             line-height: 1.25 !important;
+             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+         }
+         
+         .page-subtitle {
+             font-size: 1.125rem !important;
+             color: #6b7280 !important;
+             margin: 0 !important;
+             line-height: 1.5 !important;
+             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+         }
+         
+         .page-actions {
+             display: flex;
+            gap: 1rem;
+             flex-wrap: wrap;
+             align-items: flex-start;
+         }
+         
+         .create-position-btn {
+             display: inline-flex !important;
+             align-items: center !important;
+             gap: 0.5rem !important;
+             background: #111827 !important;
+             color: white !important;
+             padding: 0.75rem 1.5rem !important;
+             border: none !important;
+             border-radius: 0.5rem !important;
+             font-size: 0.875rem !important;
+             font-weight: 500 !important;
+             text-decoration: none !important;
+             transition: background-color 0.15s ease !important;
+             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+             white-space: nowrap !important;
+         }
+         
+         .create-position-btn:hover {
+             background: #374151 !important;
+             color: white !important;
+             text-decoration: none !important;
+         }
+         
+         .create-position-btn svg {
+             width: 1rem !important;
+             height: 1rem !important;
+             stroke: currentColor !important;
+             fill: none !important;
+         }
+         
+         /* Applications Table Specific Styling */
+         .applications-table-header {
+             grid-template-columns: 2fr 1.8fr 1.2fr 1.5fr 1.3fr 1fr 1.2fr 1.5fr;
+         }
+         
+         .applications-list .job-row {
+             grid-template-columns: 2fr 1.8fr 1.2fr 1.5fr 1.3fr 1fr 1.2fr 1.5fr;
+         }
+         
+         .applicant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+         
+         .applicant-name {
+             font-weight: 600;
+             color: #111827;
+             font-size: 0.875rem;
+         }
+         
+         .applicant-email {
+            font-size: 0.75rem;
+             color: #6b7280;
+         }
+         
+         .position-name {
+            font-weight: 500;
+             color: #111827;
+             font-size: 0.875rem;
+         }
+         
+         .general-application {
+             font-style: italic;
+             color: #6b7280;
+             font-size: 0.875rem;
+         }
+         
+         .modality-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+             border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #f3f4f6;
+             color: #374151;
+         }
+         
+         .status-dropdown-container {
+             display: flex;
+             align-items: center;
+         }
+         
+         .status-dropdown {
+             background: white !important;
+             border: 1px solid #d1d5db !important;
+             border-radius: 0.375rem !important;
+             padding: 0.375rem 0.75rem !important;
+             font-size: 0.75rem !important;
+             font-weight: 500 !important;
+             color: #374151 !important;
+             cursor: pointer !important;
+             transition: border-color 0.15s ease !important;
+             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+         }
+         
+         .status-dropdown:focus {
+             outline: none !important;
+             border-color: #6366f1 !important;
+             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+         }
+         
+         .applied-date {
+             font-size: 0.875rem;
+             color: #6b7280;
+         }
+         
+         .documents-list {
+             display: flex;
+             align-items: center;
+             gap: 0.5rem;
+         }
+         
+         .document-link {
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+             width: 1.75rem;
+             height: 1.75rem;
+             border-radius: 0.375rem;
+             background: #f3f4f6;
+             color: #374151;
+             text-decoration: none;
+             transition: all 0.15s ease;
+         }
+         
+         .document-link:hover {
+             background: #e5e7eb;
+             color: #111827;
+             text-decoration: none;
+         }
+         
+         .document-link svg {
+             width: 1rem;
+             height: 1rem;
+             stroke: currentColor;
+             fill: none;
+         }
+         
+         .resume-link {
+             background: #dbeafe;
+             color: #2563eb;
+         }
+         
+         .resume-link:hover {
+             background: #bfdbfe;
+             color: #1d4ed8;
+         }
+         
+         .cover-letter-link {
+             background: #d1fae5;
+            color: #059669;
+        }
+         
+         .cover-letter-link:hover {
+             background: #a7f3d0;
+             color: #047857;
+         }
+         
+         .no-documents {
+             font-size: 0.75rem;
+             color: #9ca3af;
+             font-style: italic;
+         }
+         
+         .notes-icon {
+             background-color: rgba(107, 114, 128, 0.1);
+             color: #6b7280;
+         }
+         
+         .notes-icon:hover {
+             background-color: rgba(55, 65, 81, 0.15);
+             color: #374151;
+         }
+         
+         .delete-all-btn {
+             display: inline-flex !important;
+             align-items: center !important;
+             gap: 0.5rem !important;
+             background: #dc2626 !important;
+             color: white !important;
+             padding: 0.75rem 1.5rem !important;
+             border: none !important;
+             border-radius: 0.5rem !important;
+            font-size: 0.875rem !important;
+             font-weight: 500 !important;
+            text-decoration: none !important;
+             transition: background-color 0.15s ease !important;
+             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+             cursor: pointer !important;
+         }
+         
+         .delete-all-btn:hover {
+             background: #b91c1c !important;
+             color: white !important;
+            text-decoration: none !important;
+        }
+         
+         .delete-all-btn svg {
+             width: 1rem !important;
+             height: 1rem !important;
+             stroke: currentColor !important;
+             fill: none !important;
+         }
+         
+         @media (max-width: 768px) {
+             .careers-dashboard-container {
+                 padding: 0 1rem;
+             }
+             
+             .dashboard-content {
+                 padding: 1.5rem 0;
+             }
+             
+             .page-header {
+            margin-bottom: 2rem;
+                 padding-bottom: 1.5rem;
+             }
+             
+             .page-header-content {
+                 flex-direction: column;
+                 gap: 1.5rem;
+             }
+             
+             .page-title {
+                 font-size: 1.875rem !important;
+             }
+             
+             .page-subtitle {
+                 font-size: 1rem !important;
+             }
+             
+             .page-actions {
+                 width: 100%;
+             }
+             
+             .create-position-btn {
+                 justify-content: center !important;
+                 width: 100% !important;
+             }
+             
+             .careers-dashboard-container .filters-grid {
+                 grid-template-columns: 1fr !important;
+                 gap: 1rem !important;
+             }
+             
+             .careers-dashboard-container .filters-section {
+                 padding: 1rem !important;
+             }
+             
+             /* Applications Table Mobile Styling */
+             .applications-table-header {
+                 display: none !important;
+             }
+             
+             .applications-list .job-row {
+                 display: block !important;
+                 padding: 1rem !important;
+                 margin-bottom: 1rem !important;
+                 border: 1px solid #e5e7eb !important;
+                 border-radius: 0.5rem !important;
+                 background: white !important;
+             }
+             
+             .applications-list .job-cell {
+                 display: flex !important;
+                 justify-content: space-between !important;
+                 align-items: center !important;
+                 padding: 0.5rem 0 !important;
+                 border-bottom: 1px solid #f3f4f6 !important;
+             }
+             
+             .applications-list .job-cell:last-child {
+                 border-bottom: none !important;
+             }
+             
+             .applications-list .job-cell:before {
+                 content: attr(data-label) ": ";
+                 font-weight: 600 !important;
+                 color: #374151 !important;
+                 font-size: 0.875rem !important;
+                 min-width: 90px !important;
+             }
+             
+             .applications-list .applicant-col:before {
+                 content: "Applicant: ";
+             }
+             
+             .applications-list .position-col:before {
+                 content: "Position: ";
+             }
+             
+             .applications-list .modality-col:before {
+                 content: "Modality: ";
+             }
+             
+             .applications-list .location-col:before {
+                 content: "Location: ";
+             }
+             
+             .applications-list .status-col:before {
+                 content: "Status: ";
+             }
+             
+             .applications-list .applied-col:before {
+                 content: "Applied: ";
+             }
+             
+             .applications-list .documents-col:before {
+                 content: "Documents: ";
+             }
+             
+             .applications-list .actions-col:before {
+                 content: "Actions: ";
+             }
+             
+             .applicant-info {
+                 align-items: flex-end !important;
+                 text-align: right !important;
+             }
+             
+            .job-actions {
+                 justify-content: flex-end !important;
+            }
+        }
+        </style>
+        
+        <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            const mobileNav = document.querySelector('.mobile-nav');
+            
+            if (menuToggle && mobileNav) {
+                menuToggle.addEventListener('click', function() {
+                    mobileNav.classList.toggle('open');
+                });
+            }
+        });
+        </script>
+        <?php
+    }
+    
+    /**
      * Render main dashboard
      */
     public function render_main_dashboard() {
@@ -45,10 +1171,13 @@ class CareersDashboard {
         $active_jobs = CareersPositionsDB::get_positions(array('status' => 'published', 'limit' => 10));
         
         ?>
+        <?php $this->render_dashboard_navigation('dashboard'); ?>
+        
         <div class="careers-dashboard-container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Dashboard</h1>
-                <p class="dashboard-subtitle">Overview of your careers system</p>
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard Overview</h1>
+                    <p class="page-subtitle">Monitor your careers system performance</p>
             </div>
             
             <!-- Removed dashboard tabs since applications is now a separate page -->
@@ -71,12 +1200,6 @@ class CareersDashboard {
                 </div>
                 
                 <div class="jobs-section">
-                    <div class="dashboard-actions">
-                        <a href="<?php echo CareersSettings::get_page_url('create_job'); ?>" class="dashboard-action-btn">Create New Job</a>
-                        <a href="<?php echo CareersSettings::get_page_url('manage_jobs'); ?>" class="dashboard-action-btn secondary">Manage All Jobs</a>
-                        <a href="<?php echo CareersSettings::get_page_url('locations'); ?>" class="dashboard-action-btn secondary">Manage Locations</a>
-                    </div>
-                    
                     <h3 class="section-title">Active Jobs</h3>
                     <?php if (empty($active_jobs)): ?>
                         <div class="empty-state">
@@ -84,53 +1207,95 @@ class CareersDashboard {
                             <p>Create your first job posting to get started.</p>
                         </div>
                     <?php else: ?>
-                        <div class="jobs-grid">
+                        <!-- Jobs Table -->
+                        <div class="jobs-table-container">
+                            <!-- Table Header -->
+                            <div class="jobs-table-header">
+                                <div class="table-header-cell job-title-col">Job Title</div>
+                                <div class="table-header-cell location-col">Location</div>
+                                <div class="table-header-cell applications-col">Apps</div>
+                                <div class="table-header-cell employment-col">Type</div>
+                                <div class="table-header-cell posted-col">Posted</div>
+                                <div class="table-header-cell actions-col">Actions</div>
+                            </div>
+                            
+                            <!-- Jobs List -->
+                            <div class="jobs-list">
                             <?php foreach ($active_jobs as $job): ?>
-                                <div class="job-card">
-                                    <div class="job-info">
-                                        <div class="job-info-item">
-                                            <div class="job-info-label">Job Title</div>
+                                <div class="job-row">
+                                    <div class="job-cell job-title-col">
                                             <h4 class="job-title"><?php echo esc_html($job->position_name); ?></h4>
                                         </div>
-                                        <div class="job-info-item">
-                                            <div class="job-info-label">Location</div>
-                                            <div class="job-location"><?php echo esc_html($job->location); ?></div>
+                                    <div class="job-cell location-col" data-label="Location">
+                                        <div class="location-info">
+                                            <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                                <circle cx="12" cy="10" r="3"/>
+                                            </svg>
+                                            <?php echo esc_html($job->location); ?>
                                         </div>
-                                        <div class="job-info-item">
-                                            <div class="job-info-label">Applications</div>
-                                            <?php 
-                                            $app_count = CareersApplicationDB::get_applications_count_by_job($job->id);
-                                            ?>
-                                            <span class="app-count"><?php echo esc_html($app_count); ?></span>
                                         </div>
-                                        <div class="job-info-item">
-                                            <div class="job-info-label">Employment Type</div>
+                                    <div class="job-cell applications-col" data-label="Applications">
+                                        <span class="applications-count">
+                                            <?php echo esc_html(CareersApplicationDB::get_applications_count_by_job($job->id)); ?>
+                                        </span>
+                                    </div>
+                                    <div class="job-cell employment-col" data-label="Employment Type">
                                             <?php if (!empty($job->job_type)): ?>
                                                 <?php 
                                                 $type_class = strtolower(str_replace([' ', '-'], '-', $job->job_type));
                                                 ?>
-                                                <span class="employment-type <?php echo esc_attr($type_class); ?>"><?php echo esc_html($job->job_type); ?></span>
+                                            <span class="employment-badge <?php echo esc_attr($type_class); ?>">
+                                                <?php echo esc_html($job->job_type); ?>
+                                            </span>
                                             <?php else: ?>
-                                                <span class="employment-type">Not specified</span>
+                                            <span class="employment-badge not-specified">Not specified</span>
                                             <?php endif; ?>
                                         </div>
-                                        <div class="job-info-item">
-                                            <div class="job-info-label">Posted Date</div>
-                                            <div class="posted-date"><?php echo esc_html(date('M j, Y', strtotime($job->created_at))); ?></div>
+                                    <div class="job-cell posted-col" data-label="Posted Date">
+                                        <span class="posted-date"><?php echo esc_html(date('M j, Y', strtotime($job->created_at))); ?></span>
+                                    </div>
+                                    <div class="job-actions">
+                                            <a href="<?php echo CareersSettings::get_page_url('edit_job', array('id' => $job->id)); ?>" 
+                                               class="action-icon edit-icon" 
+                                               title="Edit Position"
+                                               aria-label="Edit <?php echo esc_attr($job->position_name); ?>">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                    <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                            </a>
+                                            <a href="<?php echo CareersSettings::get_page_url('applications', array('job_id' => $job->id)); ?>" 
+                                               class="action-icon applications-icon" 
+                                               title="View Applications"
+                                               aria-label="View applications for <?php echo esc_attr($job->position_name); ?>">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                                    <circle cx="9" cy="7" r="4"/>
+                                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                                </svg>
+                                            </a>
+                                            <a href="<?php echo esc_url(careers_get_job_permalink($job->id)); ?>" 
+                                               class="action-icon view-icon" 
+                                               title="View Job Posting" 
+                                               target="_blank"
+                                               aria-label="View job posting for <?php echo esc_attr($job->position_name); ?>">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                    <circle cx="12" cy="12" r="3"/>
+                                                </svg>
+                                            </a>
                                         </div>
                                     </div>
-                                                        <div class="job-actions">
-                        <a href="<?php echo CareersSettings::get_page_url('edit_job', array('id' => $job->id)); ?>" class="action-btn primary">Edit</a>
-                        <a href="<?php echo CareersSettings::get_page_url('applications', array('job_id' => $job->id)); ?>" class="action-btn">Applications</a>
-                        <a href="<?php echo esc_url(careers_get_job_permalink($job->id)); ?>" class="action-btn" target="_blank">View</a>
-                    </div>
                                 </div>
                             <?php endforeach; ?>
+                            </div>
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
-        </div>
+                    </div>
         <?php
     }
     
@@ -157,11 +1322,14 @@ class CareersDashboard {
         }
         
         ?>
+        <?php $this->render_dashboard_navigation('create_job'); ?>
+        
         <div class="careers-dashboard-container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Create New Job Position</h1>
-                <p class="dashboard-subtitle">Add a new position to your careers system</p>
-            </div>
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <h1 class="page-title">Create New Position</h1>
+                    <p class="page-subtitle">Add a new position to your careers system</p>
+                </div>
             
             <form id="careers-position-form" method="post" action="">
                 <?php wp_nonce_field('careers_position_action', 'careers_nonce'); ?>
@@ -581,11 +1749,15 @@ class CareersDashboard {
             }
         }
         </style>
+        
+        <?php $this->render_dashboard_navigation('manage_jobs'); ?>
+        
         <div class="careers-dashboard-container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Edit Job Position</h1>
-                <p class="dashboard-subtitle">Update your position details</p>
-            </div>
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <h1 class="page-title">Edit Position</h1>
+                    <p class="page-subtitle">Update your position details</p>
+                </div>
             
             <form id="careers-position-edit-form" method="post" action="">
                 <?php wp_nonce_field('careers_position_action', 'careers_nonce'); ?>
@@ -1080,17 +2252,19 @@ class CareersDashboard {
             text-decoration: none !important;
         }
         
-        /* Filter Section */
+        /* Filter Section - Clean Modern Design */
         .careers-dashboard-container .filters-section {
-            background: #f8f9fa;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
             padding: 1.5rem;
-            border-radius: 8px;
             margin-bottom: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
         .careers-dashboard-container .filters-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr auto;
-            gap: 1rem;
+            grid-template-columns: 2.5fr 1.2fr 1.2fr 1.5fr auto;
+            gap: 1.25rem;
             align-items: end;
         }
         .careers-dashboard-container .filter-group {
@@ -1099,34 +2273,56 @@ class CareersDashboard {
             gap: 0.5rem;
         }
         .careers-dashboard-container .filter-group label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #555;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            color: #374151 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
         .careers-dashboard-container .filter-group input,
         .careers-dashboard-container .filter-group select {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.875rem;
+            padding: 0.75rem !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.375rem !important;
+            font-size: 0.875rem !important;
+            background: white !important;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
+        .careers-dashboard-container .filter-group input:focus,
+        .careers-dashboard-container .filter-group select:focus {
+            outline: none !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+        }
         .careers-dashboard-container .filter-button {
-            background: #000 !important;
+            background: #111827 !important;
             color: white !important;
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            height: fit-content;
+            padding: 0.75rem 1.5rem !important;
+            border: none !important;
+            border-radius: 0.375rem !important;
+            cursor: pointer !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            height: fit-content !important;
             text-decoration: none !important;
+            transition: background-color 0.15s ease !important;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
         }
         .careers-dashboard-container .filter-button:hover {
-            background: #333 !important;
+            background: #374151 !important;
             color: white !important;
             text-decoration: none !important;
+        }
+        .careers-dashboard-container .filter-button.clear-filters {
+            background: #f9fafb !important;
+            color: #6b7280 !important;
+            border: 1px solid #d1d5db !important;
+        }
+        .careers-dashboard-container .filter-button.clear-filters:hover {
+            background: #f3f4f6 !important;
+            color: #374151 !important;
         }
         .careers-dashboard-container .clear-filters {
             background: transparent !important;
@@ -1428,16 +2624,24 @@ class CareersDashboard {
         }
         </style>
         
+        <?php $this->render_dashboard_navigation('manage_jobs'); ?>
+        
         <div class="careers-dashboard-container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Manage Job Positions</h1>
-                <div class="header-actions">
-                    <a href="<?php echo CareersSettings::get_page_url('create_job'); ?>" class="create-button">
-                        Create New Position
-                    </a>
-                    <a href="<?php echo CareersSettings::get_page_url('locations'); ?>" class="create-button secondary">
-                        Manage Locations
-                    </a>
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Manage Positions</h1>
+                            <p class="page-subtitle">Create, edit, and manage job positions</p>
+                        </div>
+                        <div class="page-actions">
+                            <a href="<?php echo CareersSettings::get_page_url('create_job'); ?>" class="create-position-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Create Position
+                            </a>
+                        </div>
                 </div>
             </div>
             
@@ -1526,56 +2730,107 @@ class CareersDashboard {
                     <span>Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
                 </div>
                 
-                <!-- Positions Grid -->
-                <div class="positions-grid">
+                <!-- Positions Table -->
+                <div class="jobs-table-container">
+                    <!-- Table Header -->
+                    <div class="jobs-table-header">
+                        <div class="table-header-cell select-col">
+                            <input type="checkbox" id="select-all-positions" class="position-checkbox">
+                        </div>
+                        <div class="table-header-cell job-title-col">Job Title</div>
+                        <div class="table-header-cell location-col">Location</div>
+                        <div class="table-header-cell status-col">Status</div>
+                        <div class="table-header-cell employment-col">Type</div>
+                        <div class="table-header-cell posted-col">Posted</div>
+                        <div class="table-header-cell applications-col">Apps</div>
+                        <div class="table-header-cell actions-col">Actions</div>
+                    </div>
+                    
+                    <!-- Positions List -->
+                    <div class="jobs-list">
                     <?php foreach ($positions as $position): ?>
-                        <div class="position-card">
+                            <div class="job-row">
+                                <div class="job-cell select-col">
                             <input type="checkbox" class="position-checkbox" value="<?php echo esc_attr($position->id); ?>">
-                            <div class="position-info">
-                                <div class="position-info-item">
-                                    <div class="position-info-label">Job Title</div>
-                                    <h3 class="position-name"><?php echo esc_html($position->position_name); ?></h3>
-                                    <div class="position-location"><?php echo esc_html($position->location); ?></div>
                                 </div>
-                                <div class="position-info-item">
-                                    <div class="position-info-label">Status</div>
-                                    <span class="position-status <?php echo esc_attr($position->status); ?>">
+                                <div class="job-cell job-title-col">
+                                    <h3 class="job-title"><?php echo esc_html($position->position_name); ?></h3>
+                                </div>
+                                <div class="job-cell location-col" data-label="Location">
+                                    <div class="location-info">
+                                        <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                            <circle cx="12" cy="10" r="3"/>
+                                        </svg>
+                                        <?php echo esc_html($position->location); ?>
+                                    </div>
+                                </div>
+                                <div class="job-cell status-col" data-label="Status">
+                                    <span class="status-badge <?php echo esc_attr($position->status); ?>">
                                         <?php echo esc_html(ucfirst($position->status)); ?>
                                     </span>
                                 </div>
-                                <div class="position-info-item">
-                                    <div class="position-info-label">Job Type</div>
+                                <div class="job-cell employment-col" data-label="Employment Type">
                                     <?php if (!empty($position->job_type)): ?>
-                                        <span class="position-type"><?php echo esc_html($position->job_type); ?></span>
+                                        <span class="employment-badge"><?php echo esc_html($position->job_type); ?></span>
                                     <?php else: ?>
-                                        <span class="position-type">Not specified</span>
+                                        <span class="employment-badge not-specified">Not specified</span>
                                     <?php endif; ?>
                                 </div>
-                                <div class="position-info-item">
-                                    <div class="position-info-label">Posted Date</div>
-                                    <div class="position-date">
-                                        <?php echo esc_html(date('M j, Y', strtotime($position->created_at))); ?>
+                                <div class="job-cell posted-col" data-label="Posted Date">
+                                    <span class="posted-date"><?php echo esc_html(date('M j, Y', strtotime($position->created_at))); ?></span>
                                     </div>
-                                </div>
-                                <div class="position-info-item">
-                                    <div class="position-info-label">Applications</div>
-                                    <div class="position-apps">
+                                <div class="job-cell applications-col" data-label="Applications">
+                                    <span class="applications-count">
                                         <?php echo esc_html(CareersApplicationDB::get_applications_count_by_job($position->id)); ?>
+                                    </span>
                                     </div>
+                                    <div class="job-actions">
+                                        <a href="<?php echo CareersSettings::get_page_url('edit_job', array('id' => $position->id)); ?>" 
+                                           class="action-icon edit-icon" 
+                                           title="Edit Position"
+                                           aria-label="Edit <?php echo esc_attr($position->position_name); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                            </svg>
+                                        </a>
+                                        <a href="<?php echo CareersSettings::get_page_url('applications', array('job_id' => $position->id)); ?>" 
+                                           class="action-icon applications-icon" 
+                                           title="View Applications"
+                                           aria-label="View applications for <?php echo esc_attr($position->position_name); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                                <circle cx="9" cy="7" r="4"/>
+                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                                            </svg>
+                                        </a>
+                                        <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>" 
+                                           class="action-icon view-icon" 
+                                           title="View Job Posting" 
+                                           target="_blank"
+                                           aria-label="View job posting for <?php echo esc_attr($position->position_name); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="action-icon delete-icon delete-position" 
+                                           data-id="<?php echo esc_attr($position->id); ?>"
+                                           title="Delete Position"
+                                           aria-label="Delete <?php echo esc_attr($position->position_name); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18"/>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                            </svg>
+                                        </a>
                                 </div>
-                            </div>
-                            <div class="position-actions">
-                                <a href="<?php echo CareersSettings::get_page_url('edit_job', array('id' => $position->id)); ?>" 
-                                   class="action-button primary">Edit</a>
-                                <a href="<?php echo CareersSettings::get_page_url('applications', array('job_id' => $position->id)); ?>" 
-                                   class="action-button">Applications</a>
-                                <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>" 
-                                   class="action-button" target="_blank">View</a>
-                                <button class="action-button danger delete-position" 
-                                        data-id="<?php echo esc_attr($position->id); ?>">Delete</button>
                             </div>
                         </div>
                     <?php endforeach; ?>
+                    </div>
                 </div>
                 
                 <!-- Pagination -->
@@ -1608,7 +2863,7 @@ class CareersDashboard {
         <script>
         jQuery(document).ready(function($) {
             // Select all checkbox functionality
-            $('#select-all').on('change', function() {
+            $('#select-all, #select-all-positions').on('change', function() {
                 $('.position-checkbox').not(this).prop('checked', this.checked);
                 toggleBulkActions();
             });
@@ -2160,17 +3415,13 @@ class CareersDashboard {
         }
         </style>
         
+        <?php $this->render_dashboard_navigation('locations'); ?>
+        
         <div class="careers-dashboard-container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Manage Locations</h1>
-                <div class="header-actions">
-                    <a href="<?php echo CareersSettings::get_page_url('dashboard'); ?>" class="dashboard-action-btn">
-                        Back to Dashboard
-                    </a>
-                    <a href="<?php echo CareersSettings::get_page_url('manage_jobs'); ?>" class="dashboard-action-btn">
-                        Manage Jobs
-                    </a>
-                </div>
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <h1 class="page-title">Manage Locations</h1>
+                    <p class="page-subtitle">Add and manage job locations</p>
             </div>
             
             <?php if (!empty($locations_by_state)): ?>
@@ -2225,25 +3476,44 @@ class CareersDashboard {
                         <p>Add your first location above to get started with job postings.</p>
                     </div>
                 <?php else: ?>
-                    <div class="locations-grid">
-                        <?php foreach ($locations_by_state as $state => $cities): ?>
-                            <div class="state-card">
-                                <div class="state-header">
-                                    <h4 class="state-title"><?php echo esc_html($state); ?></h4>
-                                    <div class="state-count"><?php echo count($cities); ?> <?php echo count($cities) === 1 ? 'city' : 'cities'; ?></div>
+                    <!-- Locations Table -->
+                    <div class="jobs-table-container">
+                        <!-- Table Header -->
+                        <div class="jobs-table-header locations-table-header">
+                            <div class="table-header-cell state-col">State</div>
+                            <div class="table-header-cell city-col">City</div>
+                            <div class="table-header-cell location-actions-col">Actions</div>
                                 </div>
-                                <div class="cities-grid">
+                        
+                        <!-- Locations List -->
+                        <div class="jobs-list">
+                            <?php foreach ($locations_by_state as $state => $cities): ?>
                                     <?php foreach ($cities as $location): ?>
-                                        <div class="city-item">
+                                    <div class="job-row">
+                                        <div class="job-cell state-col" data-label="State">
+                                            <span class="state-name"><?php echo esc_html($state); ?></span>
+                                        </div>
+                                        <div class="job-cell city-col" data-label="City">
                                             <span class="city-name"><?php echo esc_html($location->city); ?></span>
-                                            <button class="delete-location" data-id="<?php echo esc_attr($location->id); ?>">
-                                                Delete
+                                        </div>
+                                        <div class="job-cell location-actions-col">
+                                            <div class="job-actions">
+                                                <button class="action-icon delete-icon delete-location" 
+                                                        data-id="<?php echo esc_attr($location->id); ?>"
+                                                        title="Delete Location"
+                                                        aria-label="Delete <?php echo esc_attr($location->city); ?>, <?php echo esc_attr($state); ?>">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M3 6h18"/>
+                                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                                    </svg>
                                             </button>
                                         </div>
-                                    <?php endforeach; ?>
                                 </div>
                             </div>
+                                <?php endforeach; ?>
                         <?php endforeach; ?>
+                        </div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -3114,16 +4384,28 @@ class CareersDashboard {
         }
         </style>
         
+        <?php $this->render_dashboard_navigation('applications'); ?>
+        
         <div class="careers-dashboard-container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Applications</h1>
-                <p class="dashboard-subtitle">Manage job applications and track applicant progress</p>
-                <div class="header-actions">
-                    <button id="delete-all-applications" class="delete-all-btn" type="button">
-                        Delete All Applications
-                    </button>
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Applications</h1>
+                            <p class="page-subtitle">Manage job applications and track applicant progress</p>
+                        </div>
+                        <div class="page-actions">
+                            <button id="delete-all-applications" class="delete-all-btn" type="button">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18"/>
+                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                </svg>
+                                Delete All Applications
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
             
             <!-- Applications Statistics -->
             <div class="applications-stats">
@@ -3199,125 +4481,149 @@ class CareersDashboard {
                     <p><?php echo $status_filter || $search_query || $job_filter ? 'Try adjusting your filters.' : 'Applications will appear here once candidates start applying.'; ?></p>
                 </div>
             <?php else: ?>
-                <!-- Applications List -->
-                <div class="applications-grid">
-                    <?php foreach ($applications as $application): ?>
-                        <?php 
-                        $user = get_user_by('id', $application->user_id);
-                        $notes = $this->get_application_notes($application->id);
-                        ?>
-                        <div class="application-card" data-application-id="<?php echo esc_attr($application->id); ?>">
-                            <div class="application-header">
-                                <div class="applicant-info">
-                                    <h3><?php echo esc_html($user ? $user->display_name : 'Unknown Applicant'); ?></h3>
-                                    <div class="applicant-email"><?php echo esc_html($user ? $user->user_email : 'No email'); ?></div>
-                                    <div class="application-meta">
-                                        Applied: <?php echo esc_html(date('M j, Y \a\t g:i A', strtotime($application->submitted_at))); ?>
+                <!-- Results Info -->
+                <div class="results-info">
+                    <span>Showing <?php echo count($applications); ?> of <?php echo $total_applications; ?> applications</span>
+                    <span>Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
+                </div>
+                <!-- Applications Table -->
+                <div class="jobs-table-container">
+                    <!-- Table Header -->
+                    <div class="jobs-table-header applications-table-header">
+                        <div class="table-header-cell applicant-col">Applicant</div>
+                        <div class="table-header-cell position-col">Position</div>
+                        <div class="table-header-cell modality-col">Modality</div>
+                        <div class="table-header-cell location-col">Location</div>
+                        <div class="table-header-cell status-col">Status</div>
+                        <div class="table-header-cell applied-col">Applied</div>
+                        <div class="table-header-cell documents-col">Documents</div>
+                        <div class="table-header-cell actions-col">Actions</div>
+                    </div>
+                    
+                    <!-- Applications List -->
+                    <div class="jobs-list applications-list">
+                        <?php foreach ($applications as $application): ?>
+                            <?php 
+                            $user = get_user_by('id', $application->user_id);
+                            $position = null;
+                            $modality = 'General';
+                            $location = 'Various';
+                            
+                            if (!empty($application->job_id) && $application->job_id > 0) {
+                                $position = CareersPositionsDB::get_position($application->job_id);
+                                if ($position) {
+                                    $modality = !empty($position->job_type) ? $position->job_type : 'Not specified';
+                                    $location = $position->location;
+                                }
+                            }
+                            
+                            $meta = !empty($application->meta) ? json_decode($application->meta, true) : array();
+                            ?>
+                            <div class="job-row application-row" data-application-id="<?php echo esc_attr($application->id); ?>">
+                                <div class="job-cell applicant-col">
+                                    <div class="applicant-info">
+                                        <div class="applicant-name"><?php echo esc_html($user ? $user->display_name : 'Unknown Applicant'); ?></div>
+                                        <div class="applicant-email"><?php echo esc_html($user ? $user->user_email : 'No email'); ?></div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <div class="application-details">
-                                <div class="detail-item">
-                                    <div class="detail-label">Position Applied For</div>
-                                    <div class="detail-value">
-                                        <?php if (empty($application->job_id) || $application->job_id == 0): ?>
-                                            <span class="general-application">General Application</span>
-                                        <?php else: ?>
-                                            <?php 
-                                            $job = CareersPositionsDB::get_position($application->job_id);
-                                            echo $job ? '<span class="job-title">' . esc_html($job->position_name) . '</span>' : 'Position Not Found';
-                                            ?>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Documents</div>
-                                    <div class="detail-value">
-                                        <?php if (!empty($application->resume_url)): ?>
-                                            <a href="<?php echo esc_url($application->resume_url); ?>" target="_blank">Resume</a>
-                                        <?php endif; ?>
-                                        <?php if (!empty($application->cover_letter_url)): ?>
-                                            <?php if (!empty($application->resume_url)): ?> • <?php endif; ?>
-                                            <a href="<?php echo esc_url($application->cover_letter_url); ?>" target="_blank">Cover Letter</a>
-                                        <?php endif; ?>
-                                        <?php if (empty($application->resume_url) && empty($application->cover_letter_url)): ?>
-                                            No documents
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Application ID</div>
-                                    <div class="detail-value">#<?php echo esc_html($application->id); ?></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Status Pipeline -->
-                            <div class="status-pipeline">
-                                <?php foreach ($status_pipeline as $status_key => $status_info): ?>
-                                    <button class="status-btn <?php echo esc_attr($status_key); ?> <?php echo ($application->status == $status_key) ? 'active' : ''; ?>"
-                                            data-status="<?php echo esc_attr($status_key); ?>"
-                                            data-application-id="<?php echo esc_attr($application->id); ?>">
-                                        <?php echo esc_html($status_info['label']); ?>
-                                    </button>
-                                <?php endforeach; ?>
-                            </div>
-                            
-                            <!-- Notes Section -->
-                            <div class="notes-section">
-                                <div class="notes-header">
-                                    <h4 class="notes-title">Notes (<?php echo count($notes); ?>)</h4>
-                                    <button class="add-note-btn" data-application-id="<?php echo esc_attr($application->id); ?>">+ Add Note</button>
-                                </div>
-                                
-                                <div class="notes-list">
-                                    <?php if (!empty($notes)): ?>
-                                        <?php foreach (array_slice($notes, 0, 2) as $note): ?>
-                                            <div class="note-item">
-                                                <div class="note-content"><?php echo esc_html($note->content); ?></div>
-                                                <div class="note-meta">
-                                                    <?php 
-                                                    $note_user = get_user_by('id', $note->user_id);
-                                                    echo esc_html($note_user ? $note_user->display_name : 'Unknown User');
-                                                    echo ' • ' . esc_html(date('M j, Y \a\t g:i A', strtotime($note->created_at)));
-                                                    ?>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; ?>
-                                        <?php if (count($notes) > 2): ?>
-                                            <div class="note-item">
-                                                <div class="note-content" style="font-style: italic; color: #666;">
-                                                    +<?php echo count($notes) - 2; ?> more notes...
-                                                </div>
-                                            </div>
-                                        <?php endif; ?>
+                                <div class="job-cell position-col" data-label="Position">
+                                    <?php if ($position): ?>
+                                        <span class="position-name"><?php echo esc_html($position->position_name); ?></span>
                                     <?php else: ?>
-                                        <div class="note-item" style="font-style: italic; color: #666;">
-                                            No notes yet
-                                        </div>
+                                        <span class="general-application">General Application</span>
                                     <?php endif; ?>
                                 </div>
-                                
-                                <div class="note-form" data-application-id="<?php echo esc_attr($application->id); ?>">
-                                    <textarea class="note-textarea" placeholder="Add a note about this applicant..."></textarea>
-                                    <div class="note-actions">
-                                        <button class="note-save-btn">Save Note</button>
-                                        <button class="note-cancel-btn">Cancel</button>
+                                <div class="job-cell modality-col" data-label="Modality">
+                                    <span class="modality-badge"><?php echo esc_html($modality); ?></span>
+                                </div>
+                                <div class="job-cell location-col" data-label="Location">
+                                    <div class="location-info">
+                                        <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                            <circle cx="12" cy="10" r="3"/>
+                                        </svg>
+                                        <?php echo esc_html($location); ?>
+                                    </div>
+                                </div>
+                                <div class="job-cell status-col" data-label="Status">
+                                    <div class="status-dropdown-container">
+                                        <select class="status-dropdown" data-application-id="<?php echo esc_attr($application->id); ?>">
+                                            <?php foreach ($status_pipeline as $status_key => $status_info): ?>
+                                                <option value="<?php echo esc_attr($status_key); ?>" 
+                                                        <?php selected($application->status, $status_key); ?>>
+                                                    <?php echo esc_html($status_info['label']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="job-cell applied-col" data-label="Applied">
+                                    <span class="applied-date"><?php echo esc_html(date('M j, Y', strtotime($application->submitted_at))); ?></span>
+                                </div>
+                                <div class="job-cell documents-col" data-label="Documents">
+                                    <div class="documents-list">
+                                        <?php if (!empty($application->resume_url)): ?>
+                                            <a href="<?php echo esc_url($application->resume_url); ?>" target="_blank" 
+                                               class="document-link resume-link" 
+                                               title="View Resume">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                                    <polyline points="14,2 14,8 20,8"/>
+                                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                                    <polyline points="10,9 9,9 8,9"/>
+                                                </svg>
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if (!empty($application->cover_letter_url)): ?>
+                                            <a href="<?php echo esc_url($application->cover_letter_url); ?>" target="_blank" 
+                                               class="document-link cover-letter-link" 
+                                               title="View Cover Letter">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                                    <polyline points="22,6 12,13 2,6"/>
+                                                </svg>
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if (empty($application->resume_url) && empty($application->cover_letter_url)): ?>
+                                            <span class="no-documents">No documents</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="job-cell actions-col">
+                                    <div class="job-actions">
+                                        <a href="<?php echo CareersSettings::get_page_url('application_view', array('id' => $application->id)); ?>" 
+                                           class="action-icon view-icon" 
+                                           title="View Application Details"
+                                           aria-label="View application details for <?php echo esc_attr($user ? $user->display_name : 'Unknown Applicant'); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="action-icon notes-icon notes-toggle" 
+                                           data-application-id="<?php echo esc_attr($application->id); ?>"
+                                           title="View/Add Notes"
+                                           aria-label="View notes for <?php echo esc_attr($user ? $user->display_name : 'Unknown Applicant'); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 3v18l6-6h12V3H3z"/>
+                                            </svg>
+                                        </a>
+                                        <a href="#" class="action-icon delete-icon delete-application" 
+                                           data-id="<?php echo esc_attr($application->id); ?>"
+                                           title="Delete Application"
+                                           aria-label="Delete application from <?php echo esc_attr($user ? $user->display_name : 'Unknown Applicant'); ?>">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18"/>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                                            </svg>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Application Actions -->
-                            <div class="application-actions">
-                                <button class="action-btn primary view-details-btn" data-application-id="<?php echo esc_attr($application->id); ?>">
-                                    View Full Details
-                                </button>
-                                <button class="action-btn view-notes-btn" data-application-id="<?php echo esc_attr($application->id); ?>">
-                                    View All Notes (<?php echo count($notes); ?>)
-                                </button>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 
                 <!-- Pagination -->
@@ -3349,15 +4655,11 @@ class CareersDashboard {
         
         <script>
         jQuery(document).ready(function($) {
-            // Status change handler
-            $('.status-btn').on('click', function() {
-                var $btn = $(this);
-                var applicationId = $btn.data('application-id');
-                var newStatus = $btn.data('status');
-                
-                if ($btn.hasClass('active')) {
-                    return; // Already active
-                }
+            // Status dropdown change handler
+            $('.status-dropdown').on('change', function() {
+                var $dropdown = $(this);
+                var applicationId = $dropdown.data('application-id');
+                var newStatus = $dropdown.val();
                 
                 $.ajax({
                     url: careers_ajax.ajax_url,
@@ -3370,17 +4672,15 @@ class CareersDashboard {
                     },
                     success: function(response) {
                         if (response.success) {
-                            // Update UI
-                            $btn.siblings('.status-btn').removeClass('active');
-                            $btn.addClass('active');
-                            
                             // Show success message
-                            $('<div class="status-update-success">Status updated to ' + $btn.text() + '</div>')
-                                .insertAfter($btn.closest('.status-pipeline'))
+                            $('<div style="position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 12px 20px; border-radius: 6px; z-index: 9999;">Status updated successfully!</div>')
+                                .appendTo('body')
                                 .delay(2000)
                                 .fadeOut();
                         } else {
                             alert('Error updating status: ' + response.data);
+                            // Reset dropdown to previous value
+                            $dropdown.val($dropdown.data('original-value'));
                         }
                     },
                     error: function() {
@@ -3389,78 +4689,55 @@ class CareersDashboard {
                 });
             });
             
-            // Add note handler
-            $('.add-note-btn').on('click', function() {
+            // Store original status values for resetting on error
+            $('.status-dropdown').each(function() {
+                $(this).data('original-value', $(this).val());
+            });
+            
+            // Notes toggle handler
+            $('.notes-toggle').on('click', function(e) {
+                e.preventDefault();
                 var applicationId = $(this).data('application-id');
-                var $noteForm = $('.note-form[data-application-id="' + applicationId + '"]');
-                
-                if ($noteForm.hasClass('active')) {
-                    $noteForm.removeClass('active');
-                    $(this).text('+ Add Note');
-                } else {
-                    $noteForm.addClass('active');
-                    $noteForm.find('.note-textarea').focus();
-                    $(this).text('Cancel');
-                }
+                // TODO: Implement notes modal/panel
+                alert('Notes functionality coming soon! Application ID: ' + applicationId);
             });
             
-            // Cancel note handler
-            $('.note-cancel-btn').on('click', function() {
-                var $form = $(this).closest('.note-form');
-                var applicationId = $form.data('application-id');
+            // Delete application handler
+            $('.delete-application').on('click', function(e) {
+                e.preventDefault();
                 
-                $form.removeClass('active');
-                $form.find('.note-textarea').val('');
-                $('.add-note-btn[data-application-id="' + applicationId + '"]').text('+ Add Note');
-            });
-            
-            // Save note handler
-            $('.note-save-btn').on('click', function() {
-                var $form = $(this).closest('.note-form');
-                var $textarea = $form.find('.note-textarea');
-                var applicationId = $form.data('application-id');
-                var noteContent = $textarea.val().trim();
-                
-                if (!noteContent) {
-                    alert('Please enter a note before saving.');
+                if (!confirm('Are you sure you want to delete this application?')) {
                     return;
                 }
+                
+                var applicationId = $(this).data('id');
+                var $row = $(this).closest('.application-row');
                 
                 $.ajax({
                     url: careers_ajax.ajax_url,
                     type: 'POST',
                     data: {
-                        action: 'careers_add_application_note',
+                        action: 'careers_delete_application',
                         application_id: applicationId,
-                        note_content: noteContent,
                         nonce: careers_ajax.nonce
                     },
                     success: function(response) {
                         if (response.success) {
-                            // Reload the page to show the new note
-                            location.reload();
+                            $row.fadeOut(300, function() {
+                                $(this).remove();
+                                // If no more rows, reload page to show empty state
+                                if ($('.application-row').length === 0) {
+                                    location.reload();
+                                }
+                            });
                         } else {
-                            alert('Error saving note: ' + response.data);
+                            alert('Error: ' + response.data);
                         }
                     },
                     error: function() {
-                        alert('Error saving note. Please try again.');
+                        alert('Error deleting application. Please try again.');
                     }
                 });
-            });
-            
-            // View details handler (placeholder for modal)
-            $('.view-details-btn').on('click', function() {
-                var applicationId = $(this).data('application-id');
-                // TODO: Implement modal view for full application details
-                alert('Application details view coming soon! Application ID: ' + applicationId);
-            });
-            
-            // View all notes handler (placeholder for modal)
-            $('.view-notes-btn').on('click', function() {
-                var applicationId = $(this).data('application-id');
-                // TODO: Implement modal view for all notes
-                alert('Full notes view coming soon! Application ID: ' + applicationId);
             });
             
             // Delete all applications handler
