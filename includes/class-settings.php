@@ -116,6 +116,16 @@ class CareersSettings {
             array('id' => 'application_view_page', 'description' => 'Select the page for viewing individual applications')
         );
         
+        // Profile page
+        add_settings_field(
+            'profile_page',
+            __('Profile Page', 'careers-manager'),
+            array($this, 'page_dropdown_callback'),
+            'careers-settings',
+            'careers_page_mapping',
+            array('id' => 'profile_page', 'description' => 'Select the page for user profile management')
+        );
+        
         // Job Detail page (public-facing)
         add_settings_field(
             'job_detail_page',
@@ -232,6 +242,7 @@ class CareersSettings {
             'locations' => 'locations_page',
             'applications' => 'applications_page',
             'application_view' => 'application_view_page',
+            'profile' => 'profile_page',
             'job_detail' => 'job_detail_page',
             'apply' => 'apply_page',
             'open_positions' => 'open_positions_page'
@@ -327,6 +338,9 @@ class CareersSettings {
                     return self::get_page_url('application_view', $args);
                 }
                 return self::get_page_url('applications', $args);
+                
+            case 'profile':
+                return self::get_page_url('profile', $args);
                 
             default:
                 return self::get_page_url('dashboard', $args);

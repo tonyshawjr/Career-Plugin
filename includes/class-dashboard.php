@@ -59,6 +59,11 @@ class CareersDashboard {
                 'label' => 'Manage Locations', 
                 'url' => CareersSettings::get_page_url('locations'),
                 'icon' => 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z'
+            ),
+            'profile' => array(
+                'label' => 'Profile', 
+                'url' => CareersSettings::get_page_url('profile'),
+                'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
             )
         );
         
@@ -768,7 +773,7 @@ class CareersDashboard {
          }
          
          .dashboard-content {
-             padding: var(--space-8) 0;
+             padding-bottom: var(--space-8);
          }
          
          .page-header {
@@ -841,6 +846,16 @@ class CareersDashboard {
              stroke: currentColor !important;
              fill: none !important;
          }
+         
+                 /* Dashboard Content Bottom Spacing */
+        .jobs-content {
+            margin-bottom: 4rem;
+        }
+        
+        /* Create/Edit Job Form Bottom Spacing */
+        #careers-position-form {
+            margin-bottom: 4rem;
+        }
          
          /* Applications Table Specific Styling */
          .applications-table-header {
@@ -1023,7 +1038,7 @@ class CareersDashboard {
              }
              
              .dashboard-content {
-                 padding: 1.5rem 0;
+                 padding-bottom: 1.5rem;
              }
              
              .page-header {
@@ -1137,6 +1152,109 @@ class CareersDashboard {
                  justify-content: flex-end !important;
             }
         }
+        
+        /* Profile Page Styles */
+        .careers-dashboard-container .profile-content {
+            margin-bottom: 4rem;
+        }
+        
+        .careers-dashboard-container .profile-form {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .careers-dashboard-container .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .careers-dashboard-container .form-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .careers-dashboard-container .section-title {
+            font-size: 1.25rem !important;
+            font-weight: 600 !important;
+            color: #111 !important;
+            margin: 0 0 1rem 0 !important;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .careers-dashboard-container .form-row {
+            margin-bottom: 1.5rem;
+        }
+        
+        .careers-dashboard-container .form-row label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+        
+        .careers-dashboard-container .form-row input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        
+        .careers-dashboard-container .form-row input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .careers-dashboard-container .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .careers-dashboard-container .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .careers-dashboard-container .alert {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .careers-dashboard-container .alert-success {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+        
+        .careers-dashboard-container .alert-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        
+        .careers-dashboard-container .password-note {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .careers-dashboard-container .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         </style>
         
         <script>
@@ -1176,9 +1294,13 @@ class CareersDashboard {
         <div class="careers-dashboard-container">
             <div class="dashboard-content">
                 <div class="page-header">
-                    <h1 class="page-title">Dashboard Overview</h1>
-                    <p class="page-subtitle">Monitor your careers system performance</p>
-            </div>
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Dashboard Overview</h1>
+                            <p class="page-subtitle">Monitor your careers system performance</p>
+                        </div>
+                    </div>
+                </div>
             
             <!-- Removed dashboard tabs since applications is now a separate page -->
             
@@ -1327,8 +1449,12 @@ class CareersDashboard {
         <div class="careers-dashboard-container">
             <div class="dashboard-content">
                 <div class="page-header">
-                    <h1 class="page-title">Create New Position</h1>
-                    <p class="page-subtitle">Add a new position to your careers system</p>
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Create New Position</h1>
+                            <p class="page-subtitle">Add a new position to your careers system</p>
+                        </div>
+                    </div>
                 </div>
             
             <form id="careers-position-form" method="post" action="">
@@ -1755,8 +1881,12 @@ class CareersDashboard {
         <div class="careers-dashboard-container">
             <div class="dashboard-content">
                 <div class="page-header">
-                    <h1 class="page-title">Edit Position</h1>
-                    <p class="page-subtitle">Update your position details</p>
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Edit Position</h1>
+                            <p class="page-subtitle">Update your position details</p>
+                        </div>
+                    </div>
                 </div>
             
             <form id="careers-position-edit-form" method="post" action="">
@@ -2411,6 +2541,11 @@ class CareersDashboard {
             grid-template-columns: 1fr;
             gap: 1rem;
         }
+        
+        /* Manage Positions Page Bottom Spacing */
+        .careers-dashboard-container .jobs-table-container {
+            margin-bottom: 4rem;
+        }
         .careers-dashboard-container .position-card {
             background: #fff;
             border: 1px solid #eee;
@@ -2521,39 +2656,7 @@ class CareersDashboard {
             color: white;
             text-decoration: none !important;
         }
-        
-        /* Pagination */
-        .careers-dashboard-container .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 2rem;
-            padding: 1rem;
-        }
-        .careers-dashboard-container .pagination a,
-        .careers-dashboard-container .pagination span {
-            padding: 0.5rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-decoration: none !important;
-            color: #333;
-            font-size: 0.875rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        }
-        .careers-dashboard-container .pagination a:hover {
-            background: #f5f5f5;
-            text-decoration: none !important;
-        }
-        .careers-dashboard-container .pagination .current {
-            background: #000;
-            color: white;
-            border-color: #000;
-        }
-        .careers-dashboard-container .pagination .disabled {
-            color: #ccc;
-            cursor: not-allowed;
-        }
+
         
         /* Empty State */
         .careers-dashboard-container .empty-state {
@@ -3362,6 +3465,11 @@ class CareersDashboard {
             gap: 1rem;
             margin-bottom: 2rem;
         }
+        
+        /* Locations Page Bottom Spacing */
+        .careers-dashboard-container .locations-section {
+            margin-bottom: 4rem;
+        }
         .careers-dashboard-container .stat-card {
             background: #fff;
             border: 1px solid #eee;
@@ -3420,9 +3528,13 @@ class CareersDashboard {
         <div class="careers-dashboard-container">
             <div class="dashboard-content">
                 <div class="page-header">
-                    <h1 class="page-title">Manage Locations</h1>
-                    <p class="page-subtitle">Add and manage job locations</p>
-            </div>
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Manage Locations</h1>
+                            <p class="page-subtitle">Add and manage job locations</p>
+                        </div>
+                    </div>
+                </div>
             
             <?php if (!empty($locations_by_state)): ?>
                 <div class="locations-stats">
@@ -3993,6 +4105,11 @@ class CareersDashboard {
             gap: 1rem;
             margin-bottom: 2rem;
         }
+        
+        /* Applications Page without pagination bottom spacing */
+        .careers-dashboard-container .empty-state {
+            margin-bottom: 4rem;
+        }
         .careers-dashboard-container .stat-card {
             background: #fff;
             border: 1px solid #eee;
@@ -4321,6 +4438,7 @@ class CareersDashboard {
             align-items: center;
             gap: 0.5rem;
             margin-top: 2rem;
+            margin-bottom: 4rem;
             padding: 1rem;
         }
         .careers-dashboard-container .pagination a,
@@ -4361,6 +4479,20 @@ class CareersDashboard {
         }
         .careers-dashboard-container .empty-state p {
             margin: 0 0 2rem 0 !important;
+        }
+        
+        /* Applications Page Bottom Spacing - Target applications page specifically */
+        .careers-dashboard-container .applications-stats {
+            margin-bottom: 2rem;
+        }
+        .careers-dashboard-container .filters-section {
+            margin-bottom: 2rem;
+        }
+        .careers-dashboard-container .empty-state {
+            margin-bottom: 4rem !important;
+        }
+        .careers-dashboard-container .jobs-table-container:last-child {
+            margin-bottom: 4rem !important;
         }
         
         /* Mobile Responsive */
@@ -4949,5 +5081,443 @@ class CareersDashboard {
             'applications_deleted' => $apps_deleted,
             'notes_deleted' => $notes_deleted
         ));
+    }
+    
+    /**
+     * Render profile management
+     */
+    public function render_profile_management() {
+        // Check if user is logged in
+        if (!is_user_logged_in()) {
+            return '<div class="careers-dashboard-error">You must be logged in to view your profile.</div>';
+        }
+        
+        $current_user = wp_get_current_user();
+        $success_message = '';
+        $error_message = '';
+        
+        // Handle form submission
+        if (isset($_POST['update_profile']) && wp_verify_nonce($_POST['careers_nonce'], 'careers_nonce')) {
+            $first_name = sanitize_text_field($_POST['first_name']);
+            $last_name = sanitize_text_field($_POST['last_name']);
+            $email = sanitize_email($_POST['email']);
+            $current_password = $_POST['current_password'];
+            $new_password = $_POST['new_password'];
+            $confirm_password = $_POST['confirm_password'];
+            
+            $update_data = array('ID' => $current_user->ID);
+            $update_meta = array();
+            
+            // Validate and update basic info
+            if (!empty($first_name)) {
+                $update_meta['first_name'] = $first_name;
+            }
+            if (!empty($last_name)) {
+                $update_meta['last_name'] = $last_name;
+            }
+            
+            // Validate email
+            if (!empty($email) && $email !== $current_user->user_email) {
+                if (!is_email($email)) {
+                    $error_message = 'Please enter a valid email address.';
+                } elseif (email_exists($email)) {
+                    $error_message = 'This email address is already in use.';
+                } else {
+                    $update_data['user_email'] = $email;
+                }
+            }
+            
+            // Handle password change
+            if (!empty($current_password) || !empty($new_password) || !empty($confirm_password)) {
+                if (empty($current_password)) {
+                    $error_message = 'Please enter your current password.';
+                } elseif (!wp_check_password($current_password, $current_user->user_pass, $current_user->ID)) {
+                    $error_message = 'Current password is incorrect.';
+                } elseif (empty($new_password)) {
+                    $error_message = 'Please enter a new password.';
+                } elseif ($new_password !== $confirm_password) {
+                    $error_message = 'New passwords do not match.';
+                } elseif (strlen($new_password) < 8) {
+                    $error_message = 'Password must be at least 8 characters long.';
+                } else {
+                    $update_data['user_pass'] = $new_password;
+                }
+            }
+            
+            // Update user if no errors
+            if (empty($error_message)) {
+                $result = wp_update_user($update_data);
+                
+                if (is_wp_error($result)) {
+                    $error_message = $result->get_error_message();
+                } else {
+                    // Update meta fields
+                    foreach ($update_meta as $key => $value) {
+                        update_user_meta($current_user->ID, $key, $value);
+                    }
+                    
+                    $success_message = 'Profile updated successfully.';
+                    
+                    // Refresh user data
+                    $current_user = wp_get_current_user();
+                }
+            }
+        }
+        
+        // Get current user meta
+        $first_name = get_user_meta($current_user->ID, 'first_name', true);
+        $last_name = get_user_meta($current_user->ID, 'last_name', true);
+        
+        ?>
+        <style>
+        .careers-dashboard-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            color: #333;
+            font-size: 16px !important;
+        }
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        /* High specificity CSS overrides to fix font and underline issues */
+        .careers-dashboard-container,
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Remove all underlines and text decorations with maximum specificity */
+        .careers-dashboard-container a,
+        .careers-dashboard-container a:link,
+        .careers-dashboard-container a:visited,
+        .careers-dashboard-container a:hover,
+        .careers-dashboard-container a:active,
+        .careers-dashboard-container a:focus,
+        .careers-dashboard-container button,
+        .careers-dashboard-container button:link,
+        .careers-dashboard-container button:visited,
+        .careers-dashboard-container button:hover,
+        .careers-dashboard-container button:active,
+        .careers-dashboard-container button:focus,
+        .careers-dashboard-container .action-btn,
+        .careers-dashboard-container .action-btn:link,
+        .careers-dashboard-container .action-btn:visited,
+        .careers-dashboard-container .action-btn:hover,
+        .careers-dashboard-container .action-btn:active,
+        .careers-dashboard-container .action-btn:focus,
+        .careers-dashboard-container .dashboard-action-btn,
+        .careers-dashboard-container .dashboard-action-btn:link,
+        .careers-dashboard-container .dashboard-action-btn:visited,
+        .careers-dashboard-container .dashboard-action-btn:hover,
+        .careers-dashboard-container .dashboard-action-btn:active,
+        .careers-dashboard-container .dashboard-action-btn:focus,
+        .careers-dashboard-container .create-button,
+        .careers-dashboard-container .create-button:link,
+        .careers-dashboard-container .create-button:visited,
+        .careers-dashboard-container .create-button:hover,
+        .careers-dashboard-container .create-button:active,
+        .careers-dashboard-container .create-button:focus,
+        .careers-dashboard-container .button,
+        .careers-dashboard-container .button:link,
+        .careers-dashboard-container .button:visited,
+        .careers-dashboard-container .button:hover,
+        .careers-dashboard-container .button:active,
+        .careers-dashboard-container .button:focus {
+            text-decoration: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            text-underline-offset: unset !important;
+            text-decoration-line: none !important;
+            text-decoration-color: transparent !important;
+            text-decoration-style: none !important;
+            text-decoration-thickness: 0 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container h1,
+        .careers-dashboard-container h2,
+        .careers-dashboard-container h3,
+        .careers-dashboard-container h4,
+        .careers-dashboard-container h5,
+        .careers-dashboard-container h6 {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        .careers-dashboard-container p,
+        .careers-dashboard-container span,
+        .careers-dashboard-container div {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        /* Page Layout */
+        .careers-dashboard-container .dashboard-content {
+            padding-bottom: 1.5rem;
+        }
+        
+        .careers-dashboard-container .page-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .careers-dashboard-container .page-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+        }
+        
+        .careers-dashboard-container .page-header-text {
+            flex: 1;
+        }
+        
+        .careers-dashboard-container .page-title {
+            font-size: 2.25rem !important;
+            font-weight: 600 !important;
+            color: #111827 !important;
+            margin: 0 0 0.75rem 0 !important;
+            line-height: 1.25 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container .page-subtitle {
+            font-size: 1.125rem !important;
+            color: #6b7280 !important;
+            margin: 0 !important;
+            line-height: 1.5 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        /* Profile Form Styles */
+        .careers-dashboard-container .profile-content {
+            margin-bottom: 4rem;
+        }
+        
+        .careers-dashboard-container .profile-form {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .careers-dashboard-container .form-section {
+            margin-bottom: 2rem;
+        }
+        
+        .careers-dashboard-container .form-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .careers-dashboard-container .section-title {
+            font-size: 1.25rem !important;
+            font-weight: 600 !important;
+            color: #111 !important;
+            margin: 0 0 1rem 0 !important;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .careers-dashboard-container .form-row {
+            margin-bottom: 2rem;
+        }
+        
+        .careers-dashboard-container .form-row label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #111;
+            font-size: 1rem;
+        }
+        
+        .careers-dashboard-container .form-row input, 
+        .careers-dashboard-container .form-row textarea, 
+        .careers-dashboard-container .form-row select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+            background: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container .form-row input:focus, 
+        .careers-dashboard-container .form-row textarea:focus, 
+        .careers-dashboard-container .form-row select:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .careers-dashboard-container .form-row small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        
+        .careers-dashboard-container .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .careers-dashboard-container .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .careers-dashboard-container .alert {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .careers-dashboard-container .alert-success {
+            background: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+        
+        .careers-dashboard-container .alert-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        
+        .careers-dashboard-container .password-note {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        
+        .careers-dashboard-container .button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem !important;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none !important;
+            text-align: center;
+            transition: background 0.2s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .button-primary {
+            background: #000 !important;
+            color: white !important;
+        }
+        .careers-dashboard-container .button-primary:hover {
+            background: #333 !important;
+            color: white !important;
+            text-decoration: none !important;
+        }
+        
+        @media (max-width: 1024px) {
+            .careers-dashboard-container .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .careers-dashboard-container .page-header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .careers-dashboard-container .page-title {
+                font-size: 1.875rem !important;
+            }
+        }
+        </style>
+        
+        <?php $this->render_dashboard_navigation('profile'); ?>
+        
+        <div class="careers-dashboard-container">
+            <div class="dashboard-content">
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <div class="page-header-text">
+                            <h1 class="page-title">Profile Settings</h1>
+                            <p class="page-subtitle">Update your personal information and password</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <?php if (!empty($success_message)): ?>
+                    <div class="alert alert-success"><?php echo esc_html($success_message); ?></div>
+                <?php endif; ?>
+                
+                <?php if (!empty($error_message)): ?>
+                    <div class="alert alert-error"><?php echo esc_html($error_message); ?></div>
+                <?php endif; ?>
+                
+                <div class="profile-content">
+                    <form method="post" class="profile-form">
+                        <?php wp_nonce_field('careers_nonce', 'careers_nonce'); ?>
+                        
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h2 class="section-title">Personal Information</h2>
+                            
+                            <div class="form-grid">
+                                <div class="form-row">
+                                    <label for="first_name">First Name</label>
+                                    <input type="text" id="first_name" name="first_name" value="<?php echo esc_attr($first_name); ?>">
+                                </div>
+                                
+                                <div class="form-row">
+                                    <label for="last_name">Last Name</label>
+                                    <input type="text" id="last_name" name="last_name" value="<?php echo esc_attr($last_name); ?>">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" value="<?php echo esc_attr($current_user->user_email); ?>">
+                            </div>
+                        </div>
+                        
+                        <!-- Change Password -->
+                        <div class="form-section">
+                            <h2 class="section-title">Change Password</h2>
+                            <p class="password-note">Leave blank to keep your current password</p>
+                            
+                            <div class="form-row">
+                                <label for="current_password">Current Password</label>
+                                <input type="password" id="current_password" name="current_password">
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-row">
+                                    <label for="new_password">New Password</label>
+                                    <input type="password" id="new_password" name="new_password">
+                                </div>
+                                
+                                <div class="form-row">
+                                    <label for="confirm_password">Confirm New Password</label>
+                                    <input type="password" id="confirm_password" name="confirm_password">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" name="update_profile" class="button button-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php
     }
 }
