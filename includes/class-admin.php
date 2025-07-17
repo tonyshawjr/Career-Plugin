@@ -83,7 +83,7 @@ class CareersAdmin {
         
         // Redirect career system users to frontend dashboard
         if (in_array('applicant', $user->roles) || in_array('career_admin', $user->roles)) {
-            wp_redirect(home_url('/dashboard'));
+            wp_redirect(CareersSettings::get_page_url('dashboard'));
             exit;
         }
     }
@@ -96,7 +96,7 @@ class CareersAdmin {
         if (isset($user->roles) && is_array($user->roles)) {
             // Redirect career system users to frontend dashboard
             if (in_array('applicant', $user->roles) || in_array('career_admin', $user->roles)) {
-                return home_url('/dashboard');
+                return CareersSettings::get_page_url('dashboard');
             }
         }
         
@@ -1210,7 +1210,7 @@ class CareersAdmin {
         // Send success response
         wp_send_json_success(array(
             'message' => __('Job created successfully!', 'careers-manager'),
-            'redirect_url' => home_url('/dashboard/jobs'),
+            'redirect_url' => CareersSettings::get_page_url('manage_jobs'),
             'job_id' => $job_id
         ));
     }
@@ -1286,7 +1286,7 @@ class CareersAdmin {
         // Send success response
         wp_send_json_success(array(
             'message' => __('Job updated successfully!', 'careers-manager'),
-            'redirect_url' => home_url('/dashboard/jobs')
+            'redirect_url' => CareersSettings::get_page_url('manage_jobs')
         ));
     }
     
