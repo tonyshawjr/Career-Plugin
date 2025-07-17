@@ -444,7 +444,6 @@ class CareersDashboard {
         .careers-dashboard-container .button:active,
         .careers-dashboard-container .button:focus {
             text-decoration: none !important;
-            border-bottom: none !important;
             box-shadow: none !important;
             outline: none !important;
             text-underline-offset: unset !important;
@@ -914,7 +913,6 @@ class CareersDashboard {
         .careers-dashboard-container .button:active,
         .careers-dashboard-container .button:focus {
             text-decoration: none !important;
-            border-bottom: none !important;
             box-shadow: none !important;
             outline: none !important;
             text-underline-offset: unset !important;
@@ -1214,6 +1212,7 @@ class CareersDashboard {
         /* Position Cards */
         .careers-dashboard-container .positions-grid {
             display: grid;
+            grid-template-columns: 1fr;
             gap: 1rem;
         }
         .careers-dashboard-container .position-card {
@@ -1770,7 +1769,6 @@ class CareersDashboard {
         .careers-dashboard-container .button:active,
         .careers-dashboard-container .button:focus {
             text-decoration: none !important;
-            border-bottom: none !important;
             box-shadow: none !important;
             outline: none !important;
             text-underline-offset: unset !important;
@@ -2655,7 +2653,6 @@ class CareersDashboard {
         .careers-dashboard-container button:active,
         .careers-dashboard-container button:focus {
             text-decoration: none !important;
-            border-bottom: none !important;
             box-shadow: none !important;
             outline: none !important;
             text-underline-offset: unset !important;

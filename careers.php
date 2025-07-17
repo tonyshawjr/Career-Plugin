@@ -110,9 +110,8 @@ class CareersManager {
             error_log('Careers Plugin Initialization Error: ' . $e->getMessage());
         }
         
-        // Enqueue assets
+        // Enqueue assets - Frontend only (no wp-admin interface)
         add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_assets'));
-        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
         
         // Add custom rewrite rules
         add_action('init', array($this, 'add_rewrite_rules'), 10);
@@ -178,33 +177,7 @@ class CareersManager {
         ));
     }
     
-    /**
-     * Enqueue admin assets
-     */
-    public function enqueue_admin_assets($hook) {
-        if (strpos($hook, 'careers') !== false || strpos($hook, 'career_job') !== false) {
-            wp_enqueue_style(
-                'careers-admin',
-                CAREERS_PLUGIN_URL . 'assets/css/admin.css',
-                array(),
-                CAREERS_PLUGIN_VERSION
-            );
-            
-            wp_enqueue_script(
-                'careers-admin',
-                CAREERS_PLUGIN_URL . 'assets/js/admin.js',
-                array('jquery'),
-                CAREERS_PLUGIN_VERSION,
-                true
-            );
-            
-            // Localize script for AJAX
-            wp_localize_script('careers-admin', 'careers_admin_ajax', array(
-                'ajax_url' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('careers_nonce'),
-            ));
-        }
-    }
+
     
     /**
      * Plugin activation

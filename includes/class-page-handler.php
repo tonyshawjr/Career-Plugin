@@ -182,7 +182,6 @@ class CareersPageHandler {
             .careers-dashboard-container .create-button:active,
             .careers-dashboard-container .create-button:focus {
                 text-decoration: none !important;
-                border-bottom: none !important;
                 box-shadow: none !important;
                 outline: none !important;
                 text-underline-offset: unset !important;
@@ -554,7 +553,6 @@ class CareersPageHandler {
                     border-bottom: 1px solid #f0f0f0 !important;
                 }
                 .careers-dashboard-container .position-info-item:last-child {
-                    border-bottom: none !important;
                     margin-bottom: 0 !important;
                 }
                 .careers-dashboard-container .position-name {
