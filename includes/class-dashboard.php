@@ -120,9 +120,9 @@ class CareersDashboard {
                                         </div>
                                     </div>
                                     <div class="job-actions">
-                                        <a href="<?php echo CareersSettings::get_page_url('edit_job', array('id' => $job->id)); ?>" class="action-btn primary">Edit</a>
-                                        <a href="<?php echo CareersSettings::get_page_url('applications', array('job_id' => $job->id)); ?>" class="action-btn">Applications</a>
-                                        <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $job->id)); ?>" class="action-btn" target="_blank">View</a>
+                                        <a href="<?php echo home_url('/dashboard/jobs/edit/' . $job->id); ?>" class="action-btn primary">Edit</a>
+                                        <a href="<?php echo home_url('/dashboard/jobs/applications/' . $job->id); ?>" class="action-btn">Applications</a>
+                                        <a href="<?php echo home_url('/open-positions/' . $job->id); ?>" class="action-btn" target="_blank">View</a>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -1433,10 +1433,10 @@ class CareersDashboard {
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Manage Job Positions</h1>
                 <div class="header-actions">
-                    <a href="<?php echo CareersSettings::get_page_url('create_job'); ?>" class="create-button">
+                    <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
                         Create New Position
                     </a>
-                    <a href="<?php echo CareersSettings::get_page_url('locations'); ?>" class="create-button secondary">
+                    <a href="<?php echo home_url('/dashboard/locations'); ?>" class="create-button secondary">
                         Manage Locations
                     </a>
                 </div>
@@ -1487,7 +1487,7 @@ class CareersDashboard {
                         </div>
                         <div>
                             <button type="submit" class="filter-button">Filter</button>
-                            <a href="<?php echo CareersSettings::get_page_url('manage_jobs'); ?>" class="filter-button clear-filters">Clear</a>
+                            <a href="<?php echo home_url('/dashboard/positions'); ?>" class="filter-button clear-filters">Clear</a>
                         </div>
                     </div>
                 </form>
@@ -1498,7 +1498,7 @@ class CareersDashboard {
                     <h3><?php echo $search_query || $status_filter || $job_type_filter || $location_filter ? 'No positions found' : 'No positions yet'; ?></h3>
                     <p><?php echo $search_query || $status_filter || $job_type_filter || $location_filter ? 'Try adjusting your filters.' : 'Create your first job position to get started.'; ?></p>
                     <?php if (!$search_query && !$status_filter && !$job_type_filter && !$location_filter): ?>
-                        <a href="<?php echo CareersSettings::get_page_url('create_job'); ?>" class="create-button">
+                        <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
                             Create Your First Position
                         </a>
                     <?php endif; ?>
@@ -1566,11 +1566,11 @@ class CareersDashboard {
                                 </div>
                             </div>
                             <div class="position-actions">
-                                <a href="<?php echo CareersSettings::get_page_url('edit_job', array('id' => $position->id)); ?>" 
+                                <a href="<?php echo home_url('/dashboard/positions/edit/' . esc_attr($position->id)); ?>" 
                                    class="action-button primary">Edit</a>
-                                <a href="<?php echo CareersSettings::get_page_url('applications', array('job_id' => $position->id)); ?>" 
+                                <a href="<?php echo home_url('/dashboard/positions/applications/' . esc_attr($position->id)); ?>" 
                                    class="action-button">Applications</a>
-                                <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position->id)); ?>" 
+                                <a href="<?php echo home_url('/open-positions/' . esc_attr($position->id)); ?>" 
                                    class="action-button" target="_blank">View</a>
                                 <button class="action-button danger delete-position" 
                                         data-id="<?php echo esc_attr($position->id); ?>">Delete</button>

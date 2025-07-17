@@ -116,13 +116,18 @@ class CareersSettings {
             array('id' => 'application_view_page', 'description' => 'Select the page for viewing individual applications')
         );
         
+<<<<<<< HEAD
         // Job Detail page (public-facing)
+=======
+        // Job Detail/Open Positions page
+>>>>>>> origin/main
         add_settings_field(
             'job_detail_page',
             __('Job Detail Page', 'careers-manager'),
             array($this, 'page_dropdown_callback'),
             'careers-settings',
             'careers_page_mapping',
+<<<<<<< HEAD
             array('id' => 'job_detail_page', 'description' => 'Select the page for public job postings (where visitors view and apply for jobs)')
         );
         
@@ -134,6 +139,19 @@ class CareersSettings {
             'careers-settings',
             'careers_page_mapping',
             array('id' => 'apply_page', 'description' => 'Select the page where users submit job applications')
+=======
+            array('id' => 'job_detail_page', 'description' => 'Select the page for viewing individual job postings (open positions)')
+        );
+        
+        // Open Positions List page
+        add_settings_field(
+            'open_positions_page',
+            __('Open Positions Page', 'careers-manager'),
+            array($this, 'page_dropdown_callback'),
+            'careers-settings',
+            'careers_page_mapping',
+            array('id' => 'open_positions_page', 'description' => 'Select the page for viewing the list of all open positions')
+>>>>>>> origin/main
         );
     }
     
@@ -223,7 +241,11 @@ class CareersSettings {
             'applications' => 'applications_page',
             'application_view' => 'application_view_page',
             'job_detail' => 'job_detail_page',
+<<<<<<< HEAD
             'apply' => 'apply_page'
+=======
+            'open_positions' => 'open_positions_page'
+>>>>>>> origin/main
         );
         
         $key = isset($map[$function]) ? $map[$function] : '';

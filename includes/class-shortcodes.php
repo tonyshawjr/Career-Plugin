@@ -90,7 +90,7 @@ class CareersShortcodes {
                     <div class="filters-sidebar">
                         <div class="filters-header">
                             <h3>Filters</h3>
-                            <a href="/open-positions/" class="clear-filters">Clear all filters</a>
+                            <a href="<?php echo esc_url(CareersSettings::get_page_url('open_positions')); ?>" class="clear-filters">Clear all filters</a>
                         </div>
                         
                         <form method="get" action="" class="filters-form">
@@ -149,7 +149,7 @@ class CareersShortcodes {
                                 <div class="position-card">
                                     <div class="position-header">
                                         <h3 class="position-title">
-                                            <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position->id)); ?>">
+                                            <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>">
                                                 <?php echo esc_html($position->position_name); ?>
                                             </a>
                                         </h3>
@@ -199,7 +199,7 @@ class CareersShortcodes {
                                     </div>
                                     
                                     <div class="position-actions">
-                                        <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position->id)); ?>" 
+                                        <a href="<?php echo esc_url(careers_get_job_permalink($position->id)); ?>"
                                            class="view-details-btn">View Details</a>
                                     </div>
                                 </div>
@@ -688,7 +688,7 @@ class CareersShortcodes {
         
         <style>
         .position-detail-page {
-            max-width: 1200px;
+            width: 1280px;
             margin: 0 auto;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             color: #333;
@@ -734,6 +734,7 @@ class CareersShortcodes {
         .apply-btn:hover, .apply-btn-full:hover {
             background: #333;
             color: white;
+            text-decoration: none;
         }
         
         .apply-btn-full {
@@ -867,7 +868,41 @@ class CareersShortcodes {
             opacity: 0.8;
         }
         
-
+        .bottom-apply-section {
+            background: #f9f9f9;
+            padding: 2.5rem 2rem;
+            border-radius: 4px;
+            margin-top: 3rem;
+            text-align: center;
+        }
+        
+        .apply-container h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #111;
+            margin-bottom: 0.5rem;
+        }
+        
+        .apply-container p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .apply-btn-large {
+            background: #000;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-block;
+            transition: background 0.2s ease;
+        }
+        
+        .apply-btn-large:hover {
+            background: #333;
+            text-decoration: none;
+        }
         
         @media (max-width: 768px) {
             .position-content-grid {
@@ -922,7 +957,7 @@ class CareersShortcodes {
             <!-- Header Section -->
             <div class="application-header">
                 <div class="breadcrumb">
-                    <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position_id)); ?>">← Back to Job Details</a>
+                    <a href="<?php echo esc_url(careers_get_job_permalink($position_id)); ?>">← Back to Job Details</a>
                 </div>
                 <h1>Apply for <?php echo esc_html($position->position_name); ?></h1>
                 <div class="position-location">
