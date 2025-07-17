@@ -136,10 +136,10 @@ class CareersApplicationDB {
         
         // Check if user already applied for this specific job (not for general applications)
         if ($data['job_id'] > 0) {
-            $existing = self::get_application_by_user_job($data['user_id'], $data['job_id']);
-            if ($existing) {
+        $existing = self::get_application_by_user_job($data['user_id'], $data['job_id']);
+        if ($existing) {
                 error_log('Careers Debug: User already applied for this job');
-                return new WP_Error('already_applied', __('You have already applied for this job.', 'careers-manager'));
+            return new WP_Error('already_applied', __('You have already applied for this job.', 'careers-manager'));
             }
         }
         
