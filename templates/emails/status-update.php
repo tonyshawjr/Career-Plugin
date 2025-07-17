@@ -32,9 +32,10 @@ $status_message = isset($status_messages[$new_status]) ? $status_messages[$new_s
         .button { display: inline-block; padding: 12px 24px; background: #007cba; color: white; text-decoration: none; border-radius: 4px; margin: 10px 0; }
         .status-update { background: #f8f9fa; padding: 20px; border-radius: 4px; margin: 20px 0; text-align: center; }
         .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; text-transform: uppercase; font-size: 12px; }
-        .status-pending { background: #ffc107; color: #856404; }
-        .status-reviewed { background: #17a2b8; color: white; }
-        .status-interviewing { background: #fd7e14; color: white; }
+        .status-new { background: #ffc107; color: #856404; }
+        .status-under_review { background: #17a2b8; color: white; }
+        .status-contacted { background: #6f42c1; color: white; }
+        .status-interview { background: #fd7e14; color: white; }
         .status-hired { background: #28a745; color: white; }
         .status-rejected { background: #dc3545; color: white; }
         .highlight { color: #007cba; font-weight: bold; }

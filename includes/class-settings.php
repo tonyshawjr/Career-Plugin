@@ -116,14 +116,24 @@ class CareersSettings {
             array('id' => 'application_view_page', 'description' => 'Select the page for viewing individual applications')
         );
         
-        // Job Detail/Open Positions page
+        // Job Detail page (public-facing)
         add_settings_field(
             'job_detail_page',
             __('Job Detail Page', 'careers-manager'),
             array($this, 'page_dropdown_callback'),
             'careers-settings',
             'careers_page_mapping',
-            array('id' => 'job_detail_page', 'description' => 'Select the page for viewing individual job postings (open positions)')
+            array('id' => 'job_detail_page', 'description' => 'Select the page for public job postings (where visitors view and apply for jobs)')
+        );
+        
+        // Apply page
+        add_settings_field(
+            'apply_page',
+            __('Apply Page', 'careers-manager'),
+            array($this, 'page_dropdown_callback'),
+            'careers-settings',
+            'careers_page_mapping',
+            array('id' => 'apply_page', 'description' => 'Select the page where users submit job applications')
         );
         
         // Open Positions List page
@@ -201,6 +211,8 @@ class CareersSettings {
                     <li>— Locations (Child of Dashboard)</li>
                     <li>— Applications (Child of Dashboard)</li>
                     <li>— View Application (Child of Applications)</li>
+                    <li>Open Positions (Standalone - for public job listings)</li>
+                    <li>Apply (Standalone - for job application forms)</li>
                 </ul>
             </div>
         </div>
@@ -221,6 +233,7 @@ class CareersSettings {
             'applications' => 'applications_page',
             'application_view' => 'application_view_page',
             'job_detail' => 'job_detail_page',
+            'apply' => 'apply_page',
             'open_positions' => 'open_positions_page'
         );
         

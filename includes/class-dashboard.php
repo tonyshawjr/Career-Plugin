@@ -15,6 +15,11 @@ class CareersDashboard {
         add_action('wp_ajax_careers_location_action', array($this, 'handle_location_action'));
         add_action('wp_ajax_careers_bulk_position_action', array($this, 'handle_bulk_position_action'));
         
+        // Application management AJAX handlers
+        add_action('wp_ajax_careers_update_application_status', array($this, 'handle_update_application_status'));
+        add_action('wp_ajax_careers_add_application_note', array($this, 'handle_add_application_note'));
+        add_action('wp_ajax_careers_delete_all_applications', array($this, 'handle_delete_all_applications'));
+        
         // Dashboard routing now handled by CareersPageHandler
         
         // Add dashboard shortcode
@@ -46,13 +51,10 @@ class CareersDashboard {
                 <p class="dashboard-subtitle">Overview of your careers system</p>
             </div>
             
-            <div class="dashboard-tabs">
-                <button class="dashboard-tab active" data-tab="jobs">Jobs</button>
-                <button class="dashboard-tab" data-tab="applicants">Applicants</button>
-            </div>
+            <!-- Removed dashboard tabs since applications is now a separate page -->
             
-            <!-- Jobs Tab -->
-            <div id="jobs-tab" class="tab-content active">
+            <!-- Main Jobs Content -->
+            <div class="jobs-content">
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <div class="metric-number"><?php echo esc_html($total_jobs); ?></div>
@@ -118,9 +120,9 @@ class CareersDashboard {
                                         </div>
                                     </div>
                                     <div class="job-actions">
-                                        <a href="<?php echo CareersSettings::get_page_url('edit_job', array('id' => $job->id)); ?>" class="action-btn primary">Edit</a>
-                                        <a href="<?php echo CareersSettings::get_page_url('applications', array('job_id' => $job->id)); ?>" class="action-btn">Applications</a>
-                                        <a href="<?php echo careers_get_job_permalink($job->id); ?>" class="action-btn" target="_blank">View</a>
+                                        <a href="<?php echo home_url('/dashboard/jobs/edit/' . $job->id); ?>" class="action-btn primary">Edit</a>
+                                        <a href="<?php echo home_url('/dashboard/jobs/applications/' . $job->id); ?>" class="action-btn">Applications</a>
+                                        <a href="<?php echo home_url('/open-positions/' . $job->id); ?>" class="action-btn" target="_blank">View</a>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
@@ -128,49 +130,7 @@ class CareersDashboard {
                     <?php endif; ?>
                 </div>
             </div>
-            
-            <!-- Applicants Tab -->
-            <div id="applicants-tab" class="tab-content">
-                <div class="applicant-status-grid">
-                    <div class="status-card">
-                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['pending'] ?? 0); ?></div>
-                        <div class="status-label">Pending</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['reviewed'] ?? 0); ?></div>
-                        <div class="status-label">Reviewed</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['interviewing'] ?? 0); ?></div>
-                        <div class="status-label">Interviewing</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['hired'] ?? 0); ?></div>
-                        <div class="status-label">Hired</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-number"><?php echo esc_html($application_stats['by_status']['rejected'] ?? 0); ?></div>
-                        <div class="status-label">Rejected</div>
-                    </div>
-                </div>
-            </div>
         </div>
-        
-        <script>
-        jQuery(document).ready(function($) {
-            $('.dashboard-tab').on('click', function() {
-                var tabId = $(this).data('tab');
-                
-                // Update tab buttons
-                $('.dashboard-tab').removeClass('active');
-                $(this).addClass('active');
-                
-                // Update tab content
-                $('.tab-content').removeClass('active');
-                $('#' + tabId + '-tab').addClass('active');
-            });
-        });
-        </script>
         <?php
     }
     
@@ -1473,10 +1433,10 @@ class CareersDashboard {
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Manage Job Positions</h1>
                 <div class="header-actions">
-                    <a href="<?php echo CareersSettings::get_dashboard_url('positions/create'); ?>" class="create-button">
+                    <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
                         Create New Position
                     </a>
-                    <a href="<?php echo CareersSettings::get_dashboard_url('locations'); ?>" class="create-button secondary">
+                    <a href="<?php echo home_url('/dashboard/locations'); ?>" class="create-button secondary">
                         Manage Locations
                     </a>
                 </div>
@@ -1527,7 +1487,7 @@ class CareersDashboard {
                         </div>
                         <div>
                             <button type="submit" class="filter-button">Filter</button>
-                            <a href="<?php echo CareersSettings::get_dashboard_url('positions'); ?>" class="filter-button clear-filters">Clear</a>
+                            <a href="<?php echo home_url('/dashboard/positions'); ?>" class="filter-button clear-filters">Clear</a>
                         </div>
                     </div>
                 </form>
@@ -1538,7 +1498,7 @@ class CareersDashboard {
                     <h3><?php echo $search_query || $status_filter || $job_type_filter || $location_filter ? 'No positions found' : 'No positions yet'; ?></h3>
                     <p><?php echo $search_query || $status_filter || $job_type_filter || $location_filter ? 'Try adjusting your filters.' : 'Create your first job position to get started.'; ?></p>
                     <?php if (!$search_query && !$status_filter && !$job_type_filter && !$location_filter): ?>
-                        <a href="<?php echo CareersSettings::get_dashboard_url('positions/create'); ?>" class="create-button">
+                        <a href="<?php echo home_url('/dashboard/positions/create'); ?>" class="create-button">
                             Create Your First Position
                         </a>
                     <?php endif; ?>
@@ -1606,11 +1566,11 @@ class CareersDashboard {
                                 </div>
                             </div>
                             <div class="position-actions">
-                                <a href="<?php echo CareersSettings::get_dashboard_url('positions/edit/' . esc_attr($position->id)); ?>" 
+                                <a href="<?php echo home_url('/dashboard/positions/edit/' . esc_attr($position->id)); ?>" 
                                    class="action-button primary">Edit</a>
-                                <a href="<?php echo CareersSettings::get_dashboard_url('positions/applications/' . esc_attr($position->id)); ?>" 
+                                <a href="<?php echo home_url('/dashboard/positions/applications/' . esc_attr($position->id)); ?>" 
                                    class="action-button">Applications</a>
-                                <a href="<?php echo careers_get_job_permalink($position->id); ?>" 
+                                <a href="<?php echo home_url('/open-positions/' . esc_attr($position->id)); ?>" 
                                    class="action-button" target="_blank">View</a>
                                 <button class="action-button danger delete-position" 
                                         data-id="<?php echo esc_attr($position->id); ?>">Delete</button>
@@ -2606,5 +2566,1096 @@ class CareersDashboard {
         }
         
         return ob_get_clean();
+    }
+    
+    /**
+     * Render applications management
+     */
+    public function render_applications_management() {
+        // Get filter parameters
+        $status_filter = isset($_GET['status']) ? sanitize_text_field($_GET['status']) : '';
+        $search_query = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
+        $job_filter = isset($_GET['job_id']) ? intval($_GET['job_id']) : '';
+        $page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+        $per_page = 20;
+        
+        // Build query arguments
+        $args = array(
+            'limit' => $per_page,
+            'offset' => ($page - 1) * $per_page,
+            'orderby' => 'submitted_at',
+            'order' => 'DESC'
+        );
+        
+        if (!empty($status_filter)) {
+            $args['status'] = $status_filter;
+        }
+        
+        if (!empty($job_filter)) {
+            $args['job_id'] = $job_filter;
+        }
+        
+        // Get applications and total count
+        $applications = CareersApplicationDB::get_applications($args);
+        $total_args = $args;
+        unset($total_args['limit'], $total_args['offset']);
+        $total_applications = $this->get_applications_count($total_args);
+        
+        // Get available jobs for filtering
+        $available_jobs = CareersPositionsDB::get_positions(array('status' => 'published', 'limit' => -1));
+        
+        // Get application statistics
+        $stats = CareersApplicationDB::get_stats();
+        
+        // Status pipeline definition
+        $status_pipeline = array(
+            'new' => array('label' => 'New', 'color' => '#3b82f6'),
+            'under_review' => array('label' => 'Under Review', 'color' => '#f59e0b'),
+            'contacted' => array('label' => 'Contacted', 'color' => '#8b5cf6'),
+            'interview' => array('label' => 'Interview', 'color' => '#06b6d4'),
+            'hired' => array('label' => 'Hired', 'color' => '#10b981'),
+            'rejected' => array('label' => 'Rejected', 'color' => '#ef4444')
+        );
+        
+        // Pagination calculations
+        $total_pages = ceil($total_applications / $per_page);
+        
+        ?>
+        <style>
+        .careers-dashboard-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            color: #333;
+            font-size: 16px !important;
+        }
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        /* High specificity CSS overrides to fix font and underline issues */
+        .careers-dashboard-container,
+        .careers-dashboard-container * {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Remove all underlines and text decorations with maximum specificity */
+        .careers-dashboard-container a,
+        .careers-dashboard-container a:link,
+        .careers-dashboard-container a:visited,
+        .careers-dashboard-container a:hover,
+        .careers-dashboard-container a:active,
+        .careers-dashboard-container a:focus,
+        .careers-dashboard-container button,
+        .careers-dashboard-container button:link,
+        .careers-dashboard-container button:visited,
+        .careers-dashboard-container button:hover,
+        .careers-dashboard-container button:active,
+        .careers-dashboard-container button:focus {
+            text-decoration: none !important;
+            border-bottom: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            text-underline-offset: unset !important;
+            text-decoration-line: none !important;
+            text-decoration-color: transparent !important;
+            text-decoration-style: none !important;
+            text-decoration-thickness: 0 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container h1,
+        .careers-dashboard-container h2,
+        .careers-dashboard-container h3,
+        .careers-dashboard-container h4,
+        .careers-dashboard-container h5,
+        .careers-dashboard-container h6 {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-weight: 500 !important;
+        }
+        .careers-dashboard-container p,
+        .careers-dashboard-container span,
+        .careers-dashboard-container div {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        
+        .careers-dashboard-container .dashboard-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #eee;
+        }
+        .careers-dashboard-container .dashboard-title {
+            font-size: 2.5rem !important;
+            font-weight: 500 !important;
+            margin: 0 0 0.5rem 0 !important;
+            line-height: 1.2 !important;
+            color: #111 !important;
+        }
+        .careers-dashboard-container .dashboard-subtitle {
+            color: #666 !important;
+            margin: 0 !important;
+            font-size: 1rem !important;
+        }
+        .careers-dashboard-container .header-actions {
+            margin-top: 1rem;
+        }
+        .careers-dashboard-container .delete-all-btn {
+            background: #dc3545 !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 6px !important;
+            font-size: 0.875rem !important;
+            cursor: pointer !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .careers-dashboard-container .delete-all-btn:hover {
+            background: #c82333 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+        }
+        
+        /* Applications Stats */
+        .careers-dashboard-container .applications-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .careers-dashboard-container .stat-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .careers-dashboard-container .stat-number {
+            font-size: 2rem !important;
+            font-weight: 600 !important;
+            margin: 0 0 0.5rem 0 !important;
+        }
+        .careers-dashboard-container .stat-label {
+            font-size: 0.875rem !important;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .careers-dashboard-container .stat-card.new .stat-number { color: #3b82f6; }
+        .careers-dashboard-container .stat-card.under-review .stat-number { color: #f59e0b; }
+        .careers-dashboard-container .stat-card.contacted .stat-number { color: #8b5cf6; }
+        .careers-dashboard-container .stat-card.interview .stat-number { color: #06b6d4; }
+        .careers-dashboard-container .stat-card.hired .stat-number { color: #10b981; }
+        .careers-dashboard-container .stat-card.rejected .stat-number { color: #ef4444; }
+        
+        /* Filter Section */
+        .careers-dashboard-container .filters-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        .careers-dashboard-container .filters-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+        .careers-dashboard-container .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .careers-dashboard-container .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #555;
+        }
+        .careers-dashboard-container .filter-group input,
+        .careers-dashboard-container .filter-group select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .filter-button {
+            background: #000 !important;
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            height: fit-content;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .filter-button:hover {
+            background: #333 !important;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .clear-filters {
+            background: transparent !important;
+            color: #666 !important;
+            border: 1px solid #ddd !important;
+            margin-left: 0.5rem;
+        }
+        .careers-dashboard-container .clear-filters:hover {
+            background: #f5f5f5 !important;
+            color: #333 !important;
+        }
+        
+        /* Applications List */
+        .careers-dashboard-container .applications-grid {
+            display: grid;
+            gap: 1rem;
+        }
+        .careers-dashboard-container .application-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+        .careers-dashboard-container .application-card:hover {
+            border-color: #ddd;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .careers-dashboard-container .application-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        .careers-dashboard-container .applicant-info h3 {
+            font-size: 1.125rem !important;
+            font-weight: 600 !important;
+            margin: 0 0 0.25rem 0 !important;
+            color: #111;
+        }
+        .careers-dashboard-container .applicant-email {
+            color: #666;
+            font-size: 0.875rem;
+        }
+        .careers-dashboard-container .application-meta {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .careers-dashboard-container .application-details {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .careers-dashboard-container .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .careers-dashboard-container .detail-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .careers-dashboard-container .detail-value {
+            font-size: 0.875rem;
+            color: #333;
+        }
+        .careers-dashboard-container .job-title {
+            font-weight: 500;
+            color: #111;
+        }
+        .careers-dashboard-container .general-application {
+            color: #f59e0b;
+            font-style: italic;
+        }
+        
+        /* Status Pipeline */
+        .careers-dashboard-container .status-pipeline {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        .careers-dashboard-container .status-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 0.75rem !important;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fff;
+            color: #666;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .status-btn:hover {
+            border-color: #999;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .status-btn.active {
+            color: white !important;
+            border-color: transparent;
+        }
+        .careers-dashboard-container .status-btn.new.active { background: #3b82f6 !important; }
+        .careers-dashboard-container .status-btn.under-review.active { background: #f59e0b !important; }
+        .careers-dashboard-container .status-btn.contacted.active { background: #8b5cf6 !important; }
+        .careers-dashboard-container .status-btn.interview.active { background: #06b6d4 !important; }
+        .careers-dashboard-container .status-btn.hired.active { background: #10b981 !important; }
+        .careers-dashboard-container .status-btn.rejected.active { background: #ef4444 !important; }
+        
+        /* Notes Section */
+        .careers-dashboard-container .notes-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f0f0f0;
+        }
+        .careers-dashboard-container .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .careers-dashboard-container .notes-title {
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            color: #333;
+            margin: 0 !important;
+        }
+        .careers-dashboard-container .add-note-btn {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .add-note-btn:hover {
+            background: #e9ecef;
+            text-decoration: none !important;
+        }
+        
+        .careers-dashboard-container .notes-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+        .careers-dashboard-container .note-item {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+        .careers-dashboard-container .note-meta {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+        .careers-dashboard-container .note-form {
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .careers-dashboard-container .note-form.active {
+            display: block;
+        }
+        .careers-dashboard-container .note-textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            resize: vertical;
+            min-height: 60px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .note-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .careers-dashboard-container .note-save-btn,
+        .careers-dashboard-container .note-cancel-btn {
+            padding: 0.25rem 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.75rem !important;
+            cursor: pointer;
+            text-decoration: none !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .note-save-btn {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        .careers-dashboard-container .note-save-btn:hover {
+            background: #333;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .note-cancel-btn {
+            background: #f8f9fa;
+            color: #666;
+        }
+        .careers-dashboard-container .note-cancel-btn:hover {
+            background: #e9ecef;
+            text-decoration: none !important;
+        }
+        
+        /* Action Buttons */
+        .careers-dashboard-container .application-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .careers-dashboard-container .action-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.875rem !important;
+            font-weight: 500;
+            text-decoration: none !important;
+            display: inline-block;
+            transition: all 0.2s ease;
+            background: #fff;
+            color: #333;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .action-btn:hover {
+            background: #f5f5f5;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .action-btn.primary {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        .careers-dashboard-container .action-btn.primary:hover {
+            background: #333;
+            text-decoration: none !important;
+        }
+        
+        /* Pagination */
+        .careers-dashboard-container .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            padding: 1rem;
+        }
+        .careers-dashboard-container .pagination a,
+        .careers-dashboard-container .pagination span {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-decoration: none !important;
+            color: #333;
+            font-size: 0.875rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+        }
+        .careers-dashboard-container .pagination a:hover {
+            background: #f5f5f5;
+            text-decoration: none !important;
+        }
+        .careers-dashboard-container .pagination .current {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+        .careers-dashboard-container .pagination .disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Empty State */
+        .careers-dashboard-container .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #666;
+        }
+        .careers-dashboard-container .empty-state h3 {
+            font-size: 1.25rem !important;
+            font-weight: 500 !important;
+            color: #111;
+            margin: 0 0 0.5rem 0 !important;
+        }
+        .careers-dashboard-container .empty-state p {
+            margin: 0 0 2rem 0 !important;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .careers-dashboard-container .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            .careers-dashboard-container .application-header {
+                grid-template-columns: 1fr;
+            }
+            .careers-dashboard-container .application-details {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .careers-dashboard-container .status-pipeline {
+                justify-content: center;
+            }
+            .careers-dashboard-container .application-actions {
+                flex-direction: column;
+            }
+        }
+        </style>
+        
+        <div class="careers-dashboard-container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Applications</h1>
+                <p class="dashboard-subtitle">Manage job applications and track applicant progress</p>
+                <div class="header-actions">
+                    <button id="delete-all-applications" class="delete-all-btn" type="button">
+                        Delete All Applications
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Applications Statistics -->
+            <div class="applications-stats">
+                <div class="stat-card new">
+                    <div class="stat-number"><?php echo esc_html($stats['by_status']['new'] ?? 0); ?></div>
+                    <div class="stat-label">New</div>
+                </div>
+                <div class="stat-card under-review">
+                    <div class="stat-number"><?php echo esc_html($stats['by_status']['under_review'] ?? 0); ?></div>
+                    <div class="stat-label">Under Review</div>
+                </div>
+                <div class="stat-card contacted">
+                    <div class="stat-number"><?php echo esc_html($stats['by_status']['contacted'] ?? 0); ?></div>
+                    <div class="stat-label">Contacted</div>
+                </div>
+                <div class="stat-card interview">
+                    <div class="stat-number"><?php echo esc_html($stats['by_status']['interview'] ?? 0); ?></div>
+                    <div class="stat-label">Interview</div>
+                </div>
+                <div class="stat-card hired">
+                    <div class="stat-number"><?php echo esc_html($stats['by_status']['hired'] ?? 0); ?></div>
+                    <div class="stat-label">Hired</div>
+                </div>
+                <div class="stat-card rejected">
+                    <div class="stat-number"><?php echo esc_html($stats['by_status']['rejected'] ?? 0); ?></div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+            </div>
+            
+            <!-- Filters Section -->
+            <div class="filters-section">
+                <form method="GET" action="" id="applications-filters-form">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="search">Search Applicants</label>
+                            <input type="text" id="search" name="search" value="<?php echo esc_attr($search_query); ?>" 
+                                   placeholder="Search by name or email...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <?php foreach ($status_pipeline as $key => $status): ?>
+                                    <option value="<?php echo esc_attr($key); ?>" <?php selected($status_filter, $key); ?>>
+                                        <?php echo esc_html($status['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="job_id">Job Position</label>
+                            <select id="job_id" name="job_id">
+                                <option value="">All Positions</option>
+                                <option value="0" <?php selected($job_filter, 0); ?>>General Applications</option>
+                                <?php foreach ($available_jobs as $job): ?>
+                                    <option value="<?php echo esc_attr($job->id); ?>" <?php selected($job_filter, $job->id); ?>>
+                                        <?php echo esc_html($job->position_name); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <button type="submit" class="filter-button">Filter</button>
+                            <a href="<?php echo remove_query_arg(array('status', 'search', 'job_id', 'paged')); ?>" class="filter-button clear-filters">Clear</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <?php if (empty($applications)): ?>
+                <div class="empty-state">
+                    <h3><?php echo $status_filter || $search_query || $job_filter ? 'No applications found' : 'No applications yet'; ?></h3>
+                    <p><?php echo $status_filter || $search_query || $job_filter ? 'Try adjusting your filters.' : 'Applications will appear here once candidates start applying.'; ?></p>
+                </div>
+            <?php else: ?>
+                <!-- Applications List -->
+                <div class="applications-grid">
+                    <?php foreach ($applications as $application): ?>
+                        <?php 
+                        $user = get_user_by('id', $application->user_id);
+                        $notes = $this->get_application_notes($application->id);
+                        ?>
+                        <div class="application-card" data-application-id="<?php echo esc_attr($application->id); ?>">
+                            <div class="application-header">
+                                <div class="applicant-info">
+                                    <h3><?php echo esc_html($user ? $user->display_name : 'Unknown Applicant'); ?></h3>
+                                    <div class="applicant-email"><?php echo esc_html($user ? $user->user_email : 'No email'); ?></div>
+                                    <div class="application-meta">
+                                        Applied: <?php echo esc_html(date('M j, Y \a\t g:i A', strtotime($application->submitted_at))); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="application-details">
+                                <div class="detail-item">
+                                    <div class="detail-label">Position Applied For</div>
+                                    <div class="detail-value">
+                                        <?php if (empty($application->job_id) || $application->job_id == 0): ?>
+                                            <span class="general-application">General Application</span>
+                                        <?php else: ?>
+                                            <?php 
+                                            $job = CareersPositionsDB::get_position($application->job_id);
+                                            echo $job ? '<span class="job-title">' . esc_html($job->position_name) . '</span>' : 'Position Not Found';
+                                            ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Documents</div>
+                                    <div class="detail-value">
+                                        <?php if (!empty($application->resume_url)): ?>
+                                            <a href="<?php echo esc_url($application->resume_url); ?>" target="_blank">Resume</a>
+                                        <?php endif; ?>
+                                        <?php if (!empty($application->cover_letter_url)): ?>
+                                            <?php if (!empty($application->resume_url)): ?> • <?php endif; ?>
+                                            <a href="<?php echo esc_url($application->cover_letter_url); ?>" target="_blank">Cover Letter</a>
+                                        <?php endif; ?>
+                                        <?php if (empty($application->resume_url) && empty($application->cover_letter_url)): ?>
+                                            No documents
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Application ID</div>
+                                    <div class="detail-value">#<?php echo esc_html($application->id); ?></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Status Pipeline -->
+                            <div class="status-pipeline">
+                                <?php foreach ($status_pipeline as $status_key => $status_info): ?>
+                                    <button class="status-btn <?php echo esc_attr($status_key); ?> <?php echo ($application->status == $status_key) ? 'active' : ''; ?>"
+                                            data-status="<?php echo esc_attr($status_key); ?>"
+                                            data-application-id="<?php echo esc_attr($application->id); ?>">
+                                        <?php echo esc_html($status_info['label']); ?>
+                                    </button>
+                                <?php endforeach; ?>
+                            </div>
+                            
+                            <!-- Notes Section -->
+                            <div class="notes-section">
+                                <div class="notes-header">
+                                    <h4 class="notes-title">Notes (<?php echo count($notes); ?>)</h4>
+                                    <button class="add-note-btn" data-application-id="<?php echo esc_attr($application->id); ?>">+ Add Note</button>
+                                </div>
+                                
+                                <div class="notes-list">
+                                    <?php if (!empty($notes)): ?>
+                                        <?php foreach (array_slice($notes, 0, 2) as $note): ?>
+                                            <div class="note-item">
+                                                <div class="note-content"><?php echo esc_html($note->content); ?></div>
+                                                <div class="note-meta">
+                                                    <?php 
+                                                    $note_user = get_user_by('id', $note->user_id);
+                                                    echo esc_html($note_user ? $note_user->display_name : 'Unknown User');
+                                                    echo ' • ' . esc_html(date('M j, Y \a\t g:i A', strtotime($note->created_at)));
+                                                    ?>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                        <?php if (count($notes) > 2): ?>
+                                            <div class="note-item">
+                                                <div class="note-content" style="font-style: italic; color: #666;">
+                                                    +<?php echo count($notes) - 2; ?> more notes...
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <div class="note-item" style="font-style: italic; color: #666;">
+                                            No notes yet
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="note-form" data-application-id="<?php echo esc_attr($application->id); ?>">
+                                    <textarea class="note-textarea" placeholder="Add a note about this applicant..."></textarea>
+                                    <div class="note-actions">
+                                        <button class="note-save-btn">Save Note</button>
+                                        <button class="note-cancel-btn">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Application Actions -->
+                            <div class="application-actions">
+                                <button class="action-btn primary view-details-btn" data-application-id="<?php echo esc_attr($application->id); ?>">
+                                    View Full Details
+                                </button>
+                                <button class="action-btn view-notes-btn" data-application-id="<?php echo esc_attr($application->id); ?>">
+                                    View All Notes (<?php echo count($notes); ?>)
+                                </button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                
+                <!-- Pagination -->
+                <?php if ($total_pages > 1): ?>
+                    <div class="pagination">
+                        <?php if ($page > 1): ?>
+                            <a href="<?php echo esc_url(add_query_arg('paged', $page - 1)); ?>">&laquo; Previous</a>
+                        <?php else: ?>
+                            <span class="disabled">&laquo; Previous</span>
+                        <?php endif; ?>
+                        
+                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                            <?php if ($i == $page): ?>
+                                <span class="current"><?php echo $i; ?></span>
+                            <?php else: ?>
+                                <a href="<?php echo esc_url(add_query_arg('paged', $i)); ?>"><?php echo $i; ?></a>
+                            <?php endif; ?>
+                        <?php endfor; ?>
+                        
+                        <?php if ($page < $total_pages): ?>
+                            <a href="<?php echo esc_url(add_query_arg('paged', $page + 1)); ?>">Next &raquo;</a>
+                        <?php else: ?>
+                            <span class="disabled">Next &raquo;</span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+        
+        <script>
+        jQuery(document).ready(function($) {
+            // Status change handler
+            $('.status-btn').on('click', function() {
+                var $btn = $(this);
+                var applicationId = $btn.data('application-id');
+                var newStatus = $btn.data('status');
+                
+                if ($btn.hasClass('active')) {
+                    return; // Already active
+                }
+                
+                $.ajax({
+                    url: careers_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'careers_update_application_status',
+                        application_id: applicationId,
+                        status: newStatus,
+                        nonce: careers_ajax.nonce
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Update UI
+                            $btn.siblings('.status-btn').removeClass('active');
+                            $btn.addClass('active');
+                            
+                            // Show success message
+                            $('<div class="status-update-success">Status updated to ' + $btn.text() + '</div>')
+                                .insertAfter($btn.closest('.status-pipeline'))
+                                .delay(2000)
+                                .fadeOut();
+                        } else {
+                            alert('Error updating status: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error updating status. Please try again.');
+                    }
+                });
+            });
+            
+            // Add note handler
+            $('.add-note-btn').on('click', function() {
+                var applicationId = $(this).data('application-id');
+                var $noteForm = $('.note-form[data-application-id="' + applicationId + '"]');
+                
+                if ($noteForm.hasClass('active')) {
+                    $noteForm.removeClass('active');
+                    $(this).text('+ Add Note');
+                } else {
+                    $noteForm.addClass('active');
+                    $noteForm.find('.note-textarea').focus();
+                    $(this).text('Cancel');
+                }
+            });
+            
+            // Cancel note handler
+            $('.note-cancel-btn').on('click', function() {
+                var $form = $(this).closest('.note-form');
+                var applicationId = $form.data('application-id');
+                
+                $form.removeClass('active');
+                $form.find('.note-textarea').val('');
+                $('.add-note-btn[data-application-id="' + applicationId + '"]').text('+ Add Note');
+            });
+            
+            // Save note handler
+            $('.note-save-btn').on('click', function() {
+                var $form = $(this).closest('.note-form');
+                var $textarea = $form.find('.note-textarea');
+                var applicationId = $form.data('application-id');
+                var noteContent = $textarea.val().trim();
+                
+                if (!noteContent) {
+                    alert('Please enter a note before saving.');
+                    return;
+                }
+                
+                $.ajax({
+                    url: careers_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'careers_add_application_note',
+                        application_id: applicationId,
+                        note_content: noteContent,
+                        nonce: careers_ajax.nonce
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            // Reload the page to show the new note
+                            location.reload();
+                        } else {
+                            alert('Error saving note: ' + response.data);
+                        }
+                    },
+                    error: function() {
+                        alert('Error saving note. Please try again.');
+                    }
+                });
+            });
+            
+            // View details handler (placeholder for modal)
+            $('.view-details-btn').on('click', function() {
+                var applicationId = $(this).data('application-id');
+                // TODO: Implement modal view for full application details
+                alert('Application details view coming soon! Application ID: ' + applicationId);
+            });
+            
+            // View all notes handler (placeholder for modal)
+            $('.view-notes-btn').on('click', function() {
+                var applicationId = $(this).data('application-id');
+                // TODO: Implement modal view for all notes
+                alert('Full notes view coming soon! Application ID: ' + applicationId);
+            });
+            
+            // Delete all applications handler
+            $('#delete-all-applications').on('click', function() {
+                if (!confirm('Are you sure you want to delete ALL applications? This action cannot be undone!')) {
+                    return;
+                }
+                
+                if (!confirm('This will permanently delete all application data including notes and files. Are you absolutely sure?')) {
+                    return;
+                }
+                
+                var $btn = $(this);
+                $btn.prop('disabled', true).text('Deleting...');
+                
+                $.ajax({
+                    url: careers_ajax.ajax_url,
+                    type: 'POST',
+                    data: {
+                        action: 'careers_delete_all_applications',
+                        nonce: careers_ajax.nonce
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('All applications have been deleted successfully.');
+                            location.reload(); // Refresh the page to show empty state
+                        } else {
+                            alert('Error deleting applications: ' + response.data);
+                            $btn.prop('disabled', false).text('Delete All Applications');
+                        }
+                    },
+                    error: function() {
+                        alert('Error deleting applications. Please try again.');
+                        $btn.prop('disabled', false).text('Delete All Applications');
+                    }
+                });
+            });
+        });
+        </script>
+        <?php
+    }
+    
+    /**
+     * Get application notes
+     */
+    private function get_application_notes($application_id) {
+        return CareersApplicationDB::get_application_notes($application_id);
+    }
+    
+    /**
+     * Get applications count with filters
+     */
+    private function get_applications_count($args) {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'careers_applications';
+        
+        $where_conditions = array();
+        $where_values = array();
+        
+        if (!empty($args['status'])) {
+            $where_conditions[] = "status = %s";
+            $where_values[] = $args['status'];
+        }
+        
+        if (!empty($args['job_id'])) {
+            $where_conditions[] = "job_id = %d";
+            $where_values[] = $args['job_id'];
+        }
+        
+        $where_clause = '';
+        if (!empty($where_conditions)) {
+            $where_clause = 'WHERE ' . implode(' AND ', $where_conditions);
+        }
+        
+        $query = "SELECT COUNT(*) FROM $table_name $where_clause";
+        
+        if (!empty($where_values)) {
+            return $wpdb->get_var($wpdb->prepare($query, $where_values));
+        } else {
+            return $wpdb->get_var($query);
+        }
+    }
+    
+    /**
+     * Handle application status update AJAX request
+     */
+    public function handle_update_application_status() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'careers_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options') && !current_user_can('career_admin')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $application_id = intval($_POST['application_id']);
+        $new_status = sanitize_text_field($_POST['status']);
+        
+        if (empty($application_id) || empty($new_status)) {
+            wp_send_json_error('Missing application ID or status');
+        }
+        
+        $result = CareersApplicationDB::update_status($application_id, $new_status);
+        
+        if (is_wp_error($result)) {
+            wp_send_json_error($result->get_error_message());
+        }
+        
+        // Add a status change note
+        $status_labels = array(
+            'new' => 'New',
+            'under_review' => 'Under Review',
+            'contacted' => 'Contacted',
+            'interview' => 'Interview',
+            'hired' => 'Hired',
+            'rejected' => 'Rejected'
+        );
+        
+        $note_content = 'Status changed to: ' . ($status_labels[$new_status] ?? $new_status);
+        CareersApplicationDB::add_note($application_id, get_current_user_id(), $note_content);
+        
+        wp_send_json_success('Status updated successfully');
+    }
+    
+    /**
+     * Handle add application note AJAX request
+     */
+    public function handle_add_application_note() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'careers_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        // Check permissions
+        if (!current_user_can('manage_options') && !current_user_can('career_admin')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $application_id = intval($_POST['application_id']);
+        $note_content = sanitize_textarea_field($_POST['note_content']);
+        
+        if (empty($application_id) || empty($note_content)) {
+            wp_send_json_error('Missing application ID or note content');
+        }
+        
+        $result = CareersApplicationDB::add_note($application_id, get_current_user_id(), $note_content);
+        
+        if (is_wp_error($result)) {
+            wp_send_json_error($result->get_error_message());
+        }
+        
+        wp_send_json_success('Note added successfully');
+    }
+    
+    /**
+     * Handle delete all applications AJAX request
+     */
+    public function handle_delete_all_applications() {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'], 'careers_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        // Check permissions - only admins can delete all applications
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied - administrator access required');
+        }
+        
+        global $wpdb;
+        
+        // Delete all application notes first (to maintain referential integrity)
+        $notes_table = $wpdb->prefix . 'careers_application_notes';
+        $notes_deleted = $wpdb->query("DELETE FROM $notes_table");
+        
+        // Delete all applications
+        $applications_table = $wpdb->prefix . 'careers_applications';
+        $apps_deleted = $wpdb->query("DELETE FROM $applications_table");
+        
+        if ($apps_deleted === false || $notes_deleted === false) {
+            wp_send_json_error('Failed to delete all applications');
+        }
+        
+        // Log the deletion for audit purposes
+        error_log("Careers: All applications deleted by user " . get_current_user_id() . " (" . wp_get_current_user()->user_login . ")");
+        
+        wp_send_json_success(array(
+            'message' => 'All applications deleted successfully',
+            'applications_deleted' => $apps_deleted,
+            'notes_deleted' => $notes_deleted
+        ));
     }
 }
