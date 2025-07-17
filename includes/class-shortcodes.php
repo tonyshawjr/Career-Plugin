@@ -18,6 +18,10 @@ class CareersShortcodes {
         // Handle application submission
         add_action('wp_ajax_careers_submit_application', array($this, 'handle_application_submission'));
         add_action('wp_ajax_nopriv_careers_submit_application', array($this, 'handle_application_submission'));
+        
+        // Handle comprehensive application form submission (non-AJAX)
+        add_action('init', array($this, 'handle_comprehensive_application_submission'));
+        add_action('template_redirect', array($this, 'handle_comprehensive_application_submission'));
     }
     
     /**
@@ -145,7 +149,7 @@ class CareersShortcodes {
                                 <div class="position-card">
                                     <div class="position-header">
                                         <h3 class="position-title">
-                                            <a href="/open-positions/<?php echo esc_attr($position->id); ?>">
+                                            <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position->id)); ?>">
                                                 <?php echo esc_html($position->position_name); ?>
                                             </a>
                                         </h3>
@@ -195,7 +199,7 @@ class CareersShortcodes {
                                     </div>
                                     
                                     <div class="position-actions">
-                                        <a href="/open-positions/<?php echo esc_attr($position->id); ?>" 
+                                        <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position->id)); ?>" 
                                            class="view-details-btn">View Details</a>
                                     </div>
                                 </div>
@@ -491,14 +495,29 @@ class CareersShortcodes {
      * Position detail shortcode [careers_position_detail]
      */
     public function careers_position_detail_shortcode($atts) {
-        // Get position ID from URL or shortcode attribute
+        // Get position ID from multiple sources to handle different URL formats
+        $position_id = 0;
+        
+        // Method 1: Old rewrite system (/open-positions/3)
         $position_id = get_query_var('careers_position_id');
         
+        // Method 2: Settings-based system (?id=3)
+        if (empty($position_id) && isset($_GET['id'])) {
+            $position_id = intval($_GET['id']);
+        }
+        
+        // Method 3: Shortcode attribute
         if (empty($position_id) && isset($atts['id'])) {
             $position_id = intval($atts['id']);
         }
         
+        error_log('Careers Debug: Job detail page - Final position ID: ' . $position_id);
+        error_log('Careers Debug: Job detail page - Query var careers_position_id: ' . get_query_var('careers_position_id'));
+        error_log('Careers Debug: Job detail page - GET id: ' . (isset($_GET['id']) ? $_GET['id'] : 'none'));
+        error_log('Careers Debug: Job detail page - Atts: ' . print_r($atts, true));
+        
         if (empty($position_id)) {
+            error_log('Careers Debug: Job detail page - No position ID, returning error');
             return '<p>Position not found.</p>';
         }
         
@@ -520,7 +539,7 @@ class CareersShortcodes {
                     </div>
                 </div>
                 <div class="hero-actions">
-                    <a href="<?php echo home_url('/apply/' . $position_id); ?>" class="apply-btn">Apply Now</a>
+                    <a href="<?php echo CareersSettings::get_page_url('apply', array('position_id' => $position_id)); ?>" class="apply-btn">Apply Now</a>
                 </div>
             </div>
 
@@ -658,20 +677,13 @@ class CareersShortcodes {
                     <div class="info-box cta-box">
                         <h3>Take the First Step</h3>
                         <p>Submit your application today and join our team of mobile diagnostic professionals.</p>
-                        <a href="<?php echo home_url('/apply/' . $position_id); ?>" class="apply-btn-full">Apply Now →</a>
+                        <a href="<?php echo CareersSettings::get_page_url('apply', array('position_id' => $position_id)); ?>" class="apply-btn-full">Apply Now →</a>
                     </div>
                     
                 </div>
             </div>
             
-            <!-- Apply Button Section -->
-            <div class="bottom-apply-section">
-                <div class="apply-container">
-                    <h3>Ready to Apply?</h3>
-                    <p>Take the next step in your career journey.</p>
-                    <a href="<?php echo home_url('/apply/' . $position_id); ?>" class="apply-btn-large">Apply for this Position →</a>
-                </div>
-            </div>
+
         </div>
         
         <style>
@@ -855,40 +867,7 @@ class CareersShortcodes {
             opacity: 0.8;
         }
         
-        .bottom-apply-section {
-            background: #f9f9f9;
-            padding: 2.5rem 2rem;
-            border-radius: 4px;
-            margin-top: 3rem;
-            text-align: center;
-        }
-        
-        .apply-container h3 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: #111;
-            margin-bottom: 0.5rem;
-        }
-        
-        .apply-container p {
-            color: #666;
-            margin-bottom: 2rem;
-        }
-        
-        .apply-btn-large {
-            background: #000;
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 500;
-            display: inline-block;
-            transition: background 0.2s ease;
-        }
-        
-        .apply-btn-large:hover {
-            background: #333;
-        }
+
         
         @media (max-width: 768px) {
             .position-content-grid {
@@ -918,15 +897,24 @@ class CareersShortcodes {
     public function careers_application_page_shortcode($atts) {
         $position_id = intval($atts['position_id']);
         
+        error_log('=== Careers Debug: Application Form Rendering ===');
+        error_log('Careers Debug: Application page shortcode called with atts: ' . print_r($atts, true));
+        error_log('Careers Debug: Position ID extracted: ' . $position_id);
+        
         if (empty($position_id)) {
+            error_log('Careers Debug: Position ID is empty - returning error');
             return '<p>Invalid position.</p>';
         }
         
         $position = CareersPositionsDB::get_position($position_id);
         
         if (!$position || $position->status !== 'published') {
+            error_log('Careers Debug: Position not found or not published for ID: ' . $position_id);
             return '<p>Position not found or no longer available.</p>';
         }
+        
+        error_log('Careers Debug: Position found: ' . $position->position_name . ' (ID: ' . $position->id . ')');
+        error_log('=== End Careers Debug: Application Form Rendering ===');
         
         ob_start();
         ?>
@@ -934,7 +922,7 @@ class CareersShortcodes {
             <!-- Header Section -->
             <div class="application-header">
                 <div class="breadcrumb">
-                    <a href="<?php echo home_url('/open-positions/' . $position_id); ?>">← Back to Job Details</a>
+                    <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position_id)); ?>">← Back to Job Details</a>
                 </div>
                 <h1>Apply for <?php echo esc_html($position->position_name); ?></h1>
                 <div class="position-location">
@@ -947,7 +935,7 @@ class CareersShortcodes {
 
             <!-- Application Form -->
             <div class="application-form-container">
-                <?php echo $this->careers_form_shortcode(array('position_id' => $position_id)); ?>
+                <?php echo $this->render_comprehensive_application_form($position_id); ?>
             </div>
         </div>
         
@@ -1194,16 +1182,21 @@ class CareersShortcodes {
         $position_id = intval($_POST['position_id']);
         $additional_info = sanitize_textarea_field($_POST['additional_info']);
         
-        // Validate position exists
-        $position = CareersPositionsDB::get_position($position_id);
-        if (!$position) {
-            wp_send_json_error('Position not found.');
-        }
-        
-        // Check if user already applied
-        $existing = CareersApplicationDB::get_application_by_user_job($user_id, $position_id);
-        if ($existing) {
-            wp_send_json_error('You have already applied for this position.');
+        // Validate position exists (unless it's a general application with position_id = 0)
+        if ($position_id > 0) {
+            $position = CareersPositionsDB::get_position($position_id);
+            if (!$position) {
+                wp_send_json_error('Position not found.');
+            }
+            
+            // Check if user already applied for this specific position
+            $existing = CareersApplicationDB::get_application_by_user_job($user_id, $position_id);
+            if ($existing) {
+                wp_send_json_error('You have already applied for this position.');
+            }
+        } else {
+            // For general applications, set position to null for validation
+            $position = null;
         }
         
         // Handle file uploads
@@ -1234,7 +1227,7 @@ class CareersShortcodes {
             'job_id' => $position_id,
             'resume_url' => $resume_url,
             'cover_letter_url' => $cover_letter_url,
-            'status' => 'pending',
+            'status' => 'new',
             'meta' => maybe_serialize(array(
                 'additional_info' => $additional_info,
                 'applied_from' => 'frontend'
@@ -1290,5 +1283,444 @@ class CareersShortcodes {
         }
         
         return new WP_Error('upload_failed', 'Failed to save uploaded file.');
+    }
+    
+    /**
+     * Render comprehensive application form with all required fields
+     */
+    private function render_comprehensive_application_form($position_id) {
+        $position = CareersPositionsDB::get_position($position_id);
+        $user = wp_get_current_user();
+        
+        // Check for success message
+        if (isset($_GET['application_submitted']) && $_GET['application_submitted'] == '1') {
+            ob_start();
+            ?>
+            <div class="careers-dashboard-container">
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">Application Submitted Successfully!</h1>
+                    <p class="dashboard-subtitle">Thank you for applying for <strong><?php echo esc_html($position->position_name); ?></strong></p>
+                </div>
+                <div class="success-message">
+                    <p>Your application has been submitted successfully. We will review your application and get back to you soon.</p>
+                    <div class="form-actions">
+                        <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                    </div>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+        
+        // Check if user is logged in
+        error_log('Careers Debug: Application form - User logged in status: ' . (is_user_logged_in() ? 'YES' : 'NO'));
+        error_log('Careers Debug: Application form - Current user ID: ' . get_current_user_id());
+        
+        if (!is_user_logged_in()) {
+            error_log('Careers Debug: Application form - Showing login required page');
+            ob_start();
+            ?>
+            <div class="careers-dashboard-container">
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">Login Required</h1>
+                    <p class="dashboard-subtitle">You need to log in to apply for <strong><?php echo esc_html($position->position_name); ?></strong></p>
+                </div>
+                <div class="login-notice">
+                    <p><strong>Please log in to submit your application.</strong></p>
+                    <p>If you don't have an account, please contact us and we'll create one for you.</p>
+                    <div class="form-actions">
+                        <a href="<?php echo wp_login_url(get_permalink()); ?>" class="button button-primary">Log In</a>
+                        <a href="<?php echo CareersSettings::get_page_url('job_detail', array('id' => $position_id)); ?>" class="button">← Back to Job Details</a>
+                    </div>
+                </div>
+            </div>
+            <?php
+            return ob_get_clean();
+        }
+        
+        // Check if user already applied
+        $existing_application = CareersApplicationDB::get_application_by_user_job($user->ID, $position_id);
+        if ($existing_application) {
+            return '<div class="application-notice">You have already applied for this position.</div>';
+        }
+        
+        // Get all states for dropdown
+        $states = array(
+            'AL' => 'Alabama', 'AK' => 'Alaska', 'AZ' => 'Arizona', 'AR' => 'Arkansas', 'CA' => 'California',
+            'CO' => 'Colorado', 'CT' => 'Connecticut', 'DE' => 'Delaware', 'FL' => 'Florida', 'GA' => 'Georgia',
+            'HI' => 'Hawaii', 'ID' => 'Idaho', 'IL' => 'Illinois', 'IN' => 'Indiana', 'IA' => 'Iowa',
+            'KS' => 'Kansas', 'KY' => 'Kentucky', 'LA' => 'Louisiana', 'ME' => 'Maine', 'MD' => 'Maryland',
+            'MA' => 'Massachusetts', 'MI' => 'Michigan', 'MN' => 'Minnesota', 'MS' => 'Mississippi', 'MO' => 'Missouri',
+            'MT' => 'Montana', 'NE' => 'Nebraska', 'NV' => 'Nevada', 'NH' => 'New Hampshire', 'NJ' => 'New Jersey',
+            'NM' => 'New Mexico', 'NY' => 'New York', 'NC' => 'North Carolina', 'ND' => 'North Dakota', 'OH' => 'Ohio',
+            'OK' => 'Oklahoma', 'OR' => 'Oregon', 'PA' => 'Pennsylvania', 'RI' => 'Rhode Island', 'SC' => 'South Carolina',
+            'SD' => 'South Dakota', 'TN' => 'Tennessee', 'TX' => 'Texas', 'UT' => 'Utah', 'VT' => 'Vermont',
+            'VA' => 'Virginia', 'WA' => 'Washington', 'WV' => 'West Virginia', 'WI' => 'Wisconsin', 'WY' => 'Wyoming'
+        );
+        
+        // How did you hear about us options
+        $hear_about_options = array(
+            'Indeed' => 'Indeed',
+            'LinkedIn' => 'LinkedIn',
+            'Company Website' => 'Company Website',
+            'Job Fair' => 'Job Fair',
+            'Referral' => 'Employee Referral',
+            'Social Media' => 'Social Media',
+            'Google Search' => 'Google Search',
+            'Other' => 'Other'
+        );
+        
+        ob_start();
+        ?>
+        <div class="careers-dashboard-container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Apply Now</h1>
+                <p class="dashboard-subtitle">You are applying for: <strong><?php echo esc_html($position->position_name); ?></strong> in <strong><?php echo esc_html($position->location); ?></strong></p>
+            </div>
+            
+            <form id="comprehensive-application-form" method="post" enctype="multipart/form-data" action="">
+                <?php wp_nonce_field('careers_application_submit', 'careers_nonce'); ?>
+                <input type="hidden" name="position_id" value="<?php echo esc_attr($position_id); ?>">
+                <input type="hidden" name="action" value="submit_comprehensive_application">
+                
+                <div class="application-form-row">
+                    <div class="application-form-group half-width">
+                        <label for="first_name">First Name <span class="required">*</span></label>
+                        <input type="text" id="first_name" name="first_name" value="<?php echo esc_attr($user->user_firstname); ?>" required>
+                    </div>
+                    <div class="application-form-group half-width">
+                        <label for="last_name">Last Name <span class="required">*</span></label>
+                        <input type="text" id="last_name" name="last_name" value="<?php echo esc_attr($user->user_lastname); ?>" required>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" value="<?php echo esc_attr($user->user_email); ?>" required>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group half-width">
+                        <label for="current_city">Current City <span class="required">*</span></label>
+                        <input type="text" id="current_city" name="current_city" required>
+                    </div>
+                    <div class="application-form-group half-width">
+                        <label for="current_state">Current State <span class="required">*</span></label>
+                        <select id="current_state" name="current_state" required>
+                            <option value="">Select a state</option>
+                            <?php foreach ($states as $code => $name): ?>
+                                <option value="<?php echo esc_attr($code); ?>"><?php echo esc_html($name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label for="role_interested">Role Interested In <span class="required">*</span></label>
+                        <input type="text" id="role_interested" name="role_interested" value="<?php echo esc_attr($position->position_name); ?>" readonly>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label for="hear_about_us">How did you hear about us? <span class="required">*</span></label>
+                        <select id="hear_about_us" name="hear_about_us" required>
+                            <option value="">Select an option</option>
+                            <?php foreach ($hear_about_options as $value => $label): ?>
+                                <option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label>Are you a new graduate? <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="new_graduate" value="yes" required> Yes
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="new_graduate" value="no" required> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label>Do you have certifications?</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="has_certifications" value="yes"> Yes
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="has_certifications" value="no"> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label>Are you willing to relocate? <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="willing_relocate" value="yes" required> Yes
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="willing_relocate" value="no" required> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label>Are you willing to travel statewide? <span class="required">*</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="willing_travel" value="yes" required> Yes
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="willing_travel" value="no" required> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="application-form-row">
+                    <div class="application-form-group">
+                        <label for="resume">Resume <span class="required">*</span></label>
+                        <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx" required>
+                        <small>PDF, Word (.doc, .docx) files only</small>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="button button-primary">Submit Application</button>
+                </div>
+            </form>
+        </div>
+        
+        <style>
+        /* Use dashboard minimal styling - no custom form styling needed */
+        .careers-dashboard-container .application-form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .careers-dashboard-container .application-form-group {
+            flex: 1;
+        }
+        
+        .careers-dashboard-container .application-form-group.half-width {
+            flex: 0 0 calc(50% - 0.5rem);
+        }
+        
+        .careers-dashboard-container .radio-group {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .careers-dashboard-container .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .careers-dashboard-container .radio-label input[type="radio"] {
+            margin: 0;
+        }
+        
+        .careers-dashboard-container .required {
+            color: #dc2626;
+        }
+        
+        .careers-dashboard-container input[readonly] {
+            background-color: #f9fafb;
+            color: #6b7280;
+        }
+        
+        .careers-dashboard-container small {
+            display: block;
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .careers-dashboard-container .application-form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .careers-dashboard-container .application-form-group.half-width {
+                flex: 1;
+            }
+            
+            .careers-dashboard-container .radio-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+        </style>
+        <?php
+        return ob_get_clean();
+    }
+    
+    /**
+     * Handle comprehensive application form submission
+     */
+    public function handle_comprehensive_application_submission() {
+        // Debug: Log all POST requests (disabled - working correctly)
+        // if (!empty($_POST)) {
+        //     error_log('Careers Debug: POST REQUEST DETECTED - Action: ' . (isset($_POST['action']) ? $_POST['action'] : 'none'));
+        // }
+        
+        // Check if this is a comprehensive application submission
+        if (!isset($_POST['action']) || $_POST['action'] !== 'submit_comprehensive_application') {
+            return;
+        }
+        
+        // Application submission working correctly - debug logs minimized
+        error_log('Careers Debug: Application submission started for position: ' . (isset($_POST['position_id']) ? $_POST['position_id'] : 'unknown'));
+        
+        error_log('=== Careers Debug: Application Submission Flow ===');
+        error_log('Careers Debug: Comprehensive application submission started');
+        
+        // Check if user is logged in
+        if (!is_user_logged_in()) {
+            error_log('Careers Debug: User not logged in - wp_die will be called');
+            wp_die('You must be logged in to apply for positions.');
+        }
+        
+        error_log('Careers Debug: User is logged in, continuing with submission...');
+        
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['careers_nonce'], 'careers_application_submit')) {
+            error_log('Careers Debug: Nonce verification failed');
+            wp_die('Security check failed. Please try again.');
+        }
+        
+        $user_id = get_current_user_id();
+        $position_id = intval($_POST['position_id']);
+        
+        error_log('Careers Debug: User ID: ' . $user_id . ', Position ID from POST: ' . $position_id);
+        
+        // Validate position exists
+        $position = CareersPositionsDB::get_position($position_id);
+        if (!$position) {
+            error_log('Careers Debug: Position not found: ' . $position_id);
+            error_log('Careers Debug: Checking if position exists in careers_positions table...');
+            
+            // Let's check what positions actually exist
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'careers_positions';
+            $existing_positions = $wpdb->get_results("SELECT id, position_name FROM $table_name");
+            error_log('Careers Debug: Existing positions: ' . print_r($existing_positions, true));
+            
+            wp_die('Position not found.');
+        }
+        
+        error_log('Careers Debug: Position found: ' . $position->position_name . ' (ID: ' . $position->id . ')');
+        
+        // Check if user already applied for this position
+        $existing = CareersApplicationDB::get_application_by_user_job($user_id, $position_id);
+        if ($existing) {
+            error_log('Careers Debug: User already applied for this position');
+            wp_die('You have already applied for this position.');
+        }
+        
+        // Handle resume upload
+        $resume_url = '';
+        error_log('Careers Debug: About to check resume upload...');
+        error_log('Careers Debug: FILES array: ' . print_r($_FILES, true));
+        
+        if (!empty($_FILES['resume']['name'])) {
+            error_log('Careers Debug: Resume file detected, processing upload...');
+            $resume_upload = $this->handle_file_upload('resume', array('pdf', 'doc', 'docx'));
+            if (is_wp_error($resume_upload)) {
+                error_log('Careers Debug: Resume upload failed: ' . $resume_upload->get_error_message());
+                wp_die('Resume upload failed: ' . $resume_upload->get_error_message());
+            }
+            $resume_url = $resume_upload;
+            error_log('Careers Debug: Resume uploaded successfully: ' . $resume_url);
+        } else {
+            error_log('Careers Debug: No resume file uploaded - FILES check failed');
+            wp_die('Resume is required.');
+        }
+        
+        // Collect all form data into meta field
+        $meta_data = array(
+            'first_name' => sanitize_text_field($_POST['first_name']),
+            'last_name' => sanitize_text_field($_POST['last_name']),
+            'email' => sanitize_email($_POST['email']),
+            'phone' => sanitize_text_field($_POST['phone']),
+            'current_city' => sanitize_text_field($_POST['current_city']),
+            'current_state' => sanitize_text_field($_POST['current_state']),
+            'role_interested' => sanitize_text_field($_POST['role_interested']),
+            'hear_about_us' => sanitize_text_field($_POST['hear_about_us']),
+            'new_graduate' => sanitize_text_field($_POST['new_graduate']),
+            'has_certifications' => isset($_POST['has_certifications']) ? sanitize_text_field($_POST['has_certifications']) : '',
+            'willing_relocate' => sanitize_text_field($_POST['willing_relocate']),
+            'willing_travel' => sanitize_text_field($_POST['willing_travel'])
+        );
+        
+        error_log('Careers Debug: Meta data collected: ' . print_r($meta_data, true));
+        
+        // Prepare application data
+        $application_data = array(
+            'user_id' => $user_id,
+            'job_id' => $position_id,
+            'resume_url' => $resume_url,
+            'cover_letter_url' => '', // No cover letter in comprehensive form
+            'status' => 'new',
+            'meta' => json_encode($meta_data)
+        );
+        
+        error_log('Careers Debug: Final application data being saved: ' . print_r($application_data, true));
+        error_log('Careers Debug: CRITICAL - job_id being saved: ' . $application_data['job_id']);
+        
+        // Insert application
+        $application_id = CareersApplicationDB::insert_application($application_data);
+        
+        if (is_wp_error($application_id)) {
+            error_log('Careers Debug: Application insert failed: ' . $application_id->get_error_message());
+            wp_die('Failed to submit application: ' . $application_id->get_error_message());
+        }
+        
+        error_log('Careers Debug: Application inserted successfully with ID: ' . $application_id);
+        
+        // Verify what was actually saved in the database
+        $saved_application = CareersApplicationDB::get_application($application_id);
+        error_log('Careers Debug: Saved application data: ' . print_r($saved_application, true));
+        error_log('Careers Debug: VERIFY - job_id actually saved: ' . $saved_application->job_id);
+        
+        // Send confirmation email if emails class exists
+        if (class_exists('CareersEmails')) {
+            do_action('careers_application_submitted', $application_id);
+        }
+        
+        // Redirect to success page
+        $redirect_url = add_query_arg('application_submitted', '1', CareersSettings::get_page_url('apply', array('position_id' => $position_id)));
+        error_log('Careers Debug: Redirecting to: ' . $redirect_url);
+        error_log('=== End Careers Debug: Application Submission Flow ===');
+        wp_redirect($redirect_url);
+        exit;
     }
 }

@@ -64,6 +64,16 @@ class CareersPageHandler {
             return $this->get_application_view_content();
         }
         
+        // Job Detail page (public-facing)
+        if ($page_id == CareersSettings::get_page_id('job_detail')) {
+            return $this->get_job_detail_content();
+        }
+        
+        // Apply page
+        if ($page_id == CareersSettings::get_page_id('apply')) {
+            return $this->get_apply_content();
+        }
+        
         return $content;
     }
     
@@ -83,7 +93,9 @@ class CareersPageHandler {
             CareersSettings::get_page_id('edit_job'),
             CareersSettings::get_page_id('locations'),
             CareersSettings::get_page_id('applications'),
-            CareersSettings::get_page_id('application_view')
+            CareersSettings::get_page_id('application_view'),
+            CareersSettings::get_page_id('job_detail'),
+            CareersSettings::get_page_id('apply')
         );
         
         if (in_array($page_id, $careers_pages)) {
@@ -553,47 +565,7 @@ class CareersPageHandler {
                 }
             }
             
-            /* Dashboard tabs */
-            .careers-dashboard-container .dashboard-tabs {
-                display: flex;
-                gap: 1rem;
-                margin-bottom: 2rem;
-                border-bottom: 2px solid #e5e7eb;
-                padding-bottom: 0;
-            }
-            .careers-dashboard-container .dashboard-tab {
-                background: none;
-                border: none;
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem !important;
-                font-weight: 500;
-                color: #6b7280;
-                cursor: pointer;
-                position: relative;
-                transition: color 0.2s ease;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            }
-            .careers-dashboard-container .dashboard-tab:hover {
-                color: #374151;
-            }
-            .careers-dashboard-container .dashboard-tab.active {
-                color: #111827;
-            }
-            .careers-dashboard-container .dashboard-tab.active::after {
-                content: "";
-                position: absolute;
-                bottom: -2px;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: #000;
-            }
-            .careers-dashboard-container .tab-content {
-                display: none;
-            }
-            .careers-dashboard-container .tab-content.active {
-                display: block;
-            }
+            /* Dashboard tabs removed - applications now on separate page */
             
             /* Metrics grid */
             .careers-dashboard-container .metrics-grid {
@@ -889,13 +861,7 @@ class CareersPageHandler {
                     justify-content: flex-start;
                     margin-top: 1rem;
                 }
-                .careers-dashboard-container .dashboard-tabs {
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling: touch;
-                }
-                .careers-dashboard-container .dashboard-tab {
-                    white-space: nowrap;
-                }
+                /* Dashboard tabs removed - applications now on separate page */
             }
             ';
             
@@ -1026,32 +992,10 @@ class CareersPageHandler {
             return '<div class="careers-dashboard-error">You must be logged in and have permission to view applications.</div>';
         }
         
-        $job_id = isset($_GET['job_id']) ? intval($_GET['job_id']) : 0;
-        
         if (class_exists('CareersDashboard')) {
             $dashboard = new CareersDashboard();
             ob_start();
-            // This method will need to be created or adapted
-            ?>
-            <div class="careers-dashboard-container">
-                <div class="dashboard-header">
-                    <h1 class="dashboard-title">Applications</h1>
-                    <p class="dashboard-subtitle">Manage job applications</p>
-                </div>
-                
-                <div class="applications-content">
-                    <?php if ($job_id): ?>
-                        <p>Viewing applications for job ID: <?php echo esc_html($job_id); ?></p>
-                    <?php else: ?>
-                        <p>Viewing all applications</p>
-                    <?php endif; ?>
-                    <!-- Applications list will go here -->
-                    <div class="coming-soon-notice">
-                        <p>Applications management functionality coming soon.</p>
-                    </div>
-                </div>
-            </div>
-            <?php
+            $dashboard->render_applications_management();
             return ob_get_clean();
         }
         
@@ -1090,5 +1034,61 @@ class CareersPageHandler {
         </div>
         <?php
         return ob_get_clean();
+    }
+    
+    /**
+     * Get job detail content (public-facing)
+     */
+    private function get_job_detail_content() {
+        $job_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        if (!$job_id) {
+            return '<div class="careers-job-error">No job specified.</div>';
+        }
+        
+        // Use the existing shortcode class to render the position detail
+        if (class_exists('CareersShortcodes')) {
+            $shortcodes = new CareersShortcodes();
+            return $shortcodes->careers_position_detail_shortcode(array('id' => $job_id));
+        }
+        
+        return '<div class="careers-job-error">Position detail system not available.</div>';
+    }
+    
+    /**
+     * Get apply page content
+     */
+    private function get_apply_content() {
+        $position_id = isset($_GET['position_id']) ? intval($_GET['position_id']) : 0;
+        
+        error_log('=== Careers Debug: Apply Page Handler ===');
+        error_log('Careers Debug: GET parameters: ' . print_r($_GET, true));
+        error_log('Careers Debug: Position ID from GET: ' . $position_id);
+        
+        if (!$position_id) {
+            error_log('Careers Debug: No position_id in URL parameters');
+            return '<div class="careers-apply-error">No position specified for application.</div>';
+        }
+        
+        // Get position data to show in the application form
+        $position = CareersPositionsDB::get_position($position_id);
+        if (!$position || $position->status !== 'published') {
+            error_log('Careers Debug: Position not found or not published for ID: ' . $position_id);
+            return '<div class="careers-apply-error">Position not found or no longer available.</div>';
+        }
+        
+        error_log('Careers Debug: Position found: ' . $position->position_name . ' (ID: ' . $position->id . ')');
+        error_log('Careers Debug: Calling application page shortcode with position_id: ' . $position_id);
+        
+        // Use the existing application page shortcode to render the application form
+        if (class_exists('CareersShortcodes')) {
+            $shortcodes = new CareersShortcodes();
+            $result = $shortcodes->careers_application_page_shortcode(array('position_id' => $position_id));
+            error_log('=== End Careers Debug: Apply Page Handler ===');
+            return $result;
+        }
+        
+        error_log('Careers Debug: CareersShortcodes class not found');
+        error_log('=== End Careers Debug: Apply Page Handler ===');
+        return '<div class="careers-apply-error">Application system not available.</div>';
     }
 }

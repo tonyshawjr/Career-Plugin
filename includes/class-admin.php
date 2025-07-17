@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 class CareersAdmin {
     
     public function __construct() {
-        // Remove wp-admin menu - this plugin is entirely frontend-based
+        // Admin menu disabled - frontend dashboard only
         // add_action('admin_menu', array($this, 'add_admin_menu'));
         
         // Keep AJAX handler for any remaining backend needs
@@ -147,6 +147,16 @@ class CareersAdmin {
             'careers-analytics',
             array($this, 'analytics_page')
         );
+        
+        // Debug submenu
+        add_submenu_page(
+            'careers-manager',
+            __('Debug Info', 'careers-manager'),
+            __('Debug Info', 'careers-manager'),
+            'manage_options',
+            'careers-debug',
+            array($this, 'debug_page')
+        );
     }
     
     /**
@@ -166,8 +176,8 @@ class CareersAdmin {
                     </div>
                     
                     <div class="careers-stat-box">
-                        <h3><?php echo isset($stats['by_status']['pending']) ? intval($stats['by_status']['pending']) : 0; ?></h3>
-                        <p><?php _e('Pending Applications', 'careers-manager'); ?></p>
+                        <h3><?php echo isset($stats['by_status']['new']) ? intval($stats['by_status']['new']) : 0; ?></h3>
+                        <p><?php _e('New Applications', 'careers-manager'); ?></p>
                     </div>
                     
                     <div class="careers-stat-box">
@@ -784,6 +794,183 @@ class CareersAdmin {
                         <?php endif; ?>
                     </div>
                 </div>
+            </div>
+        </div>
+        <?php
+    }
+    
+    /**
+     * Debug page
+     */
+    public function debug_page() {
+        global $wpdb;
+        
+        // Run debug test
+        $test_result = CareersApplicationDB::debug_test_database();
+        
+        // Get current stats
+        $stats = CareersApplicationDB::get_stats();
+        
+        // Check table existence
+        $applications_table = $wpdb->prefix . 'careers_applications';
+        $notes_table = $wpdb->prefix . 'careers_application_notes';
+        $positions_table = $wpdb->prefix . 'careers_positions';
+        
+        $app_table_exists = $wpdb->get_var("SHOW TABLES LIKE '$applications_table'");
+        $notes_table_exists = $wpdb->get_var("SHOW TABLES LIKE '$notes_table'");
+        $pos_table_exists = $wpdb->get_var("SHOW TABLES LIKE '$positions_table'");
+        
+        // Get table counts
+        $app_count = $app_table_exists ? $wpdb->get_var("SELECT COUNT(*) FROM $applications_table") : 0;
+        $notes_count = $notes_table_exists ? $wpdb->get_var("SELECT COUNT(*) FROM $notes_table") : 0;
+        $pos_count = $pos_table_exists ? $wpdb->get_var("SELECT COUNT(*) FROM $positions_table") : 0;
+        
+        // Get recent entries
+        $recent_apps = $app_table_exists ? $wpdb->get_results("SELECT * FROM $applications_table ORDER BY id DESC LIMIT 5") : array();
+        
+        ?>
+        <div class="wrap">
+            <h1><?php _e('Debug Information', 'careers-manager'); ?></h1>
+            
+            <div style="background: #fff; padding: 20px; margin: 20px 0; border: 1px solid #ddd;">
+                <h2>Database Tables Status</h2>
+                <table class="widefat">
+                    <thead>
+                        <tr>
+                            <th>Table</th>
+                            <th>Exists</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><?php echo $applications_table; ?></td>
+                            <td><?php echo $app_table_exists ? '✅ YES' : '❌ NO'; ?></td>
+                            <td><?php echo $app_count; ?></td>
+                        </tr>
+                        <tr>
+                            <td><?php echo $notes_table; ?></td>
+                            <td><?php echo $notes_table_exists ? '✅ YES' : '❌ NO'; ?></td>
+                            <td><?php echo $notes_count; ?></td>
+                        </tr>
+                        <tr>
+                            <td><?php echo $positions_table; ?></td>
+                            <td><?php echo $pos_table_exists ? '✅ YES' : '❌ NO'; ?></td>
+                            <td><?php echo $pos_count; ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="background: #fff; padding: 20px; margin: 20px 0; border: 1px solid #ddd;">
+                <h2>Application Statistics</h2>
+                <pre><?php print_r($stats); ?></pre>
+            </div>
+            
+            <div style="background: #fff; padding: 20px; margin: 20px 0; border: 1px solid #ddd;">
+                <h2>Recent Applications</h2>
+                <?php if (empty($recent_apps)): ?>
+                    <p>No applications found.</p>
+                <?php else: ?>
+                    <table class="widefat">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User ID</th>
+                                <th>Job ID</th>
+                                <th>Status</th>
+                                <th>Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($recent_apps as $app): ?>
+                                <tr>
+                                    <td><?php echo $app->id; ?></td>
+                                    <td><?php echo $app->user_id; ?></td>
+                                    <td><?php echo $app->job_id; ?></td>
+                                    <td><?php echo $app->status; ?></td>
+                                    <td><?php echo $app->submitted_at; ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
+            </div>
+            
+            <div style="background: #fff; padding: 20px; margin: 20px 0; border: 1px solid #ddd;">
+                <h2>Test Results</h2>
+                <p><strong>Debug Test Result:</strong> <?php echo $test_result; ?></p>
+                <p><strong>Table Version:</strong> <?php echo get_option('careers_applications_table_version', 'Not Set'); ?></p>
+                <p><strong>Current User ID:</strong> <?php echo get_current_user_id(); ?></p>
+                <p><strong>Is User Logged In:</strong> <?php echo is_user_logged_in() ? 'YES' : 'NO'; ?></p>
+            </div>
+            
+            <div style="background: #fff; padding: 20px; margin: 20px 0; border: 1px solid #ddd;">
+                <h2>Force Actions</h2>
+                <p>
+                    <a href="<?php echo admin_url('admin.php?page=careers-debug&force_create=1'); ?>" class="button">Force Create Tables</a>
+                    <a href="<?php echo admin_url('admin.php?page=careers-debug&test_insert=1'); ?>" class="button">Test Insert</a>
+                    <a href="<?php echo admin_url('admin.php?page=careers-debug&debug_ids=1'); ?>" class="button">Debug ID Mismatch</a>
+                </p>
+                
+                <?php if (isset($_GET['force_create'])): ?>
+                    <div class="notice notice-info">
+                        <p>Forcing table creation...</p>
+                        <?php CareersApplicationDB::create_table(); ?>
+                        <p>Table creation attempted.</p>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($_GET['test_insert'])): ?>
+                    <div class="notice notice-info">
+                        <p>Testing insert...</p>
+                        <?php 
+                        $test_data = array(
+                            'user_id' => get_current_user_id(),
+                            'job_id' => 0,
+                            'resume_url' => 'debug-test.pdf',
+                            'status' => 'new',
+                            'meta' => 'Debug test application',
+                        );
+                        $result = CareersApplicationDB::insert_application($test_data);
+                        if (is_wp_error($result)) {
+                            echo '<p style="color: red;">Error: ' . $result->get_error_message() . '</p>';
+                        } else {
+                            echo '<p style="color: green;">Success! Application ID: ' . $result . '</p>';
+                        }
+                        ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($_GET['debug_ids'])): ?>
+                    <div class="notice notice-info">
+                        <h4>ID System Debug:</h4>
+                        <?php 
+                        // Check what position IDs exist
+                        $positions = CareersPositionsDB::get_positions(array('limit' => 10));
+                        echo '<p><strong>Positions in careers_positions table:</strong></p>';
+                        if (!empty($positions)) {
+                            echo '<ul>';
+                            foreach ($positions as $pos) {
+                                $app_count = CareersApplicationDB::get_applications_count_by_job($pos->id);
+                                echo '<li>Position ID: ' . $pos->id . ' - "' . esc_html($pos->position_name) . '" - Applications: ' . $app_count . '</li>';
+                            }
+                            echo '</ul>';
+                        }
+                        
+                        // Check applications and their job_ids
+                        $applications = CareersApplicationDB::get_applications(array('limit' => 10));
+                        echo '<p><strong>Applications and their job_ids:</strong></p>';
+                        if (!empty($applications)) {
+                            echo '<ul>';
+                            foreach ($applications as $app) {
+                                echo '<li>App ID: ' . $app->id . ' - job_id: ' . $app->job_id . ' - Status: ' . $app->status . '</li>';
+                            }
+                            echo '</ul>';
+                        }
+                        ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
         <?php

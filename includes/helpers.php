@@ -101,9 +101,10 @@ function careers_get_experience_levels() {
  */
 function careers_get_application_statuses() {
     return array(
-        'pending' => __('Pending', 'careers-manager'),
-        'reviewed' => __('Reviewed', 'careers-manager'),
-        'interviewing' => __('Interviewing', 'careers-manager'),
+        'new' => __('New', 'careers-manager'),
+        'under_review' => __('Under Review', 'careers-manager'),
+        'contacted' => __('Contacted', 'careers-manager'),
+        'interview' => __('Interview', 'careers-manager'),
         'hired' => __('Hired', 'careers-manager'),
         'rejected' => __('Rejected', 'careers-manager'),
     );
